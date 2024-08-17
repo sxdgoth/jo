@@ -1,10 +1,10 @@
 class AvatarManager {
     constructor() {
         this.equippedItems = {};
+        this.pendingChanges = {};
     }
 
     initialize() {
-        // Removed: this.loadEquippedItems();
         this.createButtons();
     }
 
@@ -24,21 +24,19 @@ class AvatarManager {
     }
 
     applyAvatar() {
-        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
-        alert('Avatar saved successfully!');
+        this.equippedItems = {...this.pendingChanges};
+        this.updateAvatarDisplay();
+        this.updateItemVisuals();
+        alert('Avatar changes applied successfully!');
     }
 
     clearAvatar() {
         this.equippedItems = {};
-        localStorage.removeItem('equippedItems');
+        this.pendingChanges = {};
         this.updateAvatarDisplay();
-        document.querySelectorAll('.item-image.equipped').forEach(item => {
-            item.classList.remove('equipped');
-        });
+        this.updateItemVisuals();
         alert('Avatar cleared successfully!');
     }
-
-    // Removed: loadEquippedItems() method
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
@@ -46,20 +44,20 @@ class AvatarManager {
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
                     window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                } else {
+                    window.avatarBody.updateLayer(type, null);
                 }
             });
         }
     }
 
     toggleItem(item) {
-        if (this.equippedItems[item.type] === item.id) {
+        if (this.pendingChanges[item.type] === item.id) {
             // Unequip the item
-            delete this.equippedItems[item.type];
-            window.avatarBody.updateLayer(item.type, null);
+            delete this.pendingChanges[item.type];
         } else {
             // Equip the item
-            this.equippedItems[item.type] = item.id;
-            window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            this.pendingChanges[item.type] = item.id;
         }
         this.updateItemVisuals();
     }
@@ -68,6 +66,11 @@ class AvatarManager {
         document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.pendingChanges[item.type] === item.id) {
+                itemImage.classList.add('pending');
+            } else {
+                itemImage.classList.remove('pending');
+            }
             if (item && this.equippedItems[item.type] === item.id) {
                 itemImage.classList.add('equipped');
             } else {
@@ -77,7 +80,6 @@ class AvatarManager {
     }
 }
 
-// Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.avatarManager = new AvatarManager();
     window.avatarManager.initialize();
