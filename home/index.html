@@ -15,3 +15,16 @@ he<!DOCTYPE html>
         </div>
         <button onclick="logout()">Logout</button>
     </header>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedInUser) {
+            // If no user is logged in, redirect back to the login page
+            window.location.href = '../index.html';
+        } else {
+            // Display user information
+            document.getElementById('user-name').textContent = loggedInUser.username;
+            document.getElementById('user-coins').textContent = loggedInUser.coins;
+        }
+    });
+</script>
