@@ -47,7 +47,7 @@ class AvatarManager {
         alert('Avatar saved successfully!');
     }
 
-    clearAvatar() {
+      clearAvatar() {
         this.displayedItems = {};
         this.updateAvatarDisplay();
         this.updateItemVisuals();
@@ -56,19 +56,25 @@ class AvatarManager {
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
+            console.log("Updating avatar display");
             const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
             allLayers.forEach(layer => {
+                console.log(`Clearing layer: ${layer}`);
                 window.avatarBody.updateLayer(layer, null);
             });
 
             Object.entries(this.displayedItems).forEach(([type, itemId]) => {
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
+                    console.log(`Applying item: ${item.name} to layer: ${type}`);
                     window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 }
             });
+        } else {
+            console.error("avatarBody is not available");
         }
     }
+
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem('equippedItems');
