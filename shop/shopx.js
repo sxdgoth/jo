@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const avatarDisplay = document.getElementById('avatar-display');
     const shopItemsContainer = document.querySelector('.shop-items');
     const equippedItems = new Set();
+    const layerManager = new LayerManager();
 
     // Load base avatar
     function loadBaseAvatar() {
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             equippedItems.add(item.id);
             addItemToAvatar(item);
         }
+        layerManager.reorderLayers();
     }
 
     // Add item to avatar
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
         img.alt = item.name;
         img.dataset.id = item.id;
+        img.dataset.type = item.type;
         img.style.position = 'absolute';
         img.style.top = '0';
         img.style.left = '0';
@@ -58,4 +61,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize
     loadBaseAvatar();
     createShopItems();
+    layerManager.initialize();
 });
