@@ -41,26 +41,19 @@ class AvatarBody {
     }
 
 
-    updateLayer(type, src) {
-        if (this.layers[type]) {
-            const bodyPart = this.bodyParts.find(part => part.type === type);
-            if (src) {
-                this.layers[type].src = src;
-                this.layers[type].style.display = 'block';
-                console.log(`Updated ${type} layer with ${src}`);
-            } else if (!bodyPart.isBase) {
-                this.layers[type].style.display = 'none';
-                console.log(`Removed ${type} layer`);
+    updateLayer(layerName, imageSrc) {
+        const layerElement = document.getElementById(`avatar-${layerName}`);
+        if (layerElement) {
+            if (imageSrc) {
+                layerElement.style.backgroundImage = `url('${imageSrc}')`;
+                layerElement.style.display = 'block';
             } else {
-                // If it's a base part, revert to the original image
-                this.layers[type].src = this.baseUrl + bodyPart.file;
-                this.layers[type].style.display = 'block';
-                console.log(`Reverted ${type} to base layer`);
+                layerElement.style.backgroundImage = 'none';
+                layerElement.style.display = 'none';
             }
         } else {
-            console.warn(`Layer ${type} not found`);
+            console.error(`Layer element not found: avatar-${layerName}`);
         }
-        this.reorderLayers();
     }
 
     reorderLayers() {
