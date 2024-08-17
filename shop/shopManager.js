@@ -1,74 +1,82 @@
-// avatarManager.js
+// shopManager.js
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("Avatar manager initializing...");
-    const avatarDisplay = document.getElementById('avatar-display');
-    const equippedItems = new Set();
-    const layerManager = new LayerManager();
-    const avatarBody = new AvatarBody('avatar-display');
-
-    function loadAvatar() {
-        console.log("Loading avatar...");
-        avatarDisplay.innerHTML = ''; // Clear existing items
-
-        // Load base avatar
-        avatarBody.loadAvatar();
-
-        // Add equipped items
-        equippedItems.forEach(itemId => {
-            addItemToAvatar(itemId);
-        });
-
-        layerManager.reorderLayers();
+class ShopManager {
+    constructor(shopItems) {
+        this.shopItems = shopItems;
+        this.shopItemsContainer = document.querySelector('.shop-items');
+        this.userCoinsElement = document.getElementById('user-coins');
+        this.selectedItem = null;
     }
 
-    function addItemToAvatar(itemId) {
-        console.log("Adding item to avatar:", itemId);
-        const item = shopItems.find(item => item.id === itemId);
-        if (!item) {
-            console.error("Item not found:", itemId);
+    initShop() {
+        console.log("Initializing shop...");
+        this.createShopItems();
+        this.setupButtons();
+        this.updateUserInfo();
+    }
+
+    createShopItems() {
+        console.log("Creating shop items...");
+        this.shopItemsContainer.innerHTML = '';
+        this.shopItems.forEach(item => {
+            const button = document.createElement('button');
+            button.textContent = `${item.name} ($${item.price})`;
+            button.classList.add('item-button');
+            button.addEventListener('click', () => this.selectItem(item));
+            this.shopItemsContainer.appendChild(button);
+        });
+    }
+
+    setupButtons() {
+        if (document.querySelector('.button-container')) {
             return;
         }
 
-        const img = document.createElement('img');
-        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        img.alt = item.name;
-        img.dataset.id = item.id;
-        img.dataset.type = item.type;
-        img.style.position = 'absolute';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.onerror = () => console.error("Failed to load image:", img.src);
-        avatarDisplay.appendChild(img);
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        const buyButton = document.createElement('button');
+        buyButton.textContent = 'Buy';
+        buyButton.addEventListener('click', () => this.buySelectedItem());
+
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Avatar';
+        clearButton.addEventListener('click', () => window.clearAvatar());
+
+        buttonContainer.appendChild(buyButton);
+        buttonContainer.appendChild(clearButton);
+        document.querySelector('.shop-section').appendChild(buttonContainer);
     }
 
-    function toggleItem(item) {
-        console.log("Toggling item:", item.name);
-        if (equippedItems.has(item.id)) {
-            equippedItems.delete(item.id);
-            console.log("Item unequipped:", item.name);
-        } else {
-            equippedItems.add(item.id);
-            console.log("Item equipped:", item.name);
+    selectItem(item) {
+        this.selectedItem = item;
+        document.querySelectorAll('.item-button').forEach(el => el.classList.remove('selected'));
+        event.target.classList.add('selected');
+    }
+
+    buySelectedItem() {
+        if (!this.selectedItem) {
+            alert("Please select an item to buy.");
+            return;
         }
-        loadAvatar();
+
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser && loggedInUser.coins >= this.selectedItem.price) {
+            loggedInUser.coins -= this.selectedItem.price;
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            this.updateUserInfo();
+            window.toggleItem(this.selectedItem);
+            alert(`You bought ${this.selectedItem.name}!`);
+        } else {
+            alert("Not enough coins to buy this item!");
+        }
     }
 
-    function clearAvatar() {
-        equippedItems.clear();
-        loadAvatar();
+    updateUserInfo() {
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            document.getElementById('user-name').textContent = loggedInUser.username;
+            this.userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
+        }
     }
-
-    // Initialize
-    console.log("Avatar manager initialized.");
-    loadAvatar();
-    layerManager.initialize();
-
-    // Make necessary functions and variables global
-    window.equippedItems = equippedItems;
-    window.loadAvatar = loadAvatar;
-    window.toggleItem = toggleItem;
-    window.clearAvatar = clearAvatar;
-});
+}
