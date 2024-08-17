@@ -67,13 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateAvatarDisplay(item) {
-        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
-            window.avatarBody.updateLayer(item.type, `${item.path}${item.id}`);
-        } else {
-            console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
-        }
+   function updateAvatarDisplay(item) {
+    if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
+        // Adjust the path to match your GitHub Pages structure
+        const fullPath = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+        window.avatarBody.updateLayer(item.type, fullPath);
+    } else {
+        console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
     }
+}
 
     function getSelectedItems() {
         return selectedItems;
