@@ -68,13 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAvatarDisplay(item) {
-        // This function should update the avatar display with the new item
-        // You'll need to implement this based on your avatar system
-        // For example:
-        if (typeof updateAvatarLayer === 'function') {
-            updateAvatarLayer(item.type, item.id);
+        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
+            window.avatarBody.updateLayer(item.type, `${item.path}${item.id}`);
         } else {
-            console.warn('updateAvatarLayer function not found. Make sure layerManager.js is loaded and contains this function.');
+            console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
         }
     }
 
