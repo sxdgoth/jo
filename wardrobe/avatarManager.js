@@ -3,6 +3,7 @@
 class AvatarManager {
     constructor() {
         this.equippedItems = {};
+        this.selectedItems = {};
     }
 
     initialize() {
@@ -28,15 +29,13 @@ class AvatarManager {
         }
     }
 
-    toggleItem(item) {
-        if (this.equippedItems[item.type] === item.id) {
-            // Unequip the item
-            delete this.equippedItems[item.type];
-            window.avatarBody.updateLayer(item.type, null);
+    toggleItemSelection(item) {
+        if (this.selectedItems[item.type] === item.id) {
+            // Unselect the item
+            delete this.selectedItems[item.type];
         } else {
-            // Equip the item
-            this.equippedItems[item.type] = item.id;
-            window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            // Select the item
+            this.selectedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
     }
@@ -45,12 +44,26 @@ class AvatarManager {
         document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.equippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
+            if (item && this.selectedItems[item.type] === item.id) {
+                itemImage.classList.add('selected');
             } else {
-                itemImage.classList.remove('equipped');
+                itemImage.classList.remove('selected');
             }
         });
+    }
+
+    applySelectedItems() {
+        this.equippedItems = {...this.selectedItems};
+        this.updateAvatarDisplay();
+        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+    }
+
+    clearAvatar() {
+        this.equippedItems = {};
+        this.selectedItems = {};
+        this.updateAvatarDisplay();
+        this.updateItemVisuals();
+        localStorage.removeItem('equippedItems');
     }
 }
 
