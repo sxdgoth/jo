@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM Content Loaded"); // Debug log
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
-        console.log("User logged in:", loggedInUser.username); // Debug log
         document.getElementById('user-name').textContent = loggedInUser.username;
         document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
         
@@ -15,28 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
             window.avatarBody.initializeAvatar();
         }
         
-        // Initialize AvatarManager
-        if (!window.avatarManager) {
-            console.log("Initializing AvatarManager"); // Debug log
-            window.avatarManager = new AvatarManager();
-            window.avatarManager.initialize();
-        }
-        
         // Render owned items
-        console.log("Rendering owned items"); // Debug log
         renderOwnedItems();
     } else {
-        console.log("User not logged in, redirecting"); // Debug log
         window.location.href = '../index.html';
     }
 });
 
 function renderOwnedItems() {
-    console.log("Inside renderOwnedItems function"); // Debug log
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
-    
-    console.log("Owned items:", ownedItems); // Debug log
     
     wardrobeItemsContainer.innerHTML = ''; // Clear existing items
     
@@ -58,26 +44,57 @@ function renderOwnedItems() {
         itemImage.addEventListener('click', () => toggleItem(item));
     });
 
-    console.log("Finished rendering items"); // Debug log
-
-    // Update equipped items
+    // Initialize equipped items
     updateEquippedItems();
 }
 
 function toggleItem(item) {
-    window.avatarManager.toggleItem(item);
+    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
+    
+    if (itemImage.classList.contains('equipped')) {
+        // Unequip the item
+        itemImage.classList.remove('equipped');
+        window.avatarBody.updateLayer(item.type, null);
+    } else {
+        // Unequip any other item of the same type
+        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
+        if (equippedItemOfSameType) {
+            equippedItemOfSameType.classList.remove('equipped');
+        }
+
+        // Equip the clicked item
+        itemImage.classList.add('equipped');
+        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+    }
+
+    // Save equipped items to sessionStorage
+    saveEquippedItems();
 }
 
 function saveEquippedItems() {
-    const equippedItems = window.avatarManager.equippedItems;
+    const equippedItems = {};
+    document.querySelectorAll('.item-image.equipped').forEach(itemImage => {
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item) {
+            equippedItems[item.type] = item.id;
+        }
+    });
     sessionStorage.setItem('equippedItems', JSON.stringify(equippedItems));
 }
 
 function updateEquippedItems() {
     const equippedItems = JSON.parse(sessionStorage.getItem('equippedItems')) || {};
-    window.avatarManager.equippedItems = equippedItems;
-    window.avatarManager.updateAvatarDisplay();
-    window.avatarManager.updateItemVisuals();
+    Object.entries(equippedItems).forEach(([type, itemId]) => {
+        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
+        if (itemImage) {
+            itemImage.classList.add('equipped');
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item) {
+                window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            }
+        }
+    });
 }
 
 function logout() {
