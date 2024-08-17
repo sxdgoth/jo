@@ -40,7 +40,6 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-
     updateLayer(type, src) {
         if (this.layers[type]) {
             const bodyPart = this.bodyParts.find(part => part.type === type);
@@ -71,10 +70,17 @@ class AvatarBody {
             }
         });
     }
+
+    initializeAvatar() {
+        this.loadAvatar();
+        if (window.avatarManager) {
+            window.avatarManager.updateAvatarDisplay();
+        }
+    }
 }
 
 // Create and load the avatar body when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     window.avatarBody = new AvatarBody('avatar-display');
-    window.avatarBody.loadAvatar();
+    window.avatarBody.initializeAvatar();
 });
