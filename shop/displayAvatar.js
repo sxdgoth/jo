@@ -32,32 +32,34 @@ class AvatarDisplay {
         ];
 
         bodyParts.forEach(part => {
-            const img = document.createElement('img');
-            img.alt = part.name;
-            img.dataset.type = part.type;
-            img.style.position = 'absolute';
-            img.style.top = '0';
-            img.style.left = '0';
-            img.style.width = '100%';
-            img.style.height = '100%';
+            const obj = document.createElement('object');
+            obj.type = 'image/svg+xml';
+            obj.data = '';
+            obj.alt = part.name;
+            obj.dataset.type = part.type;
+            obj.style.position = 'absolute';
+            obj.style.top = '0';
+            obj.style.left = '0';
+            obj.style.width = '100%';
+            obj.style.height = '100%';
 
             if (part.isBase) {
-                img.src = this.baseUrl + part.file;
-                img.style.display = 'block';
-                console.log(`Loading base part: ${part.name}, src: ${img.src}`);
+                obj.data = this.baseUrl + part.file;
+                obj.style.display = 'block';
+                console.log(`Loading base part: ${part.name}, src: ${obj.data}`);
             } else if (equippedItems[part.type]) {
-                img.src = `${this.baseUrl}${part.type.toLowerCase()}s/${equippedItems[part.type]}`;
-                img.style.display = 'block';
-                console.log(`Loading equipped part: ${part.name}, src: ${img.src}`);
+                obj.data = `${this.baseUrl}${part.type.toLowerCase()}s/${equippedItems[part.type]}`;
+                obj.style.display = 'block';
+                console.log(`Loading equipped part: ${part.name}, src: ${obj.data}`);
             } else {
-                img.style.display = 'none';
+                obj.style.display = 'none';
                 console.log(`No equipped item for: ${part.name}`);
             }
 
-            img.onerror = () => console.error(`Failed to load image: ${img.src}`);
+            obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
 
-            this.container.appendChild(img);
-            this.layers[part.type] = img;
+            this.container.appendChild(obj);
+            this.layers[part.type] = obj;
         });
 
         this.reorderLayers();
