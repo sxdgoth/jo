@@ -48,22 +48,20 @@ function hasItem(itemId) {
     return inventory.some(item => item.id === itemId);
 }
 
-// Update the inventory display in the UI
-function updateInventoryDisplay() {
-    const inventoryContainer = document.getElementById('inventory-container');
-    if (inventoryContainer) {
-        const inventory = getInventory();
-        inventoryContainer.innerHTML = ''; // Clear existing items
-
-        inventory.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('inventory-item');
-            itemElement.innerHTML = `
-                <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}">
-                <p>${item.name}</p>
-            `;
-            inventoryContainer.appendChild(itemElement);
-        });
+function addToInventory(item) {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        if (!loggedInUser.inventory) {
+            loggedInUser.inventory = [];
+        }
+        loggedInUser.inventory.push(item);
+        updateUserData(loggedInUser);
+        updateInventoryDisplay();
+        
+        // Update the shop display after adding an item
+        if (typeof window.shopManager.updateShopDisplay === 'function') {
+            window.shopManager.updateShopDisplay();
+        }
     }
 }
 
