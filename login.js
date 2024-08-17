@@ -1,11 +1,10 @@
 function login() {
     console.log('Login function called');
-
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
     console.log('Username:', username, 'Password:', password);
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const users = JSON.parse(sessionStorage.getItem('users')) || [];
     const user = users.find(u => u.username === username && u.password === password);
 
     if (user) {
