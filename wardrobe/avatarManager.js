@@ -23,9 +23,7 @@ class AvatarManager {
         this.equippedItems = {};
         this.pendingChanges = {};
         this.saveEquippedItems();
-        if (window.avatarBody) {
-            window.avatarBody.clearLayers();
-        }
+        this.updateAvatarDisplay();
         this.updateItemVisuals();
         alert('Avatar cleared successfully!');
     }
@@ -46,9 +44,6 @@ class AvatarManager {
     toggleItem(item) {
         if (this.pendingChanges[item.type] === item.id) {
             delete this.pendingChanges[item.type];
-            if (window.avatarBody) {
-                window.avatarBody.updateLayer(item.type, null); // Remove the layer
-            }
         } else {
             this.pendingChanges[item.type] = item.id;
         }
@@ -86,3 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.avatarManager = new AvatarManager();
     window.avatarManager.initialize();
 });
+
+
+
