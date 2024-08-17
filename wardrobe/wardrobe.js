@@ -36,24 +36,65 @@ function renderOwnedItems() {
             </div>
             <h3>${item.name}</h3>
             <p>Type: ${item.type}</p>
-            <button class="equip-btn" data-id="${item.id}">Equip</button>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
+
+        // Add click event listener to the item image
+        const itemImage = itemElement.querySelector('.item-image');
+        itemImage.addEventListener('click', () => toggleItem(item));
     });
-    
-    // Add event listeners to equip buttons
-    document.querySelectorAll('.equip-btn').forEach(button => {
-        button.addEventListener('click', (e) => equipItem(e.target.dataset.id));
-    });
+
+    // Initialize equipped items
+    updateEquippedItems();
 }
 
-function equipItem(itemId) {
-    const item = window.userInventory.getItems().find(i => i.id === itemId);
-    if (item) {
-        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
-            window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+function toggleItem(item) {
+    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
+    
+    if (itemImage.classList.contains('equipped')) {
+        // Unequip the item
+        itemImage.classList.remove('equipped');
+        window.avatarBody.updateLayer(item.type, null);
+    } else {
+        // Unequip any other item of the same type
+        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
+        if (equippedItemOfSameType) {
+            equippedItemOfSameType.classList.remove('equipped');
         }
+
+        // Equip the clicked item
+        itemImage.classList.add('equipped');
+        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
     }
+
+    // Save equipped items to sessionStorage
+    saveEquippedItems();
+}
+
+function saveEquippedItems() {
+    const equippedItems = {};
+    document.querySelectorAll('.item-image.equipped').forEach(itemImage => {
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item) {
+            equippedItems[item.type] = item.id;
+        }
+    });
+    sessionStorage.setItem('equippedItems', JSON.stringify(equippedItems));
+}
+
+function updateEquippedItems() {
+    const equippedItems = JSON.parse(sessionStorage.getItem('equippedItems')) || {};
+    Object.entries(equippedItems).forEach(([type, itemId]) => {
+        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
+        if (itemImage) {
+            itemImage.classList.add('equipped');
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item) {
+                window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            }
+        }
+    });
 }
 
 function logout() {
