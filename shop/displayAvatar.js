@@ -7,7 +7,7 @@ class AvatarDisplay {
             console.error(`Container with id "${containerId}" not found`);
             return;
         }
-        this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/';
+        this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
     }
 
@@ -23,10 +23,10 @@ class AvatarDisplay {
         this.container.style.height = '100%';
 
         const bodyParts = [
-            { name: 'Legs', file: 'body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
-            { name: 'Arms', file: 'body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
-            { name: 'Body', file: 'body/avatar-body.svg', type: 'Body', isBase: true },
-            { name: 'Head', file: 'body/avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+            { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
+            { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
+            { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
             { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
         ];
@@ -48,9 +48,15 @@ class AvatarDisplay {
                 obj.style.display = 'block';
                 console.log(`Loading base part: ${part.name}, src: ${obj.data}`);
             } else if (equippedItems[part.type]) {
-                obj.data = `${this.baseUrl}${part.type.toLowerCase()}s/${equippedItems[part.type]}`;
-                obj.style.display = 'block';
-                console.log(`Loading equipped part: ${part.name}, src: ${obj.data}`);
+                const item = shopItems.find(item => item.id === equippedItems[part.type]);
+                if (item) {
+                    obj.data = `${this.baseUrl}${item.path}${item.id}`;
+                    obj.style.display = 'block';
+                    console.log(`Loading equipped part: ${part.name}, src: ${obj.data}`);
+                } else {
+                    console.warn(`Item not found: ${equippedItems[part.type]}`);
+                    obj.style.display = 'none';
+                }
             } else {
                 obj.style.display = 'none';
                 console.log(`No equipped item for: ${part.name}`);
