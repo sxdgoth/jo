@@ -3,7 +3,7 @@
 class AvatarBody {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
-        this.baseUrl = 'https://sxdgoth.github.io/mwahbaby/assets/legendary/';
+        this.baseUrl = 'https://sxdgoth.github.io/jo/assets/body/';
         this.bodyParts = [
             { name: 'Legs', file: 'avatar-legsandfeet.svg' },
             { name: 'Arms', file: 'avatar-armsandhands.svg' },
