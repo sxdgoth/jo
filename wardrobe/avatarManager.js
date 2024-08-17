@@ -9,11 +9,12 @@ class AvatarManager {
         this.clearButton = document.getElementById('clear-avatar');
         this.applyButton.addEventListener('click', () => this.applyAvatar());
         this.clearButton.addEventListener('click', () => this.clearAvatar());
+        this.loadEquippedItems();
     }
 
     applyAvatar() {
         this.equippedItems = {...this.pendingChanges};
-        this.updateAvatarDisplay();
+        this.saveEquippedItems();
         this.updateItemVisuals();
         alert('Avatar changes applied successfully!');
     }
@@ -21,6 +22,7 @@ class AvatarManager {
     clearAvatar() {
         this.equippedItems = {};
         this.pendingChanges = {};
+        this.saveEquippedItems();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         alert('Avatar cleared successfully!');
@@ -28,7 +30,8 @@ class AvatarManager {
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
-            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+            const itemsToDisplay = Object.keys(this.pendingChanges).length > 0 ? this.pendingChanges : this.equippedItems;
+            Object.entries(itemsToDisplay).forEach(([type, itemId]) => {
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
                     window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
@@ -45,6 +48,7 @@ class AvatarManager {
         } else {
             this.pendingChanges[item.type] = item.id;
         }
+        this.updateAvatarDisplay();
         this.updateItemVisuals();
     }
 
@@ -63,6 +67,19 @@ class AvatarManager {
                 itemImage.classList.remove('equipped');
             }
         });
+    }
+
+    saveEquippedItems() {
+        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+    }
+
+    loadEquippedItems() {
+        const savedItems = localStorage.getItem('equippedItems');
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+            this.updateAvatarDisplay();
+            this.updateItemVisuals();
+        }
     }
 }
 
