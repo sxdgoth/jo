@@ -5,12 +5,12 @@ class AvatarBody {
         this.container = document.getElementById(containerId);
         this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/body/';
         this.bodyParts = [
-            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs' },
-            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms' },
-            { name: 'Body', file: 'avatar-body.svg', type: 'Body' },
-            { name: 'Head', file: 'avatar-head.svg', type: 'Head' },
-            { name: 'Jacket', file: '', type: 'Jacket' },
-            { name: 'Shirt', file: '', type: 'Shirt' }
+            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
+            { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
+            { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+            { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
         ];
         this.layers = {};
     }
@@ -28,7 +28,7 @@ class AvatarBody {
             img.style.left = '0';
             img.style.width = '100%';
             img.style.height = '100%';
-            img.style.display = part.file ? 'block' : 'none';
+            img.style.display = part.isBase ? 'block' : 'none';
             img.onload = () => console.log(`Loaded ${part.name}`);
             img.onerror = () => console.error(`Failed to load ${part.name}: ${img.src}`);
             this.container.appendChild(img);
@@ -39,13 +39,19 @@ class AvatarBody {
 
     updateLayer(type, src) {
         if (this.layers[type]) {
+            const bodyPart = this.bodyParts.find(part => part.type === type);
             if (src) {
                 this.layers[type].src = src;
                 this.layers[type].style.display = 'block';
                 console.log(`Updated ${type} layer with ${src}`);
-            } else {
+            } else if (!bodyPart.isBase) {
                 this.layers[type].style.display = 'none';
                 console.log(`Removed ${type} layer`);
+            } else {
+                // If it's a base part, revert to the original image
+                this.layers[type].src = this.baseUrl + bodyPart.file;
+                this.layers[type].style.display = 'block';
+                console.log(`Reverted ${type} to base layer`);
             }
         } else {
             console.warn(`Layer ${type} not found`);
@@ -54,7 +60,7 @@ class AvatarBody {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Jacket', 'Shirt', 'Head'];
+        const order = ['Legs', 'Body', 'Shirt', 'Jacket', 'Arms', 'Head'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
