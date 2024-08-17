@@ -32,6 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize inventory state
         initializeInventoryState();
+
+        // Initialize avatar display
+        initializeAvatarDisplay();
+    }
+
+    function initializeAvatarDisplay() {
+        if (window.avatarManager) {
+            window.avatarManager.loadEquippedItems();
+            window.avatarManager.updateAvatarDisplay();
+        } else {
+            console.warn('avatarManager not found. Make sure it\'s properly initialized.');
+        }
     }
 
     function toggleTryOn(itemId) {
@@ -64,6 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function buyItem(itemId) {
+        // ... (keep existing buyItem function unchanged)
+    }
+    
     function updateAvatarDisplay(type, src) {
         if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
             window.avatarBody.updateLayer(type, src);
@@ -74,10 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetAvatarDisplay() {
         triedOnItems = {};
-        if (window.avatarBody) {
-            Object.keys(window.avatarBody.layers).forEach(type => {
-                window.avatarBody.updateLayer(type, null);
-            });
+        if (window.avatarManager) {
+            window.avatarManager.updateAvatarDisplay();
         }
         updateItemImages();
     }
