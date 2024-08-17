@@ -11,10 +11,6 @@ class AvatarManager {
     }
 
     createButtons() {
-        if (document.querySelector('.avatar-buttons')) {
-            return; // Buttons already exist, don't create them again
-        }
-
         const buttonContainer = document.createElement('div');
         buttonContainer.className = 'avatar-buttons';
 
@@ -30,9 +26,7 @@ class AvatarManager {
         buttonContainer.appendChild(clearButton);
 
         const avatarContainer = document.querySelector('.avatar-container');
-        if (avatarContainer) {
-            avatarContainer.insertBefore(buttonContainer, avatarContainer.firstChild);
-        }
+        avatarContainer.insertBefore(buttonContainer, avatarContainer.firstChild);
     }
 
     applyAvatar() {
@@ -95,8 +89,8 @@ class AvatarManager {
     }
 }
 
-// Remove this event listener from here
-// document.addEventListener('DOMContentLoaded', () => {
-//     window.avatarManager = new AvatarManager();
-//     window.avatarManager.initialize();
-// });
+// Initialize the AvatarManager when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.avatarManager = new AvatarManager();
+    window.avatarManager.initialize();
+});
