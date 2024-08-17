@@ -49,26 +49,25 @@ function renderOwnedItems() {
 }
 
 function toggleItem(item) {
-    if (window.avatarManager) {
-        window.avatarManager.toggleItemSelection(item);
-        
-        const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
-        
-        if (itemImage.classList.contains('selected')) {
-            // Unselect the item
-            itemImage.classList.remove('selected');
-        } else {
-            // Unselect any other item of the same type
-            const selectedItemOfSameType = document.querySelector(`.item-image.selected[data-id^="${item.type}"]`);
-            if (selectedItemOfSameType) {
-                selectedItemOfSameType.classList.remove('selected');
-            }
-
-            // Select the clicked item
-            itemImage.classList.add('selected');
-        }
+    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
+    
+    if (itemImage.classList.contains('selected')) {
+        // Unselect the item
+        itemImage.classList.remove('selected');
     } else {
-        console.error('Avatar manager not found');
+        // Unselect any other item of the same type
+        const selectedItemOfSameType = document.querySelector(`.item-image.selected[data-id^="${item.type}"]`);
+        if (selectedItemOfSameType) {
+            selectedItemOfSameType.classList.remove('selected');
+        }
+
+        // Select the clicked item
+        itemImage.classList.add('selected');
+    }
+
+    // Update the avatarManager's selectedItems
+    if (window.avatarManager) {
+        window.avatarManager.updateSelectedItems(item);
     }
 }
 
