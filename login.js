@@ -4,7 +4,7 @@ function login() {
     const password = document.getElementById('login-password').value;
     console.log('Username:', username, 'Password:', password);
 
-    const users = JSON.parse(localStorage.getItem('users')) || []; // Changed to localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
     const user = users.find(u => u.username === username && u.password === password);
 
     if (user) {
@@ -16,8 +16,6 @@ function login() {
         alert('Invalid username or password.');
     }
 }
-
-
 
 
 
