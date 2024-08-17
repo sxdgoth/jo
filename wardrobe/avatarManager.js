@@ -10,7 +10,7 @@ class AvatarManager {
         this.createButtons();
     }
 
-    createButtons() {
+   createButtons() {
     if (document.querySelector('.avatar-buttons')) {
         return; // Buttons already exist, don't create them again
     }
@@ -31,14 +31,8 @@ class AvatarManager {
 
     const avatarContainer = document.querySelector('.avatar-container');
     if (avatarContainer) {
-        // Insert the buttons after the avatar display
-        const avatarDisplay = avatarContainer.querySelector('#avatar-display');
-        if (avatarDisplay) {
-            avatarDisplay.insertAdjacentElement('afterend', buttonContainer);
-        } else {
-            // If #avatar-display is not found, append to the end of avatar-container
-            avatarContainer.appendChild(buttonContainer);
-        }
+        // Insert the buttons after the avatar container
+        avatarContainer.insertAddjacent(buttonContainer, 'afterend');
     }
 }
 
