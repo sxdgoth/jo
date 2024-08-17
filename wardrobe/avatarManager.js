@@ -71,19 +71,18 @@ class AvatarManager {
         });
     }
 
-    updateTempAvatarDisplay() {
-        if (window.avatarBody) {
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    }
-                } else {
-                    window.avatarBody.updateLayer(type, null);
+   updateTempAvatarDisplay() {
+    if (window.avatarBody) {
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 }
-            });
-        }
+            } else {
+                window.avatarBody.updateLayer(type, null);
+            }
+        });
     }
 }
 
