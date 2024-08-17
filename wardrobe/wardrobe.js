@@ -1,3 +1,5 @@
+// wardrobe.js
+
 document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
@@ -7,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Initialize user's inventory
         window.createUserInventory(loggedInUser.username);
+        
+        // Initialize AvatarManager
+        window.avatarManager = new AvatarManager();
+        window.avatarManager.initialize();
         
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
@@ -38,39 +44,18 @@ function renderOwnedItems() {
             <p>Type: ${item.type}</p>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
-
         // Add click event listener to the item image
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
     });
-
-    // Removed: updateEquippedItems();
 }
 
 function toggleItem(item) {
-    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
-    
-    if (itemImage.classList.contains('equipped')) {
-        // Unequip the item
-        itemImage.classList.remove('equipped');
-        window.avatarManager.tempEquippedItems[item.type] = null;
+    if (window.avatarManager) {
+        window.avatarManager.toggleItem(item);
     } else {
-        // Unequip any other item of the same type
-        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
-        if (equippedItemOfSameType) {
-            equippedItemOfSameType.classList.remove('equipped');
-        }
-
-        // Equip the clicked item
-        itemImage.classList.add('equipped');
-        window.avatarManager.tempEquippedItems[item.type] = item.id;
+        console.error('AvatarManager not initialized');
     }
-
-    // Update the temporary avatar display
-    window.avatarManager.updateTempAvatarDisplay();
-
-    // Update the AvatarManager's item visuals
-    window.avatarManager.updateItemVisuals();
 }
 
 function logout() {
