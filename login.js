@@ -2,13 +2,11 @@ function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
-    // In a real application, you would verify credentials with a server
-    // For this example, we'll just check against localStorage
     const storedUser = JSON.parse(localStorage.getItem('user'));
 
     if (storedUser && storedUser.username === username && storedUser.password === password) {
-        showWelcomeMessage(username);
-        clearLoginForm();
+        sessionStorage.setItem('loggedInUser', JSON.stringify(storedUser));
+        window.location.href = 'shop/index.html';
     } else {
         alert('Invalid username or password.');
     }
