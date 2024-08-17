@@ -1,17 +1,16 @@
-// inventory.js
-
 class Inventory {
-    constructor() {
+    constructor(username) {
+        this.username = username;
         this.items = this.loadInventory();
     }
 
     loadInventory() {
-        const savedInventory = localStorage.getItem('userInventory');
+        const savedInventory = localStorage.getItem(`userInventory_${this.username}`);
         return savedInventory ? JSON.parse(savedInventory) : [];
     }
 
     saveInventory() {
-        localStorage.setItem('userInventory', JSON.stringify(this.items));
+        localStorage.setItem(`userInventory_${this.username}`, JSON.stringify(this.items));
     }
 
     addItem(item) {
@@ -33,11 +32,13 @@ class Inventory {
 }
 
 // Create a global inventory instance
-window.userInventory = new Inventory();
+window.createUserInventory = function(username) {
+    window.userInventory = new Inventory(username);
+};
 
 // Function to update button state based on inventory
 function updateBuyButtonState(button, itemId) {
-    if (window.userInventory.hasItem(itemId)) {
+    if (window.userInventory && window.userInventory.hasItem(itemId)) {
         button.textContent = 'Owned';
         button.disabled = true;
         button.classList.add('owned');
@@ -46,7 +47,7 @@ function updateBuyButtonState(button, itemId) {
 
 // Function to be called when an item is successfully purchased
 function onItemPurchased(item) {
-    if (window.userInventory.addItem(item)) {
+    if (window.userInventory && window.userInventory.addItem(item)) {
         console.log(`Added ${item.name} to inventory`);
         // Update the button state for this item
         const buyButton = document.querySelector(`.buy-btn[data-id="${item.id}"]`);
@@ -60,13 +61,19 @@ function onItemPurchased(item) {
 
 // Function to initialize inventory state for shop items
 function initializeInventoryState() {
-    document.querySelectorAll('.buy-btn').forEach(button => {
-        const itemId = button.dataset.id;
-        updateBuyButtonState(button, itemId);
-    });
+    if (window.userInventory) {
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            const itemId = button.dataset.id;
+            updateBuyButtonState(button, itemId);
+        });
+    }
 }
 
 // Add this to your DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
-    initializeInventoryState();
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.createUserInventory(loggedInUser.username);
+        initializeInventoryState();
+    }
 });
