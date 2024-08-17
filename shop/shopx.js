@@ -37,24 +37,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add item to avatar
     function addItemToAvatar(item) {
-        const img = document.createElement('img');
-        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        img.alt = item.name;
-        img.dataset.id = item.id;
-        img.dataset.type = item.type;
-        img.style.position = 'absolute';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        avatarDisplay.appendChild(img);
+        fetch(`https://sxdgoth.github.io/jo/${item.path}${item.id}`)
+            .then(response => response.text())
+            .then(svgContent => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                const svgElement = svgDoc.documentElement;
+                
+                svgElement.dataset.id = item.id;
+                svgElement.dataset.type = item.type;
+                svgElement.style.position = 'absolute';
+                svgElement.style.top = '0';
+                svgElement.style.left = '0';
+                svgElement.style.width = '100%';
+                svgElement.style.height = '100%';
+                
+                avatarDisplay.appendChild(svgElement);
+            })
+            .catch(error => console.error(`Failed to load SVG: ${error}`));
     }
 
     // Remove item from avatar
     function removeItemFromAvatar(itemId) {
-        const img = avatarDisplay.querySelector(`img[data-id="${itemId}"]`);
-        if (img) {
-            img.remove();
+        const svg = avatarDisplay.querySelector(`svg[data-id="${itemId}"]`);
+        if (svg) {
+            svg.remove();
         }
     }
 
@@ -62,4 +69,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadBaseAvatar();
     createShopItems();
     layerManager.initialize();
+
+    // Log equipped items for debugging
+    window.logEquippedItems = function() {
+        console.log("Equipped items:", Array.from(equippedItems));
+    };
 });
