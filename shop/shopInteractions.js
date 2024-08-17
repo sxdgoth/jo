@@ -2,10 +2,12 @@
 
 class ShopInteractions {
     constructor() {
-        this.svgContainer = document.getElementById('body-svg');
+        this.svgContainer = document.getElementById('avatar-display');
         this.shopItemsContainer = document.querySelector('.shop-items');
         this.userCoinsElement = document.getElementById('user-coins');
-        this.clearButton = document.getElementById('clear-avatar');
+        this.clearButton = document.createElement('button');
+        this.clearButton.textContent = 'Clear Avatar';
+        this.clearButton.id = 'clear-avatar';
         this.initialize();
     }
 
@@ -16,18 +18,30 @@ class ShopInteractions {
 
     setupShopItems() {
         shopItems.forEach(item => {
-            const button = document.createElement('button');
-            button.textContent = `${item.name} ($${item.price})`;
-            button.classList.add('item-button');
-            button.addEventListener('click', () => this.buyItem(item));
-            this.shopItemsContainer.appendChild(button);
+            const itemContainer = document.createElement('div');
+            itemContainer.classList.add('shop-item');
+
+            const itemName = document.createElement('span');
+            itemName.textContent = item.name;
+
+            const itemPrice = document.createElement('span');
+            itemPrice.textContent = `$${item.price}`;
+
+            const buyButton = document.createElement('button');
+            buyButton.textContent = 'Buy';
+            buyButton.addEventListener('click', () => this.buyItem(item));
+
+            itemContainer.appendChild(itemName);
+            itemContainer.appendChild(itemPrice);
+            itemContainer.appendChild(buyButton);
+
+            this.shopItemsContainer.appendChild(itemContainer);
         });
     }
 
     setupClearButton() {
-        if (this.clearButton) {
-            this.clearButton.addEventListener('click', () => this.clearAvatar());
-        }
+        this.clearButton.addEventListener('click', () => this.clearAvatar());
+        document.querySelector('.shop-section').appendChild(this.clearButton);
     }
 
     buyItem(item) {
@@ -41,26 +55,30 @@ class ShopInteractions {
     }
 
     addItemToAvatar(item) {
-        const itemElement = document.createElementNS("http://www.w3.org/2000/svg", "image");
-        itemElement.setAttribute("href", `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-        itemElement.setAttribute("width", "100%");
-        itemElement.setAttribute("height", "100%");
-        itemElement.setAttribute("data-body-part", item.type.toLowerCase());
-
-        const groupElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        groupElement.appendChild(itemElement);
-        groupElement.setAttribute("data-body-part", item.type.toLowerCase());
-
-        this.svgContainer.appendChild(groupElement);
+        const img = document.createElement('img');
+        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+        img.alt = item.name;
+        img.dataset.id = item.id;
+        img.dataset.type = item.type;
+        img.style.position = 'absolute';
+        img.style.top = '0';
+        img.style.left = '0';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        layerManager.addLayer(img);
     }
 
     updateUserCoins(newAmount) {
         this.userCoinsElement.textContent = newAmount;
-        // You might want to update the user's coins in session storage here as well
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            loggedInUser.coins = newAmount;
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        }
     }
 
     clearAvatar() {
-        const itemsToRemove = this.svgContainer.querySelectorAll('g:not([data-body-part="legs"]):not([data-body-part="arms"]):not([data-body-part="body"]):not([data-body-part="head"])');
+        const itemsToRemove = this.svgContainer.querySelectorAll('img:not([data-type="Legs"]):not([data-type="Arms"]):not([data-type="Body"]):not([data-type="Head"])');
         itemsToRemove.forEach(item => item.remove());
     }
 }
