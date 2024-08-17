@@ -14,11 +14,7 @@ function register() {
 
         const newUser = { username, password, coins: 1000 };
         
-        let users = JSON.parse(localStorage.getItem('users'));
-        if (!Array.isArray(users)) {
-            console.log('Users is not an array, initializing:', users);
-            users = [];
-        }
+        let users = JSON.parse(localStorage.getItem('users')) || []; // Added fallback to empty array
         console.log('Existing users:', users);
         
         users.push(newUser);
@@ -36,15 +32,6 @@ function register() {
 }
 
 function usernameExists(username) {
-    const users = JSON.parse(localStorage.getItem('users'));
-    if (!Array.isArray(users)) {
-        console.log('Users is not an array:', users);
-        return false; // If users is not an array, assume username doesn't exist
-    }
+    const users = JSON.parse(localStorage.getItem('users')) || []; // Added fallback to empty array
     return users.some(user => user.username === username);
-}
-
-function clearRegisterForm() {
-    document.getElementById('reg-username').value = '';
-    document.getElementById('reg-password').value = '';
 }
