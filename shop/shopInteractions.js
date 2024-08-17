@@ -98,20 +98,3 @@ class ShopInteractions {
 document.addEventListener('DOMContentLoaded', () => {
     new ShopInteractions();
 });
-
-
-
-New inventory.js file:
-// File: inventory.js
-
-class Inventory {
-    con
-
-
-
-Avatar for lalajrf-hinsj
-
-
-
-
-
