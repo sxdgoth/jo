@@ -1,14 +1,15 @@
 // shopManager.js
 
 class ShopManager {
-    constructor() {
+    constructor(shopItems) {
+        this.shopItems = shopItems;
         this.shopItemsContainer = document.querySelector('.shop-items');
         this.userCoinsElement = document.getElementById('user-coins');
         this.selectedItem = null;
-        this.initialize();
     }
 
-    initialize() {
+    initShop() {
+        console.log("Initializing shop...");
         this.createShopItems();
         this.setupButtons();
         this.updateUserInfo();
@@ -17,7 +18,7 @@ class ShopManager {
     createShopItems() {
         console.log("Creating shop items...");
         this.shopItemsContainer.innerHTML = '';
-        shopItems.forEach(item => {
+        this.shopItems.forEach(item => {
             const button = document.createElement('button');
             button.textContent = `${item.name} ($${item.price})`;
             button.classList.add('item-button');
@@ -27,7 +28,6 @@ class ShopManager {
     }
 
     setupButtons() {
-        // Check if buttons already exist
         if (document.querySelector('.button-container')) {
             return;
         }
@@ -81,7 +81,4 @@ class ShopManager {
     }
 }
 
-// Initialize the ShopManager when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new ShopManager();
-});
+// We don't need to initialize ShopManager here anymore
