@@ -13,9 +13,18 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Loading avatar...");
         const avatarDisplay = document.getElementById('avatar-display');
         avatarDisplay.innerHTML = ''; // Clear existing items
+
+        // Add base avatar template
+        const baseAvatar = document.createElement('div');
+        baseAvatar.innerHTML = avatarTemplate; // Make sure avatarTemplate is defined in avatarTemplate.js
+        avatarDisplay.appendChild(baseAvatar);
+
+        // Add equipped items
         equippedItems.forEach(itemId => {
             addItemToAvatar(itemId);
         });
+
+        layerManager.reorderLayers();
     }
 
     // Function to add an item to the avatar display
@@ -29,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         img.style.left = '0';
         img.style.width = '100%';
         img.style.height = '100%';
+        img.dataset.id = itemId;
         img.onerror = () => console.error("Failed to load image:", img.src);
         avatarDisplay.appendChild(img);
     }
@@ -76,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
         userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
         
         loadAvatar();
-        layerManager.reorderLayers();
     }
 
     // Function to update user information display
@@ -119,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearAvatar() {
         equippedItems.clear();
         loadAvatar();
-        layerManager.reorderLayers();
     }
 
     // Initialize
