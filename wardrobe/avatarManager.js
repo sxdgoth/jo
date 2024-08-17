@@ -1,5 +1,3 @@
-// avatarManager.js
-
 class AvatarManager {
     constructor() {
         this.equippedItems = {};
@@ -29,27 +27,12 @@ class AvatarManager {
         }
     }
 
-    toggleItemSelection(item) {
+    updateSelectedItems(item) {
         if (this.selectedItems[item.type] === item.id) {
-            // Unselect the item
             delete this.selectedItems[item.type];
         } else {
-            // Select the item
             this.selectedItems[item.type] = item.id;
         }
-        this.updateItemVisuals();
-    }
-
-    updateItemVisuals() {
-        document.querySelectorAll('.item-image').forEach(itemImage => {
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.selectedItems[item.type] === item.id) {
-                itemImage.classList.add('selected');
-            } else {
-                itemImage.classList.remove('selected');
-            }
-        });
     }
 
     applySelectedItems() {
@@ -62,7 +45,9 @@ class AvatarManager {
         this.equippedItems = {};
         this.selectedItems = {};
         this.updateAvatarDisplay();
-        this.updateItemVisuals();
+        document.querySelectorAll('.item-image.selected').forEach(item => {
+            item.classList.remove('selected');
+        });
         localStorage.removeItem('equippedItems');
     }
 }
