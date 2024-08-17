@@ -47,12 +47,27 @@ class AvatarManager {
 
     clearAvatar() {
         this.equippedItems = {};
-        localStorage.removeItem('equippedItems');
         this.updateAvatarDisplay();
-        document.querySelectorAll('.item-image.equipped').forEach(item => {
-            item.classList.remove('equipped');
-        });
-        alert('Avatar cleared successfully!');
+        this.updateItemVisuals();
+        console.log("Avatar cleared"); // Debug log
+    }
+
+    updateAvatarDisplay() {
+        if (window.avatarBody) {
+            // Clear all layers first
+            const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
+            allLayers.forEach(layer => {
+                window.avatarBody.updateLayer(layer, null);
+            });
+
+            // Then apply equipped items
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                }
+            });
+        }
     }
 
     loadEquippedItems() {
@@ -60,17 +75,6 @@ class AvatarManager {
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
             this.updateAvatarDisplay();
-        }
-    }
-
-    updateAvatarDisplay() {
-        if (window.avatarBody) {
-            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                }
-            });
         }
     }
 
@@ -99,9 +103,3 @@ class AvatarManager {
         });
     }
 }
-
-// Remove this event listener from here
-// document.addEventListener('DOMContentLoaded', () => {
-//     window.avatarManager = new AvatarManager();
-//     window.avatarManager.initialize();
-// });
