@@ -39,6 +39,8 @@ function renderOwnedItems() {
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
     });
+
+    window.avatarManager.updateItemVisuals();
 }
 
 function toggleItem(item) {
