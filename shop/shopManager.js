@@ -49,14 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleTryOn(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
-            if (triedOnItems[item.type] === item.id) {
+            if (triedOnItems[item.type] === item) {
                 // Item is already tried on, so remove it
                 delete triedOnItems[item.type];
                 updateAvatarDisplay(item.type, null);
                 console.log(`Removed ${item.name}`);
             } else {
                 // Try on the new item
-                triedOnItems[item.type] = item.id;
+                triedOnItems[item.type] = item;
                 updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 console.log(`Tried on ${item.name}`);
             }
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.item-image').forEach(image => {
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (triedOnItems[item.type] === item.id) {
+            if (triedOnItems[item.type] === item) {
                 image.classList.add('tried-on');
             } else {
                 image.classList.remove('tried-on');
