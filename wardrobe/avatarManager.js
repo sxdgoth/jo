@@ -47,63 +47,38 @@ class AvatarManager {
         alert('Avatar saved successfully!');
     }
 
-       clearAvatar() {
-    this.displayedItems = {};
-    
-    if (window.avatarBody) {
-        const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
-        allLayers.forEach(layer => {
-            window.avatarBody.updateLayer(layer, null);
-        });
+         clearAvatar() {
+        this.displayedItems = {};
+        this.updateAvatarDisplay();
+        this.updateItemVisuals();
+        console.log("Avatar cleared");
+
+        // Add a small delay before showing the alert
+        setTimeout(() => {
+            alert('Avatar cleared successfully!');
+        }, 100);
     }
 
-    this.updateItemVisuals();
-    console.log("Avatar cleared");
-
-    // Force a redraw of the avatar
-    const avatarDisplay = document.getElementById('avatar-display');
-    if (avatarDisplay) {
-        avatarDisplay.style.display = 'none';
-        void avatarDisplay.offsetHeight; // Trigger a reflow
-        avatarDisplay.style.display = 'block';
-    }
-
-    // Add a small delay before showing the alert
-    setTimeout(() => {
-        alert('Avatar cleared successfully!');
-    }, 100);
-}
-
-    updateAvatarDisplay(forceRefresh = false) {
+    updateAvatarDisplay() {
         if (window.avatarBody) {
             console.log("Updating avatar display");
             const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
             
             allLayers.forEach(layer => {
-                console.log(`Clearing layer: ${layer}`);
-                window.avatarBody.updateLayer(layer, null, forceRefresh);
-            });
-
-            Object.entries(this.displayedItems).forEach(([type, itemId]) => {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    console.log(`Applying item: ${item.name} to layer: ${type}`);
-                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`, forceRefresh);
+                const itemId = this.displayedItems[layer];
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        console.log(`Applying item: ${item.name} to layer: ${layer}`);
+                        window.avatarBody.updateLayer(layer, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                } else {
+                    console.log(`Clearing layer: ${layer}`);
+                    window.avatarBody.updateLayer(layer, null);
                 }
             });
         } else {
             console.error("avatarBody is not available");
-        }
-    }
-
-
-
-    loadEquippedItems() {
-        const savedItems = localStorage.getItem('equippedItems');
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
-            this.displayedItems = {...this.equippedItems};
-            this.updateAvatarDisplay();
         }
     }
 
@@ -117,6 +92,17 @@ class AvatarManager {
         this.updateItemVisuals();
     }
 
+
+    loadEquippedItems() {
+        const savedItems = localStorage.getItem('equippedItems');
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+            this.displayedItems = {...this.equippedItems};
+            this.updateAvatarDisplay();
+        }
+    }
+
+    
     updateItemVisuals() {
         document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
