@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM Content Loaded"); // Debug log
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
+        console.log("User logged in:", loggedInUser.username); // Debug log
         document.getElementById('user-name').textContent = loggedInUser.username;
         document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
         
@@ -15,20 +17,26 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Initialize AvatarManager
         if (!window.avatarManager) {
+            console.log("Initializing AvatarManager"); // Debug log
             window.avatarManager = new AvatarManager();
             window.avatarManager.initialize();
         }
         
         // Render owned items
+        console.log("Rendering owned items"); // Debug log
         renderOwnedItems();
     } else {
+        console.log("User not logged in, redirecting"); // Debug log
         window.location.href = '../index.html';
     }
 });
 
 function renderOwnedItems() {
+    console.log("Inside renderOwnedItems function"); // Debug log
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
+    
+    console.log("Owned items:", ownedItems); // Debug log
     
     wardrobeItemsContainer.innerHTML = ''; // Clear existing items
     
@@ -49,6 +57,8 @@ function renderOwnedItems() {
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
     });
+
+    console.log("Finished rendering items"); // Debug log
 
     // Update equipped items
     updateEquippedItems();
