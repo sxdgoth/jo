@@ -22,7 +22,6 @@ function logout() {
     window.location.href = '../index.html';
 }
 
-// Function to be called from shopManager when buying an item
 function updateUserCoinsAfterPurchase(newCoins) {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
