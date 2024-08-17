@@ -10,8 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         shopItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
+            const imgSrc = `${item.path}${item.id}`;
             itemElement.innerHTML = `
-                <img src="${item.path}${item.id}" alt="${item.name}" onerror="this.src='placeholder.png'">
+                <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
                 <h3>${item.name}</h3>
                 <p>Type: ${item.type}</p>
                 <p>Price: $${item.price}</p>
