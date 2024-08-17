@@ -2,21 +2,15 @@
 
 class LayerManager {
     constructor() {
-        this.svgContainer = document.getElementById('body-svg');
-        this.layerOrder = [
-            'Legs', 
-            'Arms', 
-            'Body', 
-            'Jacket', 
-            'Head'
-        ];
+        this.avatarContainer = document.getElementById('avatar-display');
+        this.layerOrder = ['Legs', 'Arms', 'Body', 'Jacket', 'Head'];
         this.reorderTimeout = null;
     }
 
     initialize() {
         this.reorderLayers();
         const observer = new MutationObserver(() => this.scheduleReorder());
-        observer.observe(this.svgContainer, { childList: true, subtree: true });
+        observer.observe(this.avatarContainer, { childList: true, subtree: true });
     }
 
     scheduleReorder() {
@@ -27,21 +21,9 @@ class LayerManager {
     }
 
     reorderLayers() {
-        const headElement = this.svgContainer.querySelector('g[data-body-part="head"]');
-        const hoodieElement = this.svgContainer.querySelector('g[data-body-part="hoodie"]');
-
-        if (headElement) {
-            this.svgContainer.appendChild(headElement);
-        }
-
-        if (hoodieElement && headElement) {
-            this.svgContainer.insertBefore(hoodieElement, headElement);
-        }
+        this.layerOrder.forEach(layerType => {
+            const elements = this.avatarContainer.querySelectorAll(`svg[data-type="${layerType}"]`);
+            elements.forEach(element => this.avatarContainer.appendChild(element));
+        });
     }
 }
-
-// Initialize the LayerManager only once when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    const layerManager = new LayerManager();
-    layerManager.initialize();
-});
