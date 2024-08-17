@@ -13,12 +13,13 @@ class ShopManager {
             const button = document.createElement('button');
             button.textContent = `${item.name} ($${item.price})`;
             button.classList.add('item-button');
-            button.onclick = () => this.toggleItem(item);
+            button.addEventListener('click', () => this.toggleItem(item));
             shopItemsContainer.appendChild(button);
         });
     }
 
     toggleItem(item) {
+        console.log(`Toggling item: ${item.name}`); // Debug log
         if (this.equippedItems.has(item.id)) {
             this.unequipItem(item);
         } else {
@@ -29,6 +30,7 @@ class ShopManager {
     }
 
     equipItem(item) {
+        console.log(`Equipping item: ${item.name}`); // Debug log
         const avatarDisplay = document.getElementById('avatar-display');
         const img = document.createElement('img');
         img.src = `https://sxdgoth.github.io/mwahbaby/assets/legendary/${item.id}`;
@@ -45,6 +47,7 @@ class ShopManager {
     }
 
     unequipItem(item) {
+        console.log(`Unequipping item: ${item.name}`); // Debug log
         const avatarDisplay = document.getElementById('avatar-display');
         const existingItem = avatarDisplay.querySelector(`[data-id="${item.id}"]`);
         if (existingItem) {
@@ -55,13 +58,15 @@ class ShopManager {
 
     updateUserCoins(item) {
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (this.equippedItems.has(item.id)) {
-            loggedInUser.coins -= item.price;
-        } else {
-            loggedInUser.coins += item.price;
+        if (loggedInUser) {
+            if (this.equippedItems.has(item.id)) {
+                loggedInUser.coins -= item.price;
+            } else {
+                loggedInUser.coins += item.price;
+            }
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
         }
-        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
     }
 
     reorderLayers() {
