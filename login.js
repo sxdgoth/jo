@@ -2,10 +2,11 @@ function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.username === username && u.password === password);
 
-    if (storedUser && storedUser.username === username && storedUser.password === password) {
-        sessionStorage.setItem('loggedInUser', JSON.stringify(storedUser));
+    if (user) {
+        sessionStorage.setItem('loggedInUser', JSON.stringify(user));
         window.location.href = 'shop/index.html';
     } else {
         alert('Invalid username or password.');
