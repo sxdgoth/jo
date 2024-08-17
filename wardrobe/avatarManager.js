@@ -2,17 +2,26 @@ class AvatarManager {
     constructor() {
         this.equippedItems = {};
         this.tempEquippedItems = {};
+        this.loadEquippedItems();
     }
 
     initialize() {
-        this.createButtons();
         this.setupApplyAvatarButton();
+        this.updateAvatarDisplay();
     }
 
     setupApplyAvatarButton() {
         const applyAvatarBtn = document.getElementById('apply-avatar-btn');
         if (applyAvatarBtn) {
             applyAvatarBtn.addEventListener('click', () => this.applyAvatar());
+        }
+    }
+
+    loadEquippedItems() {
+        const savedItems = localStorage.getItem('equippedItems');
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+            this.tempEquippedItems = {...this.equippedItems};
         }
     }
 
@@ -23,23 +32,16 @@ class AvatarManager {
         alert('Avatar saved successfully!');
     }
 
-    clearAvatar() {
-        this.equippedItems = {};
-        this.tempEquippedItems = {};
-        localStorage.removeItem('equippedItems');
-        this.updateAvatarDisplay();
-        document.querySelectorAll('.item-image.equipped').forEach(item => {
-            item.classList.remove('equipped');
-        });
-        alert('Avatar cleared successfully!');
-    }
-
     updateAvatarDisplay() {
         if (window.avatarBody) {
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                } else {
+                    window.avatarBody.updateLayer(type, null);
                 }
             });
         }
@@ -48,14 +50,13 @@ class AvatarManager {
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             // Unequip the item
-            delete this.tempEquippedItems[item.type];
-            window.avatarBody.updateLayer(item.type, null);
+            this.tempEquippedItems[item.type] = null;
         } else {
             // Equip the item
             this.tempEquippedItems[item.type] = item.id;
-            window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         }
         this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
     }
 
     updateItemVisuals() {
@@ -68,6 +69,21 @@ class AvatarManager {
                 itemImage.classList.remove('equipped');
             }
         });
+    }
+
+    updateTempAvatarDisplay() {
+        if (window.avatarBody) {
+            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                } else {
+                    window.avatarBody.updateLayer(type, null);
+                }
+            });
+        }
     }
 }
 
