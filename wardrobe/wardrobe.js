@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
             window.avatarBody.initializeAvatar();
         }
         
+        // Initialize AvatarManager
+        window.avatarManager = new AvatarManager();
+        window.avatarManager.initialize();
+        
         // Render owned items
         renderOwnedItems();
     } else {
@@ -49,52 +53,20 @@ function renderOwnedItems() {
 }
 
 function toggleItem(item) {
-    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
-    
-    if (itemImage.classList.contains('equipped')) {
-        // Unequip the item
-        itemImage.classList.remove('equipped');
-        window.avatarBody.updateLayer(item.type, null);
-    } else {
-        // Unequip any other item of the same type
-        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
-        if (equippedItemOfSameType) {
-            equippedItemOfSameType.classList.remove('equipped');
-        }
-
-        // Equip the clicked item
-        itemImage.classList.add('equipped');
-        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-    }
-
-    // Save equipped items to sessionStorage
+    window.avatarManager.toggleItem(item);
     saveEquippedItems();
 }
 
 function saveEquippedItems() {
-    const equippedItems = {};
-    document.querySelectorAll('.item-image.equipped').forEach(itemImage => {
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item) {
-            equippedItems[item.type] = item.id;
-        }
-    });
+    const equippedItems = window.avatarManager.equippedItems;
     sessionStorage.setItem('equippedItems', JSON.stringify(equippedItems));
 }
 
 function updateEquippedItems() {
     const equippedItems = JSON.parse(sessionStorage.getItem('equippedItems')) || {};
-    Object.entries(equippedItems).forEach(([type, itemId]) => {
-        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
-        if (itemImage) {
-            itemImage.classList.add('equipped');
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-            }
-        }
-    });
+    window.avatarManager.equippedItems = equippedItems;
+    window.avatarManager.updateAvatarDisplay();
+    window.avatarManager.updateItemVisuals();
 }
 
 function logout() {
