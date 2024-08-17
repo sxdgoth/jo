@@ -1,49 +1,47 @@
-// layerManager.js
+// File: layerManager.js
 
 class LayerManager {
     constructor() {
-        this.avatarDisplay = document.getElementById('avatar-display');
+        this.svgContainer = document.getElementById('body-svg');
         this.layerOrder = [
             'Legs', 
             'Arms', 
             'Body', 
-            'Shirt',
             'Jacket', 
             'Head'
         ];
         this.reorderTimeout = null;
     }
 
-    reorderLayers() {
-        clearTimeout(this.reorderTimeout);
-        this.reorderTimeout = setTimeout(() => {
-            const items = Array.from(this.avatarDisplay.children);
-            items.sort((a, b) => {
-                const aIndex = this.getLayerIndex(a.dataset.type);
-                const bIndex = this.getLayerIndex(b.dataset.type);
-                return aIndex - bIndex;
-            });
-            items.forEach(item => this.avatarDisplay.appendChild(item));
-        }, 50);
-    }
-
-    getLayerIndex(type) {
-        const index = this.layerOrder.indexOf(type);
-        return index === -1 ? this.layerOrder.length : index;
-    }
-
-    addLayer(element) {
-        this.avatarDisplay.appendChild(element);
+    initialize() {
         this.reorderLayers();
+        const observer = new MutationObserver(() => this.scheduleReorder());
+        observer.observe(this.svgContainer, { childList: true, subtree: true });
     }
 
-    removeLayer(elementId) {
-        const element = this.avatarDisplay.querySelector(`[data-id="${elementId}"]`);
-        if (element) {
-            element.remove();
+    scheduleReorder() {
+        if (this.reorderTimeout) {
+            clearTimeout(this.reorderTimeout);
+        }
+        this.reorderTimeout = setTimeout(() => this.reorderLayers(), 100);
+    }
+
+    reorderLayers() {
+        const headElement = this.svgContainer.querySelector('g[data-body-part="head"]');
+        const hoodieElement = this.svgContainer.querySelector('g[data-body-part="hoodie"]');
+
+        if (headElement) {
+            this.svgContainer.appendChild(headElement);
+        }
+
+        if (hoodieElement && headElement) {
+            this.svgContainer.insertBefore(hoodieElement, headElement);
         }
     }
 }
 
-// Create a global instance of LayerManager
-const layerManager = new LayerManager();
+// Initialize the LayerManager only once when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const layerManager = new LayerManager();
+    layerManager.initialize();
+});
