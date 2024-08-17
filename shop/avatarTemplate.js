@@ -37,11 +37,16 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-    updateLayer(type, newSrc) {
+    updateLayer(type, src) {
         if (this.layers[type]) {
-            this.layers[type].src = newSrc;
-            this.layers[type].style.display = 'block';
-            console.log(`Updated ${type} layer with ${newSrc}`);
+            if (src) {
+                this.layers[type].src = src;
+                this.layers[type].style.display = 'block';
+                console.log(`Updated ${type} layer with ${src}`);
+            } else {
+                this.layers[type].style.display = 'none';
+                console.log(`Removed ${type} layer`);
+            }
         } else {
             console.warn(`Layer ${type} not found`);
         }
