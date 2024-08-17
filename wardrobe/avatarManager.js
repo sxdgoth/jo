@@ -10,31 +10,35 @@ class AvatarManager {
         this.createButtons();
     }
 
-   createButtons() {
-    if (document.querySelector('.avatar-buttons')) {
-        return; // Buttons already exist, don't create them again
+    createButtons() {
+        console.log("Creating buttons"); // Debug log
+        if (document.querySelector('.avatar-buttons')) {
+            console.log("Buttons already exist"); // Debug log
+            return; // Buttons already exist, don't create them again
+        }
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'avatar-buttons';
+
+        const applyButton = document.createElement('button');
+        applyButton.textContent = 'Apply Avatar';
+        applyButton.onclick = () => this.applyAvatar();
+
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Avatar';
+        clearButton.onclick = () => this.clearAvatar();
+
+        buttonContainer.appendChild(applyButton);
+        buttonContainer.appendChild(clearButton);
+
+        const avatarContainer = document.querySelector('.avatar-container');
+        if (avatarContainer) {
+            avatarContainer.appendChild(buttonContainer);
+            console.log("Buttons added to avatar container"); // Debug log
+        } else {
+            console.log("Avatar container not found"); // Debug log
+        }
     }
-
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'avatar-buttons';
-
-    const applyButton = document.createElement('button');
-    applyButton.textContent = 'Apply Avatar';
-    applyButton.onclick = () => this.applyAvatar();
-
-    const clearButton = document.createElement('button');
-    clearButton.textContent = 'Clear Avatar';
-    clearButton.onclick = () => this.clearAvatar();
-
-    buttonContainer.appendChild(applyButton);
-    buttonContainer.appendChild(clearButton);
-
-    const avatarContainer = document.querySelector('.avatar-container');
-    if (avatarContainer) {
-        // Insert the buttons after the avatar container
-        avatarContainer.insertAddjacent(buttonContainer, 'afterend');
-    }
-}
 
     applyAvatar() {
         localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
