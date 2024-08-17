@@ -44,8 +44,7 @@ function renderOwnedItems() {
         itemImage.addEventListener('click', () => toggleItem(item));
     });
 
-    // Initialize equipped items
-    updateEquippedItems();
+    // Removed: updateEquippedItems();
 }
 
 function toggleItem(item) {
@@ -67,35 +66,11 @@ function toggleItem(item) {
         window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
     }
 
-    // Save equipped items to sessionStorage
-    saveEquippedItems();
+    // Removed: saveEquippedItems();
 }
 
-function saveEquippedItems() {
-    const equippedItems = {};
-    document.querySelectorAll('.item-image.equipped').forEach(itemImage => {
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item) {
-            equippedItems[item.type] = item.id;
-        }
-    });
-    sessionStorage.setItem('equippedItems', JSON.stringify(equippedItems));
-}
-
-function updateEquippedItems() {
-    const equippedItems = JSON.parse(sessionStorage.getItem('equippedItems')) || {};
-    Object.entries(equippedItems).forEach(([type, itemId]) => {
-        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
-        if (itemImage) {
-            itemImage.classList.add('equipped');
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-            }
-        }
-    });
-}
+// Removed: saveEquippedItems() function
+// Removed: updateEquippedItems() function
 
 function logout() {
     sessionStorage.removeItem('loggedInUser');
