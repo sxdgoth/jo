@@ -11,17 +11,20 @@ function login() {
     if (user) {
         console.log('User found:', user);
         
-        // Check if the user has a stored coin balance
+        // Load user-specific data
         const storedUser = JSON.parse(localStorage.getItem(username));
         if (storedUser) {
-            // Use the stored coin balance
+            // Use the stored data, including inventory
             user.coins = storedUser.coins;
+            user.inventory = storedUser.inventory || [];
         } else {
-            // If no stored balance, initialize with the value from registration
+            // If no stored data, initialize with default values
+            user.coins = user.coins || 1000; // Default to 1000 if not set
+            user.inventory = [];
             localStorage.setItem(username, JSON.stringify(user));
         }
 
-        // Update the logged in user in localStorage instead of sessionStorage
+        // Update the logged in user in localStorage
         localStorage.setItem('loggedInUser', JSON.stringify(user));
         
         window.location.href = 'home/index.html';
@@ -31,7 +34,5 @@ function login() {
     }
 }
 
-function clearLoginForm() {
-    document.getElementById('login-username').value = '';
-    document.getElementById('login-password').value = '';
-}
+
+
