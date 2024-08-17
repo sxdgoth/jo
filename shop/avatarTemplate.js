@@ -13,6 +13,7 @@ class AvatarBody {
     }
 
     loadAvatar() {
+        console.log("Loading avatar body parts...");
         this.container.innerHTML = '';
         this.bodyParts.forEach(part => {
             const img = document.createElement('img');
@@ -23,6 +24,8 @@ class AvatarBody {
             img.style.left = '0';
             img.style.width = '100%';
             img.style.height = '100%';
+            img.onload = () => console.log(`Loaded ${part.name}`);
+            img.onerror = () => console.error(`Failed to load ${part.name}: ${img.src}`);
             this.container.appendChild(img);
         });
     }
