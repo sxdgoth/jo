@@ -1,12 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const itemsContainer = document.getElementById('items-container');
-    const selectedItemsList = document.getElementById('selected-items-list');
-    const totalPriceElement = document.getElementById('total-price');
-    const buyButton = document.getElementById('buy-button');
-
+    const shopItemsContainer = document.querySelector('.shop-items');
     let selectedItems = [];
 
     function renderShopItems() {
+        shopItemsContainer.innerHTML = ''; // Clear existing items
         shopItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
@@ -15,47 +12,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
                 <h3>${item.name}</h3>
                 <p>Type: ${item.type}</p>
-                <p>Price: $${item.price}</p>
+                <p>Price: ${item.price} coins</p>
+                <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
-            itemElement.addEventListener('click', () => toggleItemSelection(item, itemElement));
-            itemsContainer.appendChild(itemElement);
+            shopItemsContainer.appendChild(itemElement);
+        });
+
+        // Add event listeners to buy buttons
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
     }
 
-    function toggleItemSelection(item, itemElement) {
-        const index = selectedItems.findIndex(i => i.id === item.id);
-        if (index === -1) {
-            selectedItems.push(item);
-            itemElement.classList.add('selected');
-        } else {
-            selectedItems.splice(index, 1);
-            itemElement.classList.remove('selected');
+    function buyItem(itemId) {
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            const userCoins = parseInt(document.getElementById('user-coins').textContent);
+            if (userCoins >= item.price) {
+                // Deduct coins and update display
+                const newCoins = userCoins - item.price;
+                document.getElementById('user-coins').textContent = newCoins;
+                
+                // Add item to selected items
+                selectedItems.push(item);
+                
+                // Update avatar display
+                updateAvatarDisplay(item);
+                
+                console.log(`Bought item: ${item.name}`);
+                alert(`You bought ${item.name} for ${item.price} coins!`);
+            } else {
+                alert("Not enough coins!");
+            }
         }
-        updateSelectedItemsList();
     }
 
-    function updateSelectedItemsList() {
-        selectedItemsList.innerHTML = '';
-        let total = 0;
-        selectedItems.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = `${item.name} - $${item.price}`;
-            selectedItemsList.appendChild(li);
-            total += item.price;
-        });
-        totalPriceElement.textContent = total;
+    function updateAvatarDisplay(item) {
+        // This function should update the avatar display with the new item
+        // You'll need to implement this based on your avatar system
+        // For example:
+        if (typeof updateAvatarLayer === 'function') {
+            updateAvatarLayer(item.type, item.id);
+        } else {
+            console.warn('updateAvatarLayer function not found. Make sure layerManager.js is loaded and contains this function.');
+        }
     }
 
-    buyButton.addEventListener('click', () => {
-        if (selectedItems.length > 0) {
-            alert(`Thank you for your purchase! Total: $${totalPriceElement.textContent}`);
-            selectedItems = [];
-            updateSelectedItemsList();
-            document.querySelectorAll('.shop-item.selected').forEach(item => item.classList.remove('selected'));
-        } else {
-            alert('Please select at least one item before buying.');
-        }
-    });
+    function getSelectedItems() {
+        return selectedItems;
+    }
 
+    function clearSelectedItems() {
+        selectedItems = [];
+    }
+
+    // Initialize the shop
     renderShopItems();
+
+    // Expose necessary functions to the global scope
+    window.shopManager = {
+        buyItem,
+        getSelectedItems,
+        clearSelectedItems,
+        renderShopItems
+    };
 });
