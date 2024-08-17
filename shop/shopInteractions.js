@@ -5,12 +5,14 @@ class ShopInteractions {
         this.shopItemsContainer = document.querySelector('.shop-items');
         this.userCoinsElement = document.getElementById('user-coins');
         this.selectedItem = null;
+        this.layerManager = new LayerManager();
         this.initialize();
     }
 
     initialize() {
         this.setupButtons();
         this.addSelectListeners();
+        this.layerManager.initialize();
     }
 
     setupButtons() {
@@ -31,14 +33,15 @@ class ShopInteractions {
     }
 
     addSelectListeners() {
-        const shopItems = this.shopItemsContainer.querySelectorAll('.item-button');
-        shopItems.forEach(item => {
-            item.addEventListener('click', (event) => this.selectItem(event.target));
+        const shopItemButtons = this.shopItemsContainer.querySelectorAll('.item-button');
+        shopItemButtons.forEach(button => {
+            button.addEventListener('click', (event) => this.selectItem(event.target));
         });
     }
 
     selectItem(itemElement) {
-        this.selectedItem = shopItems.find(item => item.name === itemElement.textContent.split(' ($')[0]);
+        const itemName = itemElement.textContent.split(' ($')[0];
+        this.selectedItem = shopItems.find(item => item.name === itemName);
         document.querySelectorAll('.item-button').forEach(el => el.classList.remove('selected'));
         itemElement.classList.add('selected');
     }
@@ -49,43 +52,30 @@ class ShopInteractions {
             return;
         }
 
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (loggedInUser && loggedInUser.coins >= this.selectedItem.price) {
-            loggedInUser.coins -= this.selectedItem.price;
-            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-            this.userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
-            
-            // Use the existing toggleItem function from avatarManager.js
-            if (typeof toggleItem === 'function') {
-                toggleItem(this.selectedItem);
-            } else {
-                console.error('toggleItem function not found. Make sure avatarManager.js is loaded before shopInteractions.js');
-            }
-
-            alert(`You bought ${this.selectedItem.name}!`);
+        // Use the existing toggleItem function from avatarManager.js
+        if (typeof toggleItem === 'function') {
+            toggleItem(this.selectedItem);
         } else {
-            alert("Not enough coins to buy this item!");
+            console.error('toggleItem function not found. Make sure avatarManager.js is loaded before shopInteractions.js');
         }
     }
 
     clearAvatar() {
-        const avatarDisplay = document.getElementById('avatar-display');
-        const itemsToRemove = avatarDisplay.querySelectorAll('img:not([src*="avatar-legsandfeet"]):not([src*="avatar-armsandhands"]):not([src*="avatar-body"]):not([src*="avatar-head"])');
-        itemsToRemove.forEach(item => item.remove());
-
-        // Reset equipped items in avatarManager
-        if (typeof equippedItems !== 'undefined') {
+        const equippedItems = window.equippedItems; // Access the equippedItems from avatarManager.js
+        if (equippedItems) {
             equippedItems.clear();
         } else {
             console.error('equippedItems not found. Make sure avatarManager.js is loaded before shopInteractions.js');
         }
 
-        // Reload avatar
+        // Use the existing loadAvatar function from avatarManager.js
         if (typeof loadAvatar === 'function') {
             loadAvatar();
         } else {
             console.error('loadAvatar function not found. Make sure avatarManager.js is loaded before shopInteractions.js');
         }
+
+        this.layerManager.reorderLayers();
     }
 }
 
