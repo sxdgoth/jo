@@ -12,9 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
         avatarDisplay.innerHTML = ''; // Clear existing items
 
         // Add base avatar template
-        const baseAvatar = document.createElement('div');
-        baseAvatar.innerHTML = avatarTemplate; // Make sure avatarTemplate is defined in avatarTemplate.js
-        avatarDisplay.appendChild(baseAvatar);
+        avatarDisplay.innerHTML = avatarTemplate; // Make sure avatarTemplate is defined in avatarTemplate.js
 
         // Add equipped items
         equippedItems.forEach(itemId => {
