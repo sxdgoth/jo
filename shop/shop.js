@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
         document.getElementById('user-name').textContent = loggedInUser.username;
         updateUserCoins(loggedInUser.coins);
+        // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
             window.shopManager.renderShopItems();
         }
@@ -17,18 +18,18 @@ function updateUserCoins(coins) {
 }
 
 function logout() {
-    localStorage.removeItem('loggedInUser');
+    sessionStorage.removeItem('loggedInUser');
     window.location.href = '../index.html';
 }
 
 function updateUserCoinsAfterPurchase(newCoins) {
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
         loggedInUser.coins = newCoins;
-        localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        localStorage.setItem(loggedInUser.username, JSON.stringify(loggedInUser));
+        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         updateUserCoins(newCoins);
     }
 }
 
+// Expose the function to the global scope
 window.updateUserCoinsAfterPurchase = updateUserCoinsAfterPurchase;
