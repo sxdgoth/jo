@@ -27,11 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
-            const userCoins = parseInt(document.getElementById('user-coins').textContent);
+            const userCoins = parseInt(document.getElementById('user-coins').textContent.replace(/,/g, ''));
             if (userCoins >= item.price) {
                 // Deduct coins and update display
                 const newCoins = userCoins - item.price;
-                document.getElementById('user-coins').textContent = newCoins;
+                
+                // Use the function from shop.js to update user coins
+                if (typeof window.updateUserCoinsAfterPurchase === 'function') {
+                    window.updateUserCoinsAfterPurchase(newCoins);
+                } else {
+                    console.warn('updateUserCoinsAfterPurchase function not found in shop.js');
+                }
                 
                 // Add item to selected items
                 selectedItems.push(item);
@@ -65,9 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function clearSelectedItems() {
         selectedItems = [];
     }
-
-    // Initialize the shop
-    renderShopItems();
 
     // Expose necessary functions to the global scope
     window.shopManager = {
