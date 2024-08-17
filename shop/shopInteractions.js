@@ -2,7 +2,6 @@
 
 class ShopInteractions {
     constructor() {
-        this.svgContainer = document.getElementById('avatar-display');
         this.shopItemsContainer = document.querySelector('.shop-items');
         this.userCoinsElement = document.getElementById('user-coins');
         this.selectedItem = null;
@@ -43,7 +42,6 @@ class ShopInteractions {
 
     selectItem(item) {
         this.selectedItem = item;
-        // Highlight the selected item (you may want to add some CSS for this)
         document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
         event.target.classList.add('selected');
     }
@@ -54,43 +52,43 @@ class ShopInteractions {
             return;
         }
 
-        const userCoins = parseInt(this.userCoinsElement.textContent);
-        if (userCoins >= this.selectedItem.price) {
-            this.addItemToAvatar(this.selectedItem);
-            this.updateUserCoins(userCoins - this.selectedItem.price);
-            inventory.addItem(this.selectedItem);
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser && loggedInUser.coins >= this.selectedItem.price) {
+            loggedInUser.coins -= this.selectedItem.price;
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            this.userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
+            
+            // Use the existing toggleItem function from avatarManager.js
+            if (typeof toggleItem === 'function') {
+                toggleItem(this.selectedItem);
+            } else {
+                console.error('toggleItem function not found. Make sure avatarManager.js is loaded before shopInteractions.js');
+            }
+
             alert(`You bought ${this.selectedItem.name}!`);
         } else {
             alert("Not enough coins to buy this item!");
         }
     }
 
-    addItemToAvatar(item) {
-        const img = document.createElement('img');
-        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        img.alt = item.name;
-        img.dataset.id = item.id;
-        img.dataset.type = item.type;
-        img.style.position = 'absolute';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        layerManager.addLayer(img);
-    }
-
-    updateUserCoins(newAmount) {
-        this.userCoinsElement.textContent = newAmount;
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            loggedInUser.coins = newAmount;
-            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        }
-    }
-
     clearAvatar() {
-        const itemsToRemove = this.svgContainer.querySelectorAll('img:not([data-type="Legs"]):not([data-type="Arms"]):not([data-type="Body"]):not([data-type="Head"])');
+        const avatarDisplay = document.getElementById('avatar-display');
+        const itemsToRemove = avatarDisplay.querySelectorAll('img:not([src*="avatar-legsandfeet"]):not([src*="avatar-armsandhands"]):not([src*="avatar-body"]):not([src*="avatar-head"])');
         itemsToRemove.forEach(item => item.remove());
+
+        // Reset equipped items in avatarManager
+        if (typeof equippedItems !== 'undefined') {
+            equippedItems.clear();
+        } else {
+            console.error('equippedItems not found. Make sure avatarManager.js is loaded before shopInteractions.js');
+        }
+
+        // Reload avatar
+        if (typeof loadAvatar === 'function') {
+            loadAvatar();
+        } else {
+            console.error('loadAvatar function not found. Make sure avatarManager.js is loaded before shopInteractions.js');
+        }
     }
 }
 
