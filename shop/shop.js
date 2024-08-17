@@ -14,9 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
             window.shopManager.renderShopItems();
         }
-
-        // Add reset button for tried-on items
-        addResetButton();
     } else {
         window.location.href = '../index.html';
     }
