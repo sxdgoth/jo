@@ -187,16 +187,29 @@ main {
     background-color: #2980b9;
 }
 
+.item-image.pending {
+    box-shadow: 0 0 0 3px #ffc107;
+}
+
+.item-image.pending::after {
+    content: '?';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    background-color: rgba(255, 193, 7, 0.7);
+    opacity: 1;
+}
+
 @media (max-width: 768px) {
     main {
         flex-direction: column;
     }
-
     .avatar-container {
         max-width: 100%;
         height: 300px;
     }
-
     .wardrobe-items {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
