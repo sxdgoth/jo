@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.avatarBody.initializeAvatar();
         }
         
-        // Initialize AvatarManager only if it doesn't exist
+        // Initialize AvatarManager
         if (!window.avatarManager) {
             window.avatarManager = new AvatarManager();
             window.avatarManager.initialize();
@@ -51,7 +51,7 @@ function renderOwnedItems() {
     });
 
     // Update equipped items
-    window.avatarManager.updateItemVisuals();
+    updateEquippedItems();
 }
 
 function toggleItem(item) {
@@ -62,6 +62,13 @@ function toggleItem(item) {
 function saveEquippedItems() {
     const equippedItems = window.avatarManager.equippedItems;
     sessionStorage.setItem('equippedItems', JSON.stringify(equippedItems));
+}
+
+function updateEquippedItems() {
+    const equippedItems = JSON.parse(sessionStorage.getItem('equippedItems')) || {};
+    window.avatarManager.equippedItems = equippedItems;
+    window.avatarManager.updateAvatarDisplay();
+    window.avatarManager.updateItemVisuals();
 }
 
 function logout() {
