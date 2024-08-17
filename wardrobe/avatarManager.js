@@ -47,7 +47,7 @@ class AvatarManager {
         alert('Avatar saved successfully!');
     }
 
-      clearAvatar() {
+       clearAvatar() {
         this.displayedItems = {};
         this.updateAvatarDisplay(true); // Pass true to force a full refresh
         this.updateItemVisuals();
