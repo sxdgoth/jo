@@ -37,17 +37,12 @@ class AvatarManager {
         }
     }
 
-   applyAvatar() {
-    this.equippedItems = {};
-    Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-        if (itemId) {
-            this.equippedItems[type] = itemId;
-        }
-    });
-    localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
-    this.updateAvatarDisplay();
-    alert('Avatar saved successfully!');
-}
+    applyAvatar() {
+        this.equippedItems = {...this.tempEquippedItems};
+        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+        this.updateAvatarDisplay();
+        alert('Avatar saved successfully!');
+    }
 
     clearAvatar() {
         this.tempEquippedItems = {};
@@ -57,14 +52,13 @@ class AvatarManager {
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
                     if (item) {
                         window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                     }
-                } else {
-                    window.avatarBody.updateLayer(type, null);
                 }
             });
         }
@@ -73,7 +67,7 @@ class AvatarManager {
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             // Unequip the item
-            this.tempEquippedItems[item.type] = null;
+            delete this.tempEquippedItems[item.type];
         } else {
             // Equip the item
             this.tempEquippedItems[item.type] = item.id;
