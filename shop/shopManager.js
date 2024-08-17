@@ -1,95 +1,72 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
-    let selectedItems = [];
+    let selectedItems = {};
 
     function renderShopItems() {
         shopItemsContainer.innerHTML = ''; // Clear existing items
         shopItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-            const imgSrc = `${item.path}${item.id}`;
+            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
                 <h3>${item.name}</h3>
                 <p>Type: ${item.type}</p>
                 <p>Price: ${item.price} coins</p>
-                <button class="buy-btn" data-id="${item.id}">Buy</button>
+                <button class="toggle-btn" data-id="${item.id}">Select</button>
             `;
             shopItemsContainer.appendChild(itemElement);
         });
 
-        // Add event listeners to buy buttons
-        document.querySelectorAll('.buy-btn').forEach(button => {
-            button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
+        // Add event listeners to toggle buttons
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', (e) => toggleItem(e.target.dataset.id));
         });
     }
 
-    function buyItem(itemId) {
+    function toggleItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
-            // Get the logged-in user from sessionStorage
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (!loggedInUser) {
-                alert("User not logged in!");
-                return;
-            }
-
-            // Use the actual coin value from the user object
-            const userCoins = loggedInUser.coins;
-
-            if (userCoins >= item.price) {
-                // Deduct coins and update display
-                const newCoins = userCoins - item.price;
-                
-                // Update the user object in sessionStorage
-                loggedInUser.coins = newCoins;
-                sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
-                // Update the displayed coins
-                if (typeof window.updateUserCoinsAfterPurchase === 'function') {
-                    window.updateUserCoinsAfterPurchase(newCoins);
-                } else {
-                    console.warn('updateUserCoinsAfterPurchase function not found in shop.js');
-                    document.getElementById('user-coins').textContent = newCoins.toLocaleString();
-                }
-                
-                // Add item to selected items
-                selectedItems.push(item);
-                
-                // Update avatar display
-                updateAvatarDisplay(item);
-                
-                console.log(`Bought item: ${item.name}`);
-                alert(`You bought ${item.name} for ${item.price} coins!`);
+            if (selectedItems[item.type] === item) {
+                // Item is already selected, so unselect it
+                delete selectedItems[item.type];
+                updateAvatarDisplay(item.type, null);
+                console.log(`Unselected ${item.name}`);
             } else {
-                alert("Not enough coins!");
+                // Select the new item
+                selectedItems[item.type] = item;
+                updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                console.log(`Selected ${item.name}`);
             }
+            updateToggleButtons();
         }
     }
 
-   function updateAvatarDisplay(item) {
-    if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
-        // Adjust the path to match your GitHub Pages structure
-        const fullPath = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        window.avatarBody.updateLayer(item.type, fullPath);
-    } else {
-        console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
+    function updateToggleButtons() {
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            const itemId = button.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            if (selectedItems[item.type] === item) {
+                button.textContent = 'Unselect';
+                button.classList.add('selected');
+            } else {
+                button.textContent = 'Select';
+                button.classList.remove('selected');
+            }
+        });
     }
-}
 
-    function getSelectedItems() {
-        return selectedItems;
-    }
-
-    function clearSelectedItems() {
-        selectedItems = [];
+    function updateAvatarDisplay(type, src) {
+        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
+            window.avatarBody.updateLayer(type, src);
+        } else {
+            console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
+        }
     }
 
     // Expose necessary functions to the global scope
     window.shopManager = {
-        buyItem,
-        getSelectedItems,
-        clearSelectedItems,
+        toggleItem,
         renderShopItems
     };
 
