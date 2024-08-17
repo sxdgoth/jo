@@ -4,7 +4,6 @@ class ShopManager {
     constructor(items) {
         this.items = items;
         this.equippedItems = new Set();
-        this.layerOrder = ['Legs', 'Arms', 'Body', 'Jacket', 'Head'];
     }
 
     initShop() {
@@ -30,10 +29,9 @@ class ShopManager {
     }
 
        equipItem(item) {
-        console.log(`Equipping item: ${item.name}`); // Debug log
-        const avatarDisplay = document.getElementById('avatar-display');
+        console.log(`Equipping item: ${item.name}`);
         const img = document.createElement('img');
-        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`; // Update this line
+        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
         img.alt = item.name;
         img.dataset.id = item.id;
         img.dataset.type = item.type;
@@ -42,19 +40,18 @@ class ShopManager {
         img.style.left = '0';
         img.style.width = '100%';
         img.style.height = '100%';
-        avatarDisplay.appendChild(img);
+        layerManager.addLayer(img); // Use LayerManager to add and order the layer
         this.equippedItems.add(item.id);
     }
 
     unequipItem(item) {
-        console.log(`Unequipping item: ${item.name}`); // Debug log
-        const avatarDisplay = document.getElementById('avatar-display');
-        const existingItem = avatarDisplay.querySelector(`[data-id="${item.id}"]`);
-        if (existingItem) {
-            existingItem.remove();
-            this.equippedItems.delete(item.id);
-        }
+        console.log(`Unequipping item: ${item.name}`);
+        layerManager.removeLayer(item.id); // Use LayerManager to remove the layer
+        this.equippedItems.delete(item.id);
     }
+
+    // Remove the reorderLayers method from ShopManager as it's now handled by LayerManager
+}
 
     updateUserCoins(item) {
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
