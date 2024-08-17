@@ -16,13 +16,12 @@ class ShopManager {
 
     createShopItems() {
         console.log("Creating shop items...");
-        // Clear existing items to prevent duplication
         this.shopItemsContainer.innerHTML = '';
         shopItems.forEach(item => {
             const button = document.createElement('button');
             button.textContent = `${item.name} ($${item.price})`;
             button.classList.add('item-button');
-            button.onclick = () => this.selectItem(item);
+            button.addEventListener('click', () => this.selectItem(item));
             this.shopItemsContainer.appendChild(button);
         });
     }
