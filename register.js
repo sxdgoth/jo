@@ -14,7 +14,11 @@ function register() {
 
         const newUser = { username, password, coins: 1000 };
         
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let users = JSON.parse(localStorage.getItem('users'));
+        if (!Array.isArray(users)) {
+            console.log('Users is not an array, initializing:', users);
+            users = [];
+        }
         console.log('Existing users:', users);
         
         users.push(newUser);
@@ -31,7 +35,11 @@ function register() {
 }
 
 function usernameExists(username) {
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const users = JSON.parse(localStorage.getItem('users'));
+    if (!Array.isArray(users)) {
+        console.log('Users is not an array:', users);
+        return false; // If users is not an array, assume username doesn't exist
+    }
     return users.some(user => user.username === username);
 }
 
