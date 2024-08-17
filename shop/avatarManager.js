@@ -2,14 +2,17 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Avatar manager initializing...");
-    const shopItems = document.querySelector('.shop-items');
+    const shopItemsContainer = document.querySelector('.shop-items');
     const equippedItems = new Set();
+    const userCoinsElement = document.getElementById('user-coins');
+    let selectedItem = null;
+    const layerManager = new LayerManager();
 
     // Function to load and display the avatar
     function loadAvatar() {
         console.log("Loading avatar...");
-        // The base avatar is already loaded by avatarTemplate.js
-        // We just need to add any equipped items
+        const avatarDisplay = document.getElementById('avatar-display');
+        avatarDisplay.innerHTML = ''; // Clear existing items
         equippedItems.forEach(itemId => {
             addItemToAvatar(itemId);
         });
@@ -33,18 +36,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to create shop items
     function createShopItems() {
         console.log("Creating shop items...");
-        // This function should be implemented to create shop items
-        // You'll need to define the shop items elsewhere or fetch them from a server
-        // For example:
-        /*
         shopItems.forEach(item => {
             const button = document.createElement('button');
             button.textContent = `${item.name} ($${item.price})`;
             button.classList.add('item-button');
-            button.onclick = () => toggleItem(item);
-            shopItems.appendChild(button);
+            button.onclick = () => selectItem(item);
+            shopItemsContainer.appendChild(button);
         });
-        */
+    }
+
+    // Function to select an item
+    function selectItem(item) {
+        selectedItem = item;
+        document.querySelectorAll('.item-button').forEach(el => el.classList.remove('selected'));
+        event.target.classList.add('selected');
     }
 
     // Function to toggle item equip/unequip
@@ -67,11 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
         }
-
         sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
+        userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
         
         loadAvatar();
+        layerManager.reorderLayers();
     }
 
     // Function to update user information display
@@ -79,13 +84,54 @@ document.addEventListener('DOMContentLoaded', function() {
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
         if (loggedInUser) {
             document.getElementById('user-name').textContent = loggedInUser.username;
-            document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
+            userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
         }
+    }
+
+    // Function to set up buttons
+    function setupButtons() {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        const buyButton = document.createElement('button');
+        buyButton.textContent = 'Buy';
+        buyButton.addEventListener('click', buySelectedItem);
+
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Avatar';
+        clearButton.addEventListener('click', clearAvatar);
+
+        buttonContainer.appendChild(buyButton);
+        buttonContainer.appendChild(clearButton);
+        document.querySelector('.shop-section').appendChild(buttonContainer);
+    }
+
+    // Function to buy selected item
+    function buySelectedItem() {
+        if (!selectedItem) {
+            alert("Please select an item to buy.");
+            return;
+        }
+        toggleItem(selectedItem);
+    }
+
+    // Function to clear avatar
+    function clearAvatar() {
+        equippedItems.clear();
+        loadAvatar();
+        layerManager.reorderLayers();
     }
 
     // Initialize
     console.log("Avatar manager initialized.");
     updateUserInfo();
     createShopItems();
+    setupButtons();
     loadAvatar();
+    layerManager.initialize();
+
+    // Make necessary functions and variables global
+    window.equippedItems = equippedItems;
+    window.loadAvatar = loadAvatar;
+    window.toggleItem = toggleItem;
 });
