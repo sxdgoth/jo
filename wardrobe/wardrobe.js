@@ -13,9 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
             window.avatarBody.initializeAvatar();
         }
         
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager();
-        window.avatarManager.initialize();
+        // Initialize AvatarManager only if it doesn't exist
+        if (!window.avatarManager) {
+            window.avatarManager = new AvatarManager();
+            window.avatarManager.initialize();
+        }
         
         // Render owned items
         renderOwnedItems();
@@ -48,8 +50,8 @@ function renderOwnedItems() {
         itemImage.addEventListener('click', () => toggleItem(item));
     });
 
-    // Initialize equipped items
-    updateEquippedItems();
+    // Update equipped items
+    window.avatarManager.updateItemVisuals();
 }
 
 function toggleItem(item) {
@@ -60,13 +62,6 @@ function toggleItem(item) {
 function saveEquippedItems() {
     const equippedItems = window.avatarManager.equippedItems;
     sessionStorage.setItem('equippedItems', JSON.stringify(equippedItems));
-}
-
-function updateEquippedItems() {
-    const equippedItems = JSON.parse(sessionStorage.getItem('equippedItems')) || {};
-    window.avatarManager.equippedItems = equippedItems;
-    window.avatarManager.updateAvatarDisplay();
-    window.avatarManager.updateItemVisuals();
 }
 
 function logout() {
