@@ -8,21 +8,7 @@ class AvatarManager {
         this.createButtons();
     }
 
-    createButtons() {
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'avatar-buttons';
-        const applyButton = document.createElement('button');
-        applyButton.textContent = 'Apply Avatar';
-        applyButton.onclick = () => this.applyAvatar();
-        const clearButton = document.createElement('button');
-        clearButton.textContent = 'Clear Avatar';
-        clearButton.onclick = () => this.clearAvatar();
-        buttonContainer.appendChild(applyButton);
-        buttonContainer.appendChild(clearButton);
-        const avatarContainer = document.querySelector('.avatar-container');
-        avatarContainer.insertBefore(buttonContainer, avatarContainer.firstChild);
-    }
-
+   
     applyAvatar() {
         localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
         alert('Avatar saved successfully!');
