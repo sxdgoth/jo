@@ -1,3 +1,5 @@
+// shopManager.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
@@ -29,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.buy-btn').forEach(button => {
             button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
+
+        // Initialize inventory state
+        initializeInventoryState();
     }
 
     function toggleTryOn(itemId) {
@@ -64,6 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
+            // Check if the item is already owned
+            if (window.userInventory.hasItem(itemId)) {
+                alert("You already own this item!");
+                return;
+            }
+
             // Get the logged-in user from sessionStorage
             const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
             if (!loggedInUser) {
@@ -71,12 +82,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Check if user has enough coins
-            if (loggedInUser.coins >= item.price) {
+            // Use the actual coin value from the user object
+            const userCoins = loggedInUser.coins;
+
+            if (userCoins >= item.price) {
                 // Deduct coins and update display
-                loggedInUser.coins -= item.price;
+                const newCoins = userCoins - item.price;
+                
+                // Update the user object in sessionStorage
+                loggedInUser.coins = newCoins;
                 sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-                updateUserCoins(loggedInUser.coins);
+
+                // Update the displayed coins
+                if (typeof window.updateUserCoinsAfterPurchase === 'function') {
+                    window.updateUserCoinsAfterPurchase(newCoins);
+                } else {
+                    console.warn('updateUserCoinsAfterPurchase function not found in shop.js');
+                    document.getElementById('user-coins').textContent = newCoins.toLocaleString();
+                }
+                
+                // Add item to inventory
+                onItemPurchased(item);
                 
                 console.log(`Bought item: ${item.name}`);
                 alert(`You bought ${item.name} for ${item.price} coins!`);
@@ -92,10 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
         }
-    }
-
-    function updateUserCoins(coins) {
-        document.getElementById('user-coins').textContent = coins.toLocaleString();
     }
 
     // Expose necessary functions to the global scope
