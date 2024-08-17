@@ -92,12 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
             loggedInUser.coins = newCoins;
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
-            // Update the user's coin balance in the stored users array
-            let users = JSON.parse(sessionStorage.getItem('users')) || [];
+            // Update the user's coin balance in localStorage
+            let users = JSON.parse(localStorage.getItem('users')) || [];
             const userIndex = users.findIndex(u => u.username === loggedInUser.username);
             if (userIndex !== -1) {
                 users[userIndex].coins = newCoins;
-                sessionStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('users', JSON.stringify(users));
             }
 
             // Update the displayed coins
