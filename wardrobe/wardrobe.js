@@ -49,26 +49,27 @@ function renderOwnedItems() {
 }
 
 function toggleItem(item) {
-    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
-    
-    if (itemImage.classList.contains('equipped')) {
-        // Unequip the item
-        itemImage.classList.remove('equipped');
-        window.avatarBody.updateLayer(item.type, null);
-    } else {
-        // Unequip any other item of the same type
-        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
-        if (equippedItemOfSameType) {
-            equippedItemOfSameType.classList.remove('equipped');
+    if (window.avatarManager) {
+        window.avatarManager.toggleItemSelection(item);
+        
+        const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
+        
+        if (itemImage.classList.contains('selected')) {
+            // Unselect the item
+            itemImage.classList.remove('selected');
+        } else {
+            // Unselect any other item of the same type
+            const selectedItemOfSameType = document.querySelector(`.item-image.selected[data-id^="${item.type}"]`);
+            if (selectedItemOfSameType) {
+                selectedItemOfSameType.classList.remove('selected');
+            }
+
+            // Select the clicked item
+            itemImage.classList.add('selected');
         }
-
-        // Equip the clicked item
-        itemImage.classList.add('equipped');
-        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+    } else {
+        console.error('Avatar manager not found');
     }
-
-    // Save equipped items to sessionStorage
-    saveEquippedItems();
 }
 
 function saveEquippedItems() {
