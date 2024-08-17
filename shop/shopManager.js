@@ -32,31 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize inventory state
         initializeInventoryState();
-
-        // Initialize avatar display
-        initializeAvatarDisplay();
-    }
-
-    function initializeAvatarDisplay() {
-        if (window.avatarManager) {
-            window.avatarManager.loadEquippedItems();
-            window.avatarManager.updateAvatarDisplay();
-        } else {
-            console.warn('avatarManager not found. Make sure it\'s properly initialized.');
-        }
     }
 
     function toggleTryOn(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
-            if (triedOnItems[item.type] === item) {
+            if (triedOnItems[item.type] === item.id) {
                 // Item is already tried on, so remove it
                 delete triedOnItems[item.type];
                 updateAvatarDisplay(item.type, null);
                 console.log(`Removed ${item.name}`);
             } else {
                 // Try on the new item
-                triedOnItems[item.type] = item;
+                triedOnItems[item.type] = item.id;
                 updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 console.log(`Tried on ${item.name}`);
             }
@@ -68,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.item-image').forEach(image => {
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (triedOnItems[item.type] === item) {
+            if (triedOnItems[item.type] === item.id) {
                 image.classList.add('tried-on');
             } else {
                 image.classList.remove('tried-on');
@@ -76,25 +64,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function buyItem(itemId) {
-        // ... (keep existing buyItem function unchanged)
-    }
-    
     function updateAvatarDisplay(type, src) {
-        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
-            window.avatarBody.updateLayer(type, src);
+        if (window.avatarDisplay && typeof window.avatarDisplay.updateLayer === 'function') {
+            window.avatarDisplay.updateLayer(type, src);
         } else {
-            console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
+            console.warn('avatarDisplay.updateLayer function not found. Make sure displayAvatar.js is loaded and initialized.');
         }
     }
 
     function resetAvatarDisplay() {
         triedOnItems = {};
-        if (window.avatarManager) {
-            window.avatarManager.updateAvatarDisplay();
+        if (window.avatarDisplay) {
+            window.avatarDisplay.loadAvatar();
         }
         updateItemImages();
     }
+
+    // Keep the existing buyItem function
 
     // Expose necessary functions to the global scope
     window.shopManager = {
