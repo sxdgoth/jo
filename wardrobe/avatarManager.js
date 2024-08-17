@@ -41,10 +41,7 @@ class AvatarManager {
     this.equippedItems = {};
     Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
         if (itemId) {
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                this.equippedItems[type] = `${item.path}${item.id}`;
-            }
+            this.equippedItems[type] = itemId;
         }
     });
     localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
