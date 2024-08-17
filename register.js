@@ -26,8 +26,9 @@ function register() {
         localStorage.setItem('users', JSON.stringify(users));
         console.log('Updated users:', users);
         
-        alert('Registration successful! You have been awarded 1000 coins. You can now log in.');
-        clearRegisterForm();
+        alert('Registration successful! You have been awarded 1000 coins. You will now be redirected to the home page.');
+        sessionStorage.setItem('loggedInUser', JSON.stringify(newUser));
+        window.location.href = 'home/index.html';
     } else {
         console.log('Empty fields');
         alert('Please fill in all fields.');
