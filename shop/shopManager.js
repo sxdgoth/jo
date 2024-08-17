@@ -66,17 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function buyItem(itemId) {
+ function buyItem(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
-        if (window.userInventory.hasItem(itemId)) {
-            alert("You already own this item!");
-            return;
-        }
-
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
         if (!loggedInUser) {
             alert("User not logged in!");
+            return;
+        }
+
+        if (window.userInventory.hasItem(itemId)) {
+            alert("You already own this item!");
             return;
         }
 
@@ -85,6 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const newCoins = userCoins - item.price;
             
             loggedInUser.coins = newCoins;
+            window.userInventory.addToInventory(item);
+
             localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
             localStorage.setItem(loggedInUser.username, JSON.stringify(loggedInUser));
 
@@ -95,15 +97,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('user-coins').textContent = newCoins.toLocaleString();
             }
             
-            onItemPurchased(item);
-            
             console.log(`Bought item: ${item.name}`);
             alert(`You bought ${item.name} for ${item.price} coins!`);
+            
+            // Update the shop display to show the item as owned
+            updateShopDisplay();
         } else {
             alert("Not enough coins!");
         }
     }
 }
+    function updateShopDisplay() {
+    shopItemsContainer.innerHTML = ''; // Clear existing items
+
+    shopItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('shop-item');
+
+        const isOwned = window.userInventory.hasItem(item.id);
+        const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+
+        itemElement.innerHTML = `
+            <div class="item-image ${isOwned ? 'owned' : ''}" data-id="${item.id}">
+                <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
+            </div>
+            <h3>${item.name}</h3>
+            <p>Type: ${item.type}</p>
+            <p>Price: ${item.price} coins</p>
+            ${isOwned ? '<p class="owned-text">Owned</p>' : `<button class="buy-btn" data-id="${item.id}">Buy</button>`}
+        `;
+
+        shopItemsContainer.appendChild(itemElement);
+    });
+
+    // Add event listeners to item images for try on/off
+    document.querySelectorAll('.item-image').forEach(image => {
+        image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
+    });
+
+    // Add event listeners to buy buttons
+    document.querySelectorAll('.buy-btn').forEach(button => {
+        button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
+    });
+}
+
 
     function updateAvatarDisplay(type, src) {
         if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
