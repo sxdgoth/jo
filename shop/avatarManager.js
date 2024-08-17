@@ -1,7 +1,5 @@
 // avatarManager.js
 
-console.log("avatarManager.js loaded");
-
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded");
     const avatarBody = new AvatarBody('avatar-display');
@@ -23,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function addItemToAvatar(itemId) {
         console.log("Adding item to avatar:", itemId);
         const img = document.createElement('img');
-        img.src = avatarConfig.baseUrl + itemId;
+        img.src = avatarBody.baseUrl + itemId;
         img.style.position = 'absolute';
         img.style.top = '0';
         img.style.left = '0';
@@ -36,13 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to create shop items
     function createShopItems() {
         console.log("Creating shop items...");
-        avatarConfig.wearableItems.forEach(item => {
-            const button = document.createElement('button');
-            button.textContent = `${item.name} ($${item.price})`;
-            button.classList.add('item-button');
-            button.onclick = () => toggleItem(item);
-            shopItems.appendChild(button);
-        });
+        // This function should be implemented to create shop items
+        // You'll need to define the shop items elsewhere or fetch them from a server
     }
 
     // Function to toggle item equip/unequip
