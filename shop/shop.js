@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (loggedInUser) {
         document.getElementById('user-name').textContent = loggedInUser.username;
-        document.getElementById('user-coins').textContent = loggedInUser.coins;
+        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString(); // Format number with commas
     } else {
         window.location.href = '../index.html';
     }
