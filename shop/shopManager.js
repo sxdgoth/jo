@@ -1,74 +1,76 @@
-// File: shopManager.js
+// shopManager.js
 
 class ShopManager {
     constructor() {
         this.shopItemsContainer = document.querySelector('.shop-items');
-        this.avatarDisplay = document.getElementById('avatar-display');
-        this.equippedItems = new Set();
+        this.userCoinsElement = document.getElementById('user-coins');
+        this.selectedItem = null;
         this.initialize();
     }
 
     initialize() {
         this.createShopItems();
+        this.setupButtons();
+        this.updateUserInfo();
     }
 
     createShopItems() {
+        console.log("Creating shop items...");
         shopItems.forEach(item => {
             const button = document.createElement('button');
             button.textContent = `${item.name} ($${item.price})`;
             button.classList.add('item-button');
-            button.onclick = () => this.toggleItem(item);
+            button.onclick = () => this.selectItem(item);
             this.shopItemsContainer.appendChild(button);
         });
     }
 
-    toggleItem(item) {
-        console.log("Toggling item:", item.name);
-        if (this.equippedItems.has(item.id)) {
-            this.unequipItem(item);
+    setupButtons() {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        const buyButton = document.createElement('button');
+        buyButton.textContent = 'Buy';
+        buyButton.addEventListener('click', () => this.buySelectedItem());
+
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Avatar';
+        clearButton.addEventListener('click', () => clearAvatar());
+
+        buttonContainer.appendChild(buyButton);
+        buttonContainer.appendChild(clearButton);
+        document.querySelector('.shop-section').appendChild(buttonContainer);
+    }
+
+    selectItem(item) {
+        this.selectedItem = item;
+        document.querySelectorAll('.item-button').forEach(el => el.classList.remove('selected'));
+        event.target.classList.add('selected');
+    }
+
+    buySelectedItem() {
+        if (!this.selectedItem) {
+            alert("Please select an item to buy.");
+            return;
+        }
+
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser && loggedInUser.coins >= this.selectedItem.price) {
+            loggedInUser.coins -= this.selectedItem.price;
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            this.updateUserInfo();
+            toggleItem(this.selectedItem);
+            alert(`You bought ${this.selectedItem.name}!`);
         } else {
-            this.equipItem(item);
+            alert("Not enough coins to buy this item!");
         }
     }
 
-    equipItem(item) {
-        console.log("Equipping item:", item.name);
-        const img = document.createElement('img');
-        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        img.alt = item.name;
-        img.dataset.id = item.id;
-        img.dataset.type = item.type;
-        img.style.position = 'absolute';
-        img.style.top = '0';
-        img.style.left = '0';
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.onerror = () => console.error("Failed to load image:", img.src);
-        
-        this.avatarDisplay.appendChild(img);
-        this.equippedItems.add(item.id);
-
-        // Use the global layerManager instance
-        if (window.layerManager) {
-            window.layerManager.reorderLayers();
-        } else {
-            console.error('layerManager not found. Make sure layerManager.js is loaded before shopManager.js');
-        }
-    }
-
-    unequipItem(item) {
-        console.log("Unequipping item:", item.name);
-        const img = this.avatarDisplay.querySelector(`img[data-id="${item.id}"]`);
-        if (img) {
-            img.remove();
-        }
-        this.equippedItems.delete(item.id);
-
-        // Use the global layerManager instance
-        if (window.layerManager) {
-            window.layerManager.reorderLayers();
-        } else {
-            console.error('layerManager not found. Make sure layerManager.js is loaded before shopManager.js');
+    updateUserInfo() {
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            document.getElementById('user-name').textContent = loggedInUser.username;
+            this.userCoinsElement.textContent = loggedInUser.coins.toLocaleString();
         }
     }
 }
