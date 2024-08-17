@@ -16,6 +16,8 @@ class ShopManager {
 
     createShopItems() {
         console.log("Creating shop items...");
+        // Clear existing items to prevent duplication
+        this.shopItemsContainer.innerHTML = '';
         shopItems.forEach(item => {
             const button = document.createElement('button');
             button.textContent = `${item.name} ($${item.price})`;
@@ -26,6 +28,11 @@ class ShopManager {
     }
 
     setupButtons() {
+        // Check if buttons already exist
+        if (document.querySelector('.button-container')) {
+            return;
+        }
+
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('button-container');
 
@@ -54,7 +61,7 @@ class ShopManager {
             return;
         }
 
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
         if (loggedInUser && loggedInUser.coins >= this.selectedItem.price) {
             loggedInUser.coins -= this.selectedItem.price;
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
