@@ -4,28 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avatar Shop</title>
-    <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="shop.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to the Avatar Shop, <span id="user-name"></span>!</h1>
-        <div class="coin-display">
-            <span class="coin-icon">🪙</span>
-            <span id="user-coins">0</span>
+    <header>
+        <h1>Welcome to the Avatar Shop</h1>
+        <div id="user-info">
+            <span>Welcome, <span id="user-name"></span>!</span>
+            <span>Coins: <span id="user-coins"></span></span>
         </div>
-        
+        <button onclick="logout()">Logout</button>
+    </header>
+
+    <main>
         <div class="avatar-container">
             <div id="avatar-display"></div>
         </div>
-        
+
+        <h2>Shop Items</h2>
         <div class="shop-items">
-            <h2>Wearable Items</h2>
-            <div id="item-list"></div>
+            <!-- Shop items will be dynamically added here by avatarManager.js -->
         </div>
-        
-        <button onclick="logout()">Logout</button>
-    </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Avatar Shop. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../avatarTemplate.js"></script>
     <script src="shop.js"></script>
+    <script src="../avatarManager.js"></script>
 </body>
 </html>
