@@ -5,50 +5,61 @@ class ShopInteractions {
         this.svgContainer = document.getElementById('avatar-display');
         this.shopItemsContainer = document.querySelector('.shop-items');
         this.userCoinsElement = document.getElementById('user-coins');
-        this.clearButton = document.createElement('button');
-        this.clearButton.textContent = 'Clear Avatar';
-        this.clearButton.id = 'clear-avatar';
+        this.selectedItem = null;
         this.initialize();
     }
 
     initialize() {
         this.setupShopItems();
-        this.setupClearButton();
+        this.setupButtons();
     }
 
     setupShopItems() {
         shopItems.forEach(item => {
-            const itemContainer = document.createElement('div');
-            itemContainer.classList.add('shop-item');
-
-            const itemName = document.createElement('span');
-            itemName.textContent = item.name;
-
-            const itemPrice = document.createElement('span');
-            itemPrice.textContent = `$${item.price}`;
-
-            const buyButton = document.createElement('button');
-            buyButton.textContent = 'Buy';
-            buyButton.addEventListener('click', () => this.buyItem(item));
-
-            itemContainer.appendChild(itemName);
-            itemContainer.appendChild(itemPrice);
-            itemContainer.appendChild(buyButton);
-
-            this.shopItemsContainer.appendChild(itemContainer);
+            const itemElement = document.createElement('div');
+            itemElement.classList.add('shop-item');
+            itemElement.textContent = `${item.name} ($${item.price})`;
+            itemElement.addEventListener('click', () => this.selectItem(item));
+            this.shopItemsContainer.appendChild(itemElement);
         });
     }
 
-    setupClearButton() {
-        this.clearButton.addEventListener('click', () => this.clearAvatar());
-        document.querySelector('.shop-section').appendChild(this.clearButton);
+    setupButtons() {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        const buyButton = document.createElement('button');
+        buyButton.textContent = 'Buy';
+        buyButton.addEventListener('click', () => this.buySelectedItem());
+
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Avatar';
+        clearButton.addEventListener('click', () => this.clearAvatar());
+
+        buttonContainer.appendChild(buyButton);
+        buttonContainer.appendChild(clearButton);
+        document.querySelector('.shop-section').appendChild(buttonContainer);
     }
 
-    buyItem(item) {
+    selectItem(item) {
+        this.selectedItem = item;
+        // Highlight the selected item (you may want to add some CSS for this)
+        document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
+        event.target.classList.add('selected');
+    }
+
+    buySelectedItem() {
+        if (!this.selectedItem) {
+            alert("Please select an item to buy.");
+            return;
+        }
+
         const userCoins = parseInt(this.userCoinsElement.textContent);
-        if (userCoins >= item.price) {
-            this.addItemToAvatar(item);
-            this.updateUserCoins(userCoins - item.price);
+        if (userCoins >= this.selectedItem.price) {
+            this.addItemToAvatar(this.selectedItem);
+            this.updateUserCoins(userCoins - this.selectedItem.price);
+            inventory.addItem(this.selectedItem);
+            alert(`You bought ${this.selectedItem.name}!`);
         } else {
             alert("Not enough coins to buy this item!");
         }
@@ -87,3 +98,20 @@ class ShopInteractions {
 document.addEventListener('DOMContentLoaded', () => {
     new ShopInteractions();
 });
+
+
+
+New inventory.js file:
+// File: inventory.js
+
+class Inventory {
+    con
+
+
+
+Avatar for lalajrf-hinsj
+
+
+
+
+
