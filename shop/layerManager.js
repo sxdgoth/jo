@@ -7,6 +7,7 @@ class LayerManager {
             'Legs', 
             'Arms', 
             'Body', 
+            'Shirt',
             'Jacket', 
             'Head'
         ];
@@ -18,12 +19,17 @@ class LayerManager {
         this.reorderTimeout = setTimeout(() => {
             const items = Array.from(this.avatarDisplay.children);
             items.sort((a, b) => {
-                const aIndex = this.layerOrder.indexOf(a.dataset.type);
-                const bIndex = this.layerOrder.indexOf(b.dataset.type);
+                const aIndex = this.getLayerIndex(a.dataset.type);
+                const bIndex = this.getLayerIndex(b.dataset.type);
                 return aIndex - bIndex;
             });
             items.forEach(item => this.avatarDisplay.appendChild(item));
         }, 50);
+    }
+
+    getLayerIndex(type) {
+        const index = this.layerOrder.indexOf(type);
+        return index === -1 ? this.layerOrder.length : index;
     }
 
     addLayer(element) {
