@@ -8,7 +8,9 @@ class AvatarBody {
             { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs' },
             { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms' },
             { name: 'Body', file: 'avatar-body.svg', type: 'Body' },
-            { name: 'Head', file: 'avatar-head.svg', type: 'Head' }
+            { name: 'Head', file: 'avatar-head.svg', type: 'Head' },
+            { name: 'Jacket', file: '', type: 'Jacket' },
+            { name: 'Shirt', file: '', type: 'Shirt' }
         ];
         this.layers = {};
     }
@@ -18,7 +20,7 @@ class AvatarBody {
         this.container.innerHTML = '';
         this.bodyParts.forEach(part => {
             const img = document.createElement('img');
-            img.src = this.baseUrl + part.file;
+            img.src = part.file ? this.baseUrl + part.file : '';
             img.alt = part.name;
             img.dataset.type = part.type;
             img.style.position = 'absolute';
@@ -26,6 +28,7 @@ class AvatarBody {
             img.style.left = '0';
             img.style.width = '100%';
             img.style.height = '100%';
+            img.style.display = part.file ? 'block' : 'none';
             img.onload = () => console.log(`Loaded ${part.name}`);
             img.onerror = () => console.error(`Failed to load ${part.name}: ${img.src}`);
             this.container.appendChild(img);
@@ -37,6 +40,7 @@ class AvatarBody {
     updateLayer(type, newSrc) {
         if (this.layers[type]) {
             this.layers[type].src = newSrc;
+            this.layers[type].style.display = 'block';
             console.log(`Updated ${type} layer with ${newSrc}`);
         } else {
             console.warn(`Layer ${type} not found`);
@@ -45,7 +49,7 @@ class AvatarBody {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Body', 'Arms', 'Head'];
+        const order = ['Legs', 'Body', 'Shirt', 'Jacket', 'Arms', 'Head'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
