@@ -23,15 +23,17 @@ class AvatarManager {
         this.equippedItems = {};
         this.pendingChanges = {};
         this.saveEquippedItems();
-        this.updateAvatarDisplay();
+        if (window.avatarBody) {
+            window.avatarBody.clearLayers();
+        }
         this.updateItemVisuals();
         alert('Avatar cleared successfully!');
     }
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
-            const itemsToDisplay = {...this.equippedItems, ...this.pendingChanges};
             window.avatarBody.clearLayers();
+            const itemsToDisplay = {...this.equippedItems, ...this.pendingChanges};
             Object.entries(itemsToDisplay).forEach(([type, itemId]) => {
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
@@ -44,6 +46,9 @@ class AvatarManager {
     toggleItem(item) {
         if (this.pendingChanges[item.type] === item.id) {
             delete this.pendingChanges[item.type];
+            if (window.avatarBody) {
+                window.avatarBody.updateLayer(item.type, null); // Remove the layer
+            }
         } else {
             this.pendingChanges[item.type] = item.id;
         }
@@ -81,6 +86,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.avatarManager = new AvatarManager();
     window.avatarManager.initialize();
 });
-
-
-
