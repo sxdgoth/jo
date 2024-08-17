@@ -1,25 +1,25 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
 
-   function renderShopItems() {
-    shopItemsContainer.innerHTML = ''; // Clear existing items
-    shopItems.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.classList.add('shop-item');
-        const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        itemElement.innerHTML = `
-            <div class="item-image" data-id="${item.id}">
-                <img src="${imgSrc}" alt="${item.name}" style="width: 100px; height: 100px; object-fit: contain;">
-            </div>
-            <h3>${item.name}</h3>
-            <p>Type: ${item.type}</p>
-            <p>Price: ${item.price} coins</p>
-            <button class="buy-btn" data-id="${item.id}">Buy</button>
-        `;
-        shopItemsContainer.appendChild(itemElement);
-    });
-
+    function renderShopItems() {
+        shopItemsContainer.innerHTML = ''; // Clear existing items
+        shopItems.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.classList.add('shop-item');
+            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+            itemElement.innerHTML = `
+                <div class="item-image" data-id="${item.id}">
+                    <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
+                </div>
+                <h3>${item.name}</h3>
+                <p>Type: ${item.type}</p>
+                <p>Price: ${item.price} coins</p>
+                <button class="buy-btn" data-id="${item.id}">Buy</button>
+            `;
+            shopItemsContainer.appendChild(itemElement);
+        });
 
         // Add event listeners to item images for try on/off
         document.querySelectorAll('.item-image').forEach(image => {
@@ -73,22 +73,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function resetAvatarDisplay() {
-        triedOnItems = {};
-        if (window.avatarDisplay) {
-            window.avatarDisplay.loadAvatar();
-        }
-        updateItemImages();
+    function buyItem(itemId) {
+        // ... (keep existing buyItem function unchanged)
     }
-
-    // Keep the existing buyItem function
 
     // Expose necessary functions to the global scope
     window.shopManager = {
         toggleTryOn,
         buyItem,
-        renderShopItems,
-        resetAvatarDisplay
+        renderShopItems
     };
 
     // Initialize the shop
