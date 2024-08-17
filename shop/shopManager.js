@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
             itemElement.innerHTML = `
-                <img src="${item.path}${item.id}" alt="${item.name}">
+                <img src="${item.path}${item.id}" alt="${item.name}" onerror="this.src='placeholder.png'">
                 <h3>${item.name}</h3>
                 <p>Type: ${item.type}</p>
                 <p>Price: $${item.price}</p>
