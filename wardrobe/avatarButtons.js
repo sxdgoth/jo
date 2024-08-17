@@ -28,32 +28,19 @@ function createAvatarButtons() {
 }
 
 function applyAvatar() {
-    const equippedItems = {};
-    document.querySelectorAll('.item-image.equipped').forEach(itemImage => {
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item) {
-            equippedItems[item.type] = item.id;
-        }
-    });
-
-    localStorage.setItem('equippedItems', JSON.stringify(equippedItems));
-    alert('Avatar saved successfully!');
+    if (window.avatarManager) {
+        window.avatarManager.applySelectedItems();
+        alert('Avatar applied and saved successfully!');
+    } else {
+        console.error('Avatar manager not found');
+    }
 }
 
 function clearAvatar() {
-    document.querySelectorAll('.item-image.equipped').forEach(itemImage => {
-        itemImage.classList.remove('equipped');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && window.avatarBody) {
-            window.avatarBody.updateLayer(item.type, null);
-        }
-    });
-
-    localStorage.removeItem('equippedItems');
     if (window.avatarManager) {
-        window.avatarManager.equippedItems = {};
+        window.avatarManager.clearAvatar();
+        alert('Avatar cleared successfully!');
+    } else {
+        console.error('Avatar manager not found');
     }
-    alert('Avatar cleared successfully!');
 }
