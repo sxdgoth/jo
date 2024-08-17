@@ -31,14 +31,6 @@ createButtons() {
 
 
 
-This change will prevent the creation of duplicate buttons if they already exist on the page.
-
-Now, to ensure that we're not creating these buttons elsewhere in your code, please check your wardrobe.js and any other relevant files to remove any other code that might be creating these buttons.
-
-If you still see duplicate buttons after making this change, it's possible that the AvatarManager is being
-
-Avatar for lalajrf-hinsj
-
 
 
 
