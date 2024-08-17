@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         document.getElementById('user-name').textContent = loggedInUser.username;
         updateUserCoins(loggedInUser.coins);
+        window.createUserInventory(loggedInUser.username);
         // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
             window.shopManager.renderShopItems();
