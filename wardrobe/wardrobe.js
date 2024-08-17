@@ -51,24 +51,24 @@ function renderOwnedItems() {
 function toggleItem(item) {
     const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
     
-    if (itemImage.classList.contains('selected')) {
-        // Unselect the item
-        itemImage.classList.remove('selected');
+    if (itemImage.classList.contains('equipped')) {
+        // Unequip the item
+        itemImage.classList.remove('equipped');
+        window.avatarBody.updateLayer(item.type, null);
     } else {
-        // Unselect any other item of the same type
-        const selectedItemOfSameType = document.querySelector(`.item-image.selected[data-id^="${item.type}"]`);
-        if (selectedItemOfSameType) {
-            selectedItemOfSameType.classList.remove('selected');
+        // Unequip any other item of the same type
+        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
+        if (equippedItemOfSameType) {
+            equippedItemOfSameType.classList.remove('equipped');
         }
 
-        // Select the clicked item
-        itemImage.classList.add('selected');
+        // Equip the clicked item
+        itemImage.classList.add('equipped');
+        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
     }
 
-    // Update the avatarManager's selectedItems
-    if (window.avatarManager) {
-        window.avatarManager.updateSelectedItems(item);
-    }
+    // Save equipped items to sessionStorage
+    saveEquippedItems();
 }
 
 function saveEquippedItems() {
