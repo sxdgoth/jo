@@ -15,24 +15,24 @@ main {
     background-color: #ffffff;
     box-shadow: 0 0 20px rgba(0,0,0,0.1);
     border-radius: 10px;
+}
+
+.shop-content {
     display: flex;
     gap: 20px;
 }
 
-.shop-section {
+.items-container {
     flex: 1;
 }
 
-.shop-items-container {
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-    padding-right: 10px;
-}
-
-.shop-items {
+.item-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .shop-item {
@@ -40,6 +40,7 @@ main {
     border-radius: 5px;
     padding: 10px;
     text-align: center;
+    cursor: pointer;
     transition: all 0.3s ease;
     background-color: #fff;
     display: flex;
@@ -52,45 +53,51 @@ main {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.item-image {
-    width: 100%;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px;
-    overflow: hidden;
-    cursor: pointer;
+.shop-item.selected {
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
-.item-image img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-}
-
-.shop-item h3 {
+.shop-item-name {
     font-weight: bold;
-    margin: 10px 0;
-    font-size: 16px;
+    margin-bottom: 10px;
 }
 
-.shop-item p {
-    margin: 5px 0;
-    font-size: 14px;
+.shop-item-price {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.preview-container {
+    width: 300px;
+}
+
+#avatar-display {
+    width: 100%;
+    height: 400px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+#avatar-display img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .buy-btn {
-    margin-top: 10px;
-    padding: 8px 15px;
+    padding: 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 14px;
     font-weight: bold;
+    margin-top: 10px;
 }
 
 .buy-btn:hover {
@@ -102,30 +109,27 @@ main {
     cursor: not-allowed;
 }
 
-.avatar-container {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Scrollbar styles */
+.item-list::-webkit-scrollbar {
+    width: 8px;
 }
 
-#avatar-display {
-    width: 100%;
-    height: 400px;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
-    position: relative;
+.item-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
-#avatar-display img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+.item-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.item-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.shop-item.owned .shop-item-status {
+    color: green;
+    font-weight: bold;
 }
 
 #user-info {
@@ -134,51 +138,38 @@ main {
     align-items: center;
     padding: 10px 20px;
     background-color: #f0f0f0;
-    color: #333;
     margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    width: 100%;
+    border-radius: 5px;
 }
 
-#user-info span {
-    font-size: 14px;
-}
-
-#user-coins {
+#coin-display {
+    font-size: 18px;
     font-weight: bold;
     color: #f39c12;
 }
 
-/* Scrollbar styles */
-.shop-items-container::-webkit-scrollbar {
-    width: 8px;
+.item-image {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    overflow: hidden;
 }
 
-.shop-items-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.shop-items-container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-.shop-items-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
+.item-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
 }
 
 @media (max-width: 768px) {
-    main {
+    .shop-content {
         flex-direction: column;
     }
 
-    .avatar-container {
+    .preview-container {
         width: 100%;
-        margin-bottom: 20px;
-    }
-
-    #avatar-display {
-        height: 300px;
     }
 }
