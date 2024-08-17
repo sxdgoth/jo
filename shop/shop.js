@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+ddocument.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
@@ -6,9 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
         
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager();
-        window.avatarManager.initialize();
+        // Initialize AvatarBody
+        window.avatarBody = new AvatarBody('avatar-display');
         
         // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
