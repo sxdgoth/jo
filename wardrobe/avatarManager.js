@@ -5,22 +5,10 @@ class AvatarManager {
     }
 
     initialize() {
-        this.createButtons();
-    }
-
-    createButtons() {
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'avatar-buttons';
-        const applyButton = document.createElement('button');
-        applyButton.textContent = 'Apply Avatar';
-        applyButton.onclick = () => this.applyAvatar();
-        const clearButton = document.createElement('button');
-        clearButton.textContent = 'Clear Avatar';
-        clearButton.onclick = () => this.clearAvatar();
-        buttonContainer.appendChild(applyButton);
-        buttonContainer.appendChild(clearButton);
-        const avatarContainer = document.querySelector('.avatar-container');
-        avatarContainer.insertBefore(buttonContainer, avatarContainer.firstChild);
+        this.applyButton = document.getElementById('apply-avatar');
+        this.clearButton = document.getElementById('clear-avatar');
+        this.applyButton.addEventListener('click', () => this.applyAvatar());
+        this.clearButton.addEventListener('click', () => this.clearAvatar());
     }
 
     applyAvatar() {
@@ -53,10 +41,8 @@ class AvatarManager {
 
     toggleItem(item) {
         if (this.pendingChanges[item.type] === item.id) {
-            // Unequip the item
             delete this.pendingChanges[item.type];
         } else {
-            // Equip the item
             this.pendingChanges[item.type] = item.id;
         }
         this.updateItemVisuals();
