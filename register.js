@@ -3,9 +3,8 @@ function register() {
     const password = document.getElementById('reg-password').value;
 
     if (username && password) {
-        // In a real application, you would send this data to a server
-        // For this example, we'll just store it in localStorage
-        localStorage.setItem('user', JSON.stringify({ username, password }));
+        const newUser = { username, password, coins: 1000 };
+        localStorage.setItem('user', JSON.stringify(newUser));
         alert('Registration successful! You can now log in.');
         clearRegisterForm();
     } else {
