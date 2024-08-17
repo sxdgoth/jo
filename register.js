@@ -1,28 +1,31 @@
 function register() {
+    console.log('Register function called');
+
     const username = document.getElementById('reg-username').value;
     const password = document.getElementById('reg-password').value;
+    console.log('Username:', username, 'Password:', password);
 
     if (username && password) {
-        // Check if the username already exists
         if (usernameExists(username)) {
+            console.log('Username already exists');
             alert('Username already exists. Please choose a different username.');
             return;
         }
 
         const newUser = { username, password, coins: 1000 };
         
-        // Get existing users or initialize an empty array
         let users = JSON.parse(localStorage.getItem('users')) || [];
+        console.log('Existing users:', users);
         
-        // Add the new user
         users.push(newUser);
         
-        // Save the updated users array
         localStorage.setItem('users', JSON.stringify(users));
+        console.log('Updated users:', users);
         
         alert('Registration successful! You have been awarded 1000 coins. You can now log in.');
         clearRegisterForm();
     } else {
+        console.log('Empty fields');
         alert('Please fill in all fields.');
     }
 }
