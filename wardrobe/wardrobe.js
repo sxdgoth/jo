@@ -53,7 +53,6 @@ function toggleItem(item) {
     if (itemImage.classList.contains('equipped')) {
         // Unequip the item
         itemImage.classList.remove('equipped');
-        window.avatarBody.updateLayer(item.type, null);
         window.avatarManager.tempEquippedItems[item.type] = null;
     } else {
         // Unequip any other item of the same type
@@ -64,16 +63,15 @@ function toggleItem(item) {
 
         // Equip the clicked item
         itemImage.classList.add('equipped');
-        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         window.avatarManager.tempEquippedItems[item.type] = item.id;
     }
+
+    // Update the temporary avatar display
+    window.avatarManager.updateTempAvatarDisplay();
 
     // Update the AvatarManager's item visuals
     window.avatarManager.updateItemVisuals();
 }
-
-// Removed: saveEquippedItems() function
-// Removed: updateEquippedItems() function
 
 function logout() {
     sessionStorage.removeItem('loggedInUser');
