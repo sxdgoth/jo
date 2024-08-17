@@ -37,12 +37,20 @@ class AvatarManager {
         }
     }
 
-    applyAvatar() {
-        this.equippedItems = {...this.tempEquippedItems};
-        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
-        this.updateAvatarDisplay();
-        alert('Avatar saved successfully!');
-    }
+   applyAvatar() {
+    this.equippedItems = {};
+    Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+        if (itemId) {
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item) {
+                this.equippedItems[type] = `${item.path}${item.id}`;
+            }
+        }
+    });
+    localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+    this.updateAvatarDisplay();
+    alert('Avatar saved successfully!');
+}
 
     clearAvatar() {
         this.tempEquippedItems = {};
