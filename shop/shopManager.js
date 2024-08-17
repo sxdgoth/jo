@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
@@ -66,22 +65,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAvatarDisplay(type, src) {
-        if (window.avatarDisplay && typeof window.avatarDisplay.updateLayer === 'function') {
-            window.avatarDisplay.updateLayer(type, src);
+        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
+            window.avatarBody.updateLayer(type, src);
         } else {
-            console.warn('avatarDisplay.updateLayer function not found. Make sure displayAvatar.js is loaded and initialized.');
+            console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
         }
     }
 
-    function buyItem(itemId) {
-        // ... (keep existing buyItem function unchanged)
+    function resetAvatarDisplay() {
+        triedOnItems = {};
+        if (window.avatarBody) {
+            Object.keys(window.avatarBody.layers).forEach(type => {
+                window.avatarBody.updateLayer(type, null);
+            });
+        }
+        updateItemImages();
     }
 
     // Expose necessary functions to the global scope
     window.shopManager = {
         toggleTryOn,
         buyItem,
-        renderShopItems
+        renderShopItems,
+        resetAvatarDisplay
     };
 
     // Initialize the shop
