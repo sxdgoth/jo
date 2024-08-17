@@ -5,14 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const avatarDisplay = document.getElementById('avatar-display');
     const equippedItems = new Set();
     const layerManager = new LayerManager();
+    const avatarBody = new AvatarBody('avatar-display');
 
     // Function to load and display the avatar
     function loadAvatar() {
         console.log("Loading avatar...");
         avatarDisplay.innerHTML = ''; // Clear existing items
 
-        // Add base avatar template
-        avatarDisplay.innerHTML = avatarTemplate; // Make sure avatarTemplate is defined in avatarTemplate.js
+        // Load base avatar
+        avatarBody.loadAvatar();
 
         // Add equipped items
         equippedItems.forEach(itemId => {
