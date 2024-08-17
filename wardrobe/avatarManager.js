@@ -30,8 +30,8 @@ class AvatarManager {
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
-            window.avatarBody.clearLayers();
             const itemsToDisplay = {...this.equippedItems, ...this.pendingChanges};
+            window.avatarBody.clearLayers();
             Object.entries(itemsToDisplay).forEach(([type, itemId]) => {
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
@@ -81,6 +81,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.avatarManager = new AvatarManager();
     window.avatarManager.initialize();
 });
-
-
-
