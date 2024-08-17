@@ -10,6 +10,7 @@ class AvatarBody {
             { name: 'Body', file: 'avatar-body.svg', type: 'Body' },
             { name: 'Head', file: 'avatar-head.svg', type: 'Head' }
         ];
+        this.layers = {};
     }
 
     loadAvatar() {
@@ -28,17 +29,33 @@ class AvatarBody {
             img.onload = () => console.log(`Loaded ${part.name}`);
             img.onerror = () => console.error(`Failed to load ${part.name}: ${img.src}`);
             this.container.appendChild(img);
+            this.layers[part.type] = img;
         });
-        layerManager.reorderLayers();
+        this.reorderLayers();
+    }
+
+    updateLayer(type, newSrc) {
+        if (this.layers[type]) {
+            this.layers[type].src = newSrc;
+            console.log(`Updated ${type} layer with ${newSrc}`);
+        } else {
+            console.warn(`Layer ${type} not found`);
+        }
+        this.reorderLayers();
+    }
+
+    reorderLayers() {
+        const order = ['Legs', 'Body', 'Arms', 'Head'];
+        order.forEach((type, index) => {
+            if (this.layers[type]) {
+                this.layers[type].style.zIndex = index + 1;
+            }
+        });
     }
 }
 
 // Create and load the avatar body when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    const avatarBody = new AvatarBody('avatar-display');
-    avatarBody.loadAvatar();
+    window.avatarBody = new AvatarBody('avatar-display');
+    window.avatarBody.loadAvatar();
 });
-
-
-
-
