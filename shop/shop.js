@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
         
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager();
-        window.avatarManager.initialize();
+        // Initialize AvatarDisplay
+        window.avatarDisplay = new AvatarDisplay('avatar-display');
+        window.avatarDisplay.loadAvatar();
         
         // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
