@@ -27,16 +27,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
-            const userCoins = parseInt(document.getElementById('user-coins').textContent.replace(/,/g, ''));
+            // Get the logged-in user from sessionStorage
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedInUser) {
+                alert("User not logged in!");
+                return;
+            }
+
+            // Use the actual coin value from the user object
+            const userCoins = loggedInUser.coins;
+
             if (userCoins >= item.price) {
                 // Deduct coins and update display
                 const newCoins = userCoins - item.price;
                 
-                // Use the function from shop.js to update user coins
+                // Update the user object in sessionStorage
+                loggedInUser.coins = newCoins;
+                sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+                // Update the displayed coins
                 if (typeof window.updateUserCoinsAfterPurchase === 'function') {
                     window.updateUserCoinsAfterPurchase(newCoins);
                 } else {
                     console.warn('updateUserCoinsAfterPurchase function not found in shop.js');
+                    document.getElementById('user-coins').textContent = newCoins.toLocaleString();
                 }
                 
                 // Add item to selected items
@@ -79,4 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSelectedItems,
         renderShopItems
     };
+
+    // Initialize the shop
+    renderShopItems();
 });
