@@ -3,12 +3,18 @@
 class AvatarDisplay {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
-        this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/body/';
+        if (!this.container) {
+            console.error(`Container with id "${containerId}" not found`);
+            return;
+        }
+        this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/';
         this.layers = {};
     }
 
     loadAvatar() {
+        console.log("Loading avatar...");
         const savedItems = localStorage.getItem('equippedItems');
+        console.log("Saved items:", savedItems);
         const equippedItems = savedItems ? JSON.parse(savedItems) : {};
 
         this.container.innerHTML = '';
@@ -17,10 +23,10 @@ class AvatarDisplay {
         this.container.style.height = '100%';
 
         const bodyParts = [
-            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
-            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
-            { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
-            { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Legs', file: 'body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+            { name: 'Arms', file: 'body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
+            { name: 'Body', file: 'body/avatar-body.svg', type: 'Body', isBase: true },
+            { name: 'Head', file: 'body/avatar-head.svg', type: 'Head', isBase: true },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
             { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
         ];
@@ -38,12 +44,17 @@ class AvatarDisplay {
             if (part.isBase) {
                 img.src = this.baseUrl + part.file;
                 img.style.display = 'block';
+                console.log(`Loading base part: ${part.name}, src: ${img.src}`);
             } else if (equippedItems[part.type]) {
-                img.src = `https://sxdgoth.github.io/jo/${equippedItems[part.type]}`;
+                img.src = `${this.baseUrl}${part.type.toLowerCase()}s/${equippedItems[part.type]}`;
                 img.style.display = 'block';
+                console.log(`Loading equipped part: ${part.name}, src: ${img.src}`);
             } else {
                 img.style.display = 'none';
+                console.log(`No equipped item for: ${part.name}`);
             }
+
+            img.onerror = () => console.error(`Failed to load image: ${img.src}`);
 
             this.container.appendChild(img);
             this.layers[part.type] = img;
@@ -64,6 +75,7 @@ class AvatarDisplay {
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, initializing AvatarDisplay");
     const avatarDisplay = new AvatarDisplay('avatar-display');
     avatarDisplay.loadAvatar();
 });
