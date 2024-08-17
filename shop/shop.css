@@ -167,3 +167,8 @@ main {
         height: 50vh;
     }
 }
+
+.buy-btn.owned {
+    background-color: #888;
+    cursor: not-allowed;
+}
