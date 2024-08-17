@@ -29,11 +29,11 @@ class ShopManager {
         this.reorderLayers();
     }
 
-    equipItem(item) {
+       equipItem(item) {
         console.log(`Equipping item: ${item.name}`); // Debug log
         const avatarDisplay = document.getElementById('avatar-display');
         const img = document.createElement('img');
-        img.src = `https://sxdgoth.github.io/mwahbaby/assets/legendary/${item.id}`;
+        img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`; // Update this line
         img.alt = item.name;
         img.dataset.id = item.id;
         img.dataset.type = item.type;
