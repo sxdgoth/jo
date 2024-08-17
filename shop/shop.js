@@ -5,10 +5,18 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('user-name').textContent = loggedInUser.username;
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
+        
+        // Initialize AvatarManager
+        window.avatarManager = new AvatarManager();
+        window.avatarManager.initialize();
+        
         // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
             window.shopManager.renderShopItems();
         }
+
+        // Add reset button for tried-on items
+        addResetButton();
     } else {
         window.location.href = '../index.html';
     }
@@ -30,6 +38,17 @@ function updateUserCoinsAfterPurchase(newCoins) {
         sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         updateUserCoins(newCoins);
     }
+}
+
+function addResetButton() {
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset Tried-On Items';
+    resetButton.addEventListener('click', () => {
+        if (window.shopManager && typeof window.shopManager.resetAvatarDisplay === 'function') {
+            window.shopManager.resetAvatarDisplay();
+        }
+    });
+    document.querySelector('.shop-container').prepend(resetButton);
 }
 
 // Expose the function to the global scope
