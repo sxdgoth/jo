@@ -16,6 +16,8 @@ class AvatarManager {
         const applyAvatarBtn = document.getElementById('apply-avatar-btn');
         if (applyAvatarBtn) {
             applyAvatarBtn.addEventListener('click', () => this.applyAvatar());
+        } else {
+            console.error('Apply Avatar button not found');
         }
     }
 
@@ -88,9 +90,3 @@ class AvatarManager {
         }
     }
 }
-
-// Initialize the AvatarManager when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.avatarManager = new AvatarManager();
-    window.avatarManager.initialize();
-});
