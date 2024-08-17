@@ -66,7 +66,6 @@ function renderOwnedItems() {
 
 function toggleItem(item) {
     window.avatarManager.toggleItem(item);
-    saveEquippedItems();
 }
 
 function saveEquippedItems() {
