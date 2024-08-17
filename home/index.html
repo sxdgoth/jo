@@ -15,6 +15,8 @@ he<!DOCTYPE html>
         </div>
         <button onclick="logout()">Logout</button>
     </header>
+<div id="avatar-display" style="width: 200px; height: 400px;"></div>
+    
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
