@@ -18,6 +18,9 @@ class AvatarBody {
     loadAvatar() {
         console.log("Loading avatar body parts...");
         this.container.innerHTML = '';
+        this.container.style.position = 'relative';
+        this.container.style.width = '100%';
+        this.container.style.height = '100%';
         this.bodyParts.forEach(part => {
             const img = document.createElement('img');
             img.src = part.file ? this.baseUrl + part.file : '';
@@ -36,6 +39,7 @@ class AvatarBody {
         });
         this.reorderLayers();
     }
+
 
     updateLayer(type, src) {
         if (this.layers[type]) {
