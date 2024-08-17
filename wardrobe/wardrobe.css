@@ -55,15 +55,15 @@ main {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    position: relative; /* Add this line */
+    position: relative;
 }
 
 #avatar-display {
     width: 100%;
     height: 100%;
-    position: absolute; /* Add this line */
-    top: 0; /* Add this line */
-    left: 0; /* Add this line */
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .wardrobe-section {
@@ -90,10 +90,47 @@ main {
     transform: translateY(-5px);
 }
 
+.item-image {
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
 .item-image img {
     max-width: 100%;
     height: auto;
     border-radius: 5px;
+}
+
+.item-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.item-image:hover::after {
+    opacity: 1;
+}
+
+.item-image.equipped {
+    box-shadow: 0 0 10px 5px #4CAF50;
+}
+
+.item-image.equipped::after {
+    content: '✓';
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    background-color: rgba(76, 175, 80, 0.7);
+    opacity: 1;
 }
 
 .wardrobe-item h3 {
@@ -107,21 +144,17 @@ main {
     font-size: 0.9rem;
 }
 
-.equip-btn {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin-top: 0.5rem;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background-color 0.2s;
-}
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
 
-.equip-btn:hover {
-    background-color: #45a049;
+    .avatar-container {
+        max-width: 100%;
+        height: 300px;
+    }
+
+    .wardrobe-items {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
 }
