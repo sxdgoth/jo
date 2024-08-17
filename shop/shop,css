@@ -1,0 +1,27 @@
+.coin-display {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.coin-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+#user-coins {
+    font-weight: bold;
+    color: #FFD700; /* Gold color for coins */
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#user-name {
+    color: #007bff;
+    font-weight: bold;
+}
