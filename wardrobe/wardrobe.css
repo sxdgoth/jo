@@ -2,23 +2,64 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f0f0f0;
 }
 
 header {
-    background-color: #f0f0f0;
+    background-color: #333;
+    color: white;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+header h1 {
+    margin: 0;
+}
+
+#user-info {
+    display: flex;
+    gap: 1rem;
+}
+
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
 main {
     display: flex;
-    padding: 1rem;
+    padding: 2rem;
+    gap: 2rem;
 }
 
 .avatar-container {
     flex: 1;
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#avatar-display {
+    width: 100%;
+    height: 400px; /* Adjust as needed */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .wardrobe-section {
@@ -32,12 +73,51 @@ main {
 }
 
 .wardrobe-item {
+    background-color: white;
     border: 1px solid #ddd;
-    padding: 0.5rem;
+    border-radius: 5px;
+    padding: 1rem;
     text-align: center;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.wardrobe-item:hover {
+    transform: translateY(-5px);
 }
 
 .item-image img {
     max-width: 100%;
     height: auto;
+    border-radius: 5px;
+}
+
+.wardrobe-item h3 {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.wardrobe-item p {
+    margin: 0.5rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.equip-btn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.equip-btn:hover {
+    background-color: #45a049;
 }
