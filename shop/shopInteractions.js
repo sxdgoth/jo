@@ -9,18 +9,8 @@ class ShopInteractions {
     }
 
     initialize() {
-        this.setupShopItems();
         this.setupButtons();
-    }
-
-    setupShopItems() {
-        shopItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('shop-item');
-            itemElement.textContent = `${item.name} ($${item.price})`;
-            itemElement.addEventListener('click', () => this.selectItem(item));
-            this.shopItemsContainer.appendChild(itemElement);
-        });
+        this.addSelectListeners();
     }
 
     setupButtons() {
@@ -40,10 +30,17 @@ class ShopInteractions {
         document.querySelector('.shop-section').appendChild(buttonContainer);
     }
 
-    selectItem(item) {
-        this.selectedItem = item;
-        document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
-        event.target.classList.add('selected');
+    addSelectListeners() {
+        const shopItems = this.shopItemsContainer.querySelectorAll('.item-button');
+        shopItems.forEach(item => {
+            item.addEventListener('click', (event) => this.selectItem(event.target));
+        });
+    }
+
+    selectItem(itemElement) {
+        this.selectedItem = shopItems.find(item => item.name === itemElement.textContent.split(' ($')[0]);
+        document.querySelectorAll('.item-button').forEach(el => el.classList.remove('selected'));
+        itemElement.classList.add('selected');
     }
 
     buySelectedItem() {
