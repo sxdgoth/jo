@@ -48,11 +48,31 @@ class AvatarManager {
     }
 
        clearAvatar() {
-        this.displayedItems = {};
-        this.updateAvatarDisplay(true); // Pass true to force a full refresh
-        this.updateItemVisuals();
-        console.log("Avatar cleared");
+    this.displayedItems = {};
+    
+    if (window.avatarBody) {
+        const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
+        allLayers.forEach(layer => {
+            window.avatarBody.updateLayer(layer, null);
+        });
     }
+
+    this.updateItemVisuals();
+    console.log("Avatar cleared");
+
+    // Force a redraw of the avatar
+    const avatarDisplay = document.getElementById('avatar-display');
+    if (avatarDisplay) {
+        avatarDisplay.style.display = 'none';
+        void avatarDisplay.offsetHeight; // Trigger a reflow
+        avatarDisplay.style.display = 'block';
+    }
+
+    // Add a small delay before showing the alert
+    setTimeout(() => {
+        alert('Avatar cleared successfully!');
+    }, 100);
+}
 
     updateAvatarDisplay(forceRefresh = false) {
         if (window.avatarBody) {
