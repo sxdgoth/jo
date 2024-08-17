@@ -1,11 +1,47 @@
+// avatarManager.js
+
 class AvatarManager {
     constructor() {
         this.equippedItems = {};
-        this.selectedItems = {};
     }
 
     initialize() {
         this.loadEquippedItems();
+        this.createButtons();
+    }
+
+    createButtons() {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'avatar-buttons';
+
+        const applyButton = document.createElement('button');
+        applyButton.textContent = 'Apply Avatar';
+        applyButton.onclick = () => this.applyAvatar();
+
+        const clearButton = document.createElement('button');
+        clearButton.textContent = 'Clear Avatar';
+        clearButton.onclick = () => this.clearAvatar();
+
+        buttonContainer.appendChild(applyButton);
+        buttonContainer.appendChild(clearButton);
+
+        const avatarContainer = document.querySelector('.avatar-container');
+        avatarContainer.insertBefore(buttonContainer, avatarContainer.firstChild);
+    }
+
+    applyAvatar() {
+        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+        alert('Avatar saved successfully!');
+    }
+
+    clearAvatar() {
+        this.equippedItems = {};
+        localStorage.removeItem('equippedItems');
+        this.updateAvatarDisplay();
+        document.querySelectorAll('.item-image.equipped').forEach(item => {
+            item.classList.remove('equipped');
+        });
+        alert('Avatar cleared successfully!');
     }
 
     loadEquippedItems() {
@@ -27,28 +63,29 @@ class AvatarManager {
         }
     }
 
-    updateSelectedItems(item) {
-        if (this.selectedItems[item.type] === item.id) {
-            delete this.selectedItems[item.type];
+    toggleItem(item) {
+        if (this.equippedItems[item.type] === item.id) {
+            // Unequip the item
+            delete this.equippedItems[item.type];
+            window.avatarBody.updateLayer(item.type, null);
         } else {
-            this.selectedItems[item.type] = item.id;
+            // Equip the item
+            this.equippedItems[item.type] = item.id;
+            window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         }
+        this.updateItemVisuals();
     }
 
-    applySelectedItems() {
-        this.equippedItems = {...this.selectedItems};
-        this.updateAvatarDisplay();
-        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
-    }
-
-    clearAvatar() {
-        this.equippedItems = {};
-        this.selectedItems = {};
-        this.updateAvatarDisplay();
-        document.querySelectorAll('.item-image.selected').forEach(item => {
-            item.classList.remove('selected');
+    updateItemVisuals() {
+        document.querySelectorAll('.item-image').forEach(itemImage => {
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.equippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+            } else {
+                itemImage.classList.remove('equipped');
+            }
         });
-        localStorage.removeItem('equippedItems');
     }
 }
 
