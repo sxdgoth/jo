@@ -5,12 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('user-name').textContent = loggedInUser.username;
         document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
         
+        // Initialize user's inventory
         window.createUserInventory(loggedInUser.username);
         
+        // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
             window.avatarBody.initializeAvatar();
         }
         
+        // Render owned items
         renderOwnedItems();
     } else {
         window.location.href = '../index.html';
@@ -21,7 +24,7 @@ function renderOwnedItems() {
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
     
-    wardrobeItemsContainer.innerHTML = '';
+    wardrobeItemsContainer.innerHTML = ''; // Clear existing items
     
     ownedItems.forEach(item => {
         const itemElement = document.createElement('div');
@@ -36,16 +39,38 @@ function renderOwnedItems() {
         `;
         wardrobeItemsContainer.appendChild(itemElement);
 
+        // Add click event listener to the item image
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
     });
 
-    window.avatarManager.updateItemVisuals();
+    // Removed: updateEquippedItems();
 }
 
 function toggleItem(item) {
-    window.avatarManager.toggleItem(item);
+    const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
+    
+    if (itemImage.classList.contains('equipped')) {
+        // Unequip the item
+        itemImage.classList.remove('equipped');
+        window.avatarBody.updateLayer(item.type, null);
+    } else {
+        // Unequip any other item of the same type
+        const equippedItemOfSameType = document.querySelector(`.item-image.equipped[data-id^="${item.type}"]`);
+        if (equippedItemOfSameType) {
+            equippedItemOfSameType.classList.remove('equipped');
+        }
+
+        // Equip the clicked item
+        itemImage.classList.add('equipped');
+        window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+    }
+
+    // Removed: saveEquippedItems();
 }
+
+// Removed: saveEquippedItems() function
+// Removed: updateEquippedItems() function
 
 function logout() {
     sessionStorage.removeItem('loggedInUser');
