@@ -10,7 +10,20 @@ function login() {
 
     if (user) {
         console.log('User found:', user);
-        sessionStorage.setItem('loggedInUser', JSON.stringify(user));
+        
+        // Check if the user has a stored coin balance
+        const storedUser = JSON.parse(localStorage.getItem(username));
+        if (storedUser) {
+            // Use the stored coin balance
+            user.coins = storedUser.coins;
+        } else {
+            // If no stored balance, initialize with the value from registration
+            localStorage.setItem(username, JSON.stringify(user));
+        }
+
+        // Update the logged in user in localStorage instead of sessionStorage
+        localStorage.setItem('loggedInUser', JSON.stringify(user));
+        
         window.location.href = 'home/index.html';
     } else {
         console.log('Invalid login attempt');
