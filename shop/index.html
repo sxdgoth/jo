@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop</title>
     <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="shop.css">
 </head>
 <body>
     <div class="container">
         <h1>Welcome to the Shop, <span id="user-name"></span>!</h1>
-        <p>Your coins: <span id="user-coins"></span></p>
+        <div class="coin-display">
+            <img src="coin-icon.png" alt="Coin" class="coin-icon">
+            <span id="user-coins">0</span>
+        </div>
         <!-- Add your shop items here -->
         <button onclick="logout()">Logout</button>
     </div>
