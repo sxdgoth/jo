@@ -10,3 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Shop items not found or not an array');
     }
 });
+
+
+
