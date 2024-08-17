@@ -46,11 +46,14 @@ function clearAvatar() {
         itemImage.classList.remove('equipped');
         const itemId = itemImage.dataset.id;
         const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item) {
+        if (item && window.avatarBody) {
             window.avatarBody.updateLayer(item.type, null);
         }
     });
 
     localStorage.removeItem('equippedItems');
+    if (window.avatarManager) {
+        window.avatarManager.equippedItems = {};
+    }
     alert('Avatar cleared successfully!');
 }
