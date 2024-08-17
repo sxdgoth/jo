@@ -77,6 +77,18 @@ class AvatarBody {
             window.avatarManager.updateAvatarDisplay();
         }
     }
+
+    // New method for clearing all non-base layers
+    clearAllLayers() {
+        Object.entries(this.layers).forEach(([type, layer]) => {
+            const bodyPart = this.bodyParts.find(part => part.type === type);
+            if (!bodyPart.isBase) {
+                layer.style.display = 'none';
+                layer.src = '';
+            }
+        });
+        this.reorderLayers();
+    }
 }
 
 // Create and load the avatar body when the DOM is fully loaded
