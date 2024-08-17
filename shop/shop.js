@@ -37,16 +37,44 @@ function updateUserCoinsAfterPurchase(newCoins) {
     }
 }
 
-function addResetButton() {
-    const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset Tried-On Items';
-    resetButton.addEventListener('click', () => {
-        if (window.shopManager && typeof window.shopManager.resetAvatarDisplay === 'function') {
-            window.shopManager.resetAvatarDisplay();
+function createUserInventory(username) {
+    window.userInventory = {
+        username: username,
+        items: [],
+        addItem: function(item) {
+            this.items.push(item);
+            this.saveInventory();
+        },
+        removeItem: function(itemId) {
+            this.items = this.items.filter(item => item.id !== itemId);
+            this.saveInventory();
+        },
+        hasItem: function(itemId) {
+            return this.items.some(item => item.id === itemId);
+        },
+        getItems: function() {
+            return this.items;
+        },
+        saveInventory: function() {
+            localStorage.setItem(`inventory_${this.username}`, JSON.stringify(this.items));
+        },
+        loadInventory: function() {
+            const savedInventory = localStorage.getItem(`inventory_${this.username}`);
+            if (savedInventory) {
+                this.items = JSON.parse(savedInventory);
+            }
         }
-    });
-    document.querySelector('.shop-container').prepend(resetButton);
+    };
+    window.userInventory.loadInventory();
 }
 
-// Expose the function to the global scope
+// Function to handle item purchase
+function onItemPurchased(item) {
+    window.userInventory.addItem(item);
+    console.log(`Item added to inventory: ${item.name}`);
+}
+
+// Expose necessary functions to the global scope
 window.updateUserCoinsAfterPurchase = updateUserCoinsAfterPurchase;
+window.createUserInventory = createUserInventory;
+window.onItemPurchased = onItemPurchased;
