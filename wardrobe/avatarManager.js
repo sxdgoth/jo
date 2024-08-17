@@ -1,21 +1,31 @@
 class AvatarManager {
     constructor() {
         this.equippedItems = {};
+        this.tempEquippedItems = {};
     }
 
     initialize() {
-        // Removed: this.loadEquippedItems();
         this.createButtons();
+        this.setupApplyAvatarButton();
     }
 
-   
+    setupApplyAvatarButton() {
+        const applyAvatarBtn = document.getElementById('apply-avatar-btn');
+        if (applyAvatarBtn) {
+            applyAvatarBtn.addEventListener('click', () => this.applyAvatar());
+        }
+    }
+
     applyAvatar() {
+        this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+        this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
 
     clearAvatar() {
         this.equippedItems = {};
+        this.tempEquippedItems = {};
         localStorage.removeItem('equippedItems');
         this.updateAvatarDisplay();
         document.querySelectorAll('.item-image.equipped').forEach(item => {
@@ -23,8 +33,6 @@ class AvatarManager {
         });
         alert('Avatar cleared successfully!');
     }
-
-    // Removed: loadEquippedItems() method
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
@@ -38,13 +46,13 @@ class AvatarManager {
     }
 
     toggleItem(item) {
-        if (this.equippedItems[item.type] === item.id) {
+        if (this.tempEquippedItems[item.type] === item.id) {
             // Unequip the item
-            delete this.equippedItems[item.type];
+            delete this.tempEquippedItems[item.type];
             window.avatarBody.updateLayer(item.type, null);
         } else {
             // Equip the item
-            this.equippedItems[item.type] = item.id;
+            this.tempEquippedItems[item.type] = item.id;
             window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         }
         this.updateItemVisuals();
@@ -54,7 +62,7 @@ class AvatarManager {
         document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.equippedItems[item.type] === item.id) {
+            if (item && this.tempEquippedItems[item.type] === item.id) {
                 itemImage.classList.add('equipped');
             } else {
                 itemImage.classList.remove('equipped');
