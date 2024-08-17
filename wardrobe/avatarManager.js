@@ -49,31 +49,33 @@ class AvatarManager {
 
       clearAvatar() {
         this.displayedItems = {};
-        this.updateAvatarDisplay();
+        this.updateAvatarDisplay(true); // Pass true to force a full refresh
         this.updateItemVisuals();
         console.log("Avatar cleared");
     }
 
-    updateAvatarDisplay() {
+    updateAvatarDisplay(forceRefresh = false) {
         if (window.avatarBody) {
             console.log("Updating avatar display");
             const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
+            
             allLayers.forEach(layer => {
                 console.log(`Clearing layer: ${layer}`);
-                window.avatarBody.updateLayer(layer, null);
+                window.avatarBody.updateLayer(layer, null, forceRefresh);
             });
 
             Object.entries(this.displayedItems).forEach(([type, itemId]) => {
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
                     console.log(`Applying item: ${item.name} to layer: ${type}`);
-                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`, forceRefresh);
                 }
             });
         } else {
             console.error("avatarBody is not available");
         }
     }
+
 
 
     loadEquippedItems() {
