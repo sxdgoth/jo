@@ -3,18 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop</title>
+    <title>Avatar Shop</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="shop.css">
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to the Shop, <span id="user-name"></span>!</h1>
+        <h1>Welcome to the Avatar Shop, <span id="user-name"></span>!</h1>
         <div class="coin-display">
-            <img src="coin-icon.png" alt="Coin" class="coin-icon">
+            <span class="coin-icon">🪙</span>
             <span id="user-coins">0</span>
         </div>
-        <!-- Add your shop items here -->
+        
+        <div class="avatar-container">
+            <div id="avatar-display"></div>
+        </div>
+        
+        <div class="shop-items">
+            <h2>Wearable Items</h2>
+            <div id="item-list"></div>
+        </div>
+        
         <button onclick="logout()">Logout</button>
     </div>
     <script src="shop.js"></script>
