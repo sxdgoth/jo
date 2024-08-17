@@ -3,7 +3,6 @@
 class AvatarManager {
     constructor() {
         this.equippedItems = {};
-        this.displayedItems = {};
     }
 
     initialize() {
@@ -12,10 +11,8 @@ class AvatarManager {
     }
 
     createButtons() {
-        console.log("Creating buttons");
         if (document.querySelector('.avatar-buttons')) {
-            console.log("Buttons already exist");
-            return;
+            return; // Buttons already exist, don't create them again
         }
 
         const buttonContainer = document.createElement('div');
@@ -34,80 +31,62 @@ class AvatarManager {
 
         const avatarContainer = document.querySelector('.avatar-container');
         if (avatarContainer) {
-            avatarContainer.appendChild(buttonContainer);
-            console.log("Buttons added to avatar container");
-        } else {
-            console.log("Avatar container not found");
+            avatarContainer.insertBefore(buttonContainer, avatarContainer.firstChild);
         }
     }
 
     applyAvatar() {
-        this.equippedItems = {...this.displayedItems};
         localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
         alert('Avatar saved successfully!');
     }
 
-         clearAvatar() {
-        this.displayedItems = {};
+    clearAvatar() {
+        this.equippedItems = {};
+        localStorage.removeItem('equippedItems');
         this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        console.log("Avatar cleared");
-
-        // Add a small delay before showing the alert
-        setTimeout(() => {
-            alert('Avatar cleared successfully!');
-        }, 100);
+        document.querySelectorAll('.item-image.equipped').forEach(item => {
+            item.classList.remove('equipped');
+        });
+        alert('Avatar cleared successfully!');
     }
-
-    updateAvatarDisplay() {
-        if (window.avatarBody) {
-            console.log("Updating avatar display");
-            const allLayers = ['base', 'eyes', 'mouth', 'hair', 'clothes', 'accessories'];
-            
-            allLayers.forEach(layer => {
-                const itemId = this.displayedItems[layer];
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        console.log(`Applying item: ${item.name} to layer: ${layer}`);
-                        window.avatarBody.updateLayer(layer, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    }
-                } else {
-                    console.log(`Clearing layer: ${layer}`);
-                    window.avatarBody.updateLayer(layer, null);
-                }
-            });
-        } else {
-            console.error("avatarBody is not available");
-        }
-    }
-
-    toggleItem(item) {
-        if (this.displayedItems[item.type] === item.id) {
-            delete this.displayedItems[item.type];
-        } else {
-            this.displayedItems[item.type] = item.id;
-        }
-        this.updateAvatarDisplay();
-        this.updateItemVisuals();
-    }
-
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem('equippedItems');
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            this.displayedItems = {...this.equippedItems};
             this.updateAvatarDisplay();
         }
     }
 
-    
+    updateAvatarDisplay() {
+        if (window.avatarBody) {
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                }
+            });
+        }
+    }
+
+    toggleItem(item) {
+        if (this.equippedItems[item.type] === item.id) {
+            // Unequip the item
+            delete this.equippedItems[item.type];
+            window.avatarBody.updateLayer(item.type, null);
+        } else {
+            // Equip the item
+            this.equippedItems[item.type] = item.id;
+            window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+        }
+        this.updateItemVisuals();
+    }
+
     updateItemVisuals() {
         document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.displayedItems[item.type] === item.id) {
+            if (item && this.equippedItems[item.type] === item.id) {
                 itemImage.classList.add('equipped');
             } else {
                 itemImage.classList.remove('equipped');
@@ -115,3 +94,9 @@ class AvatarManager {
         });
     }
 }
+
+// Remove this event listener from here
+// document.addEventListener('DOMContentLoaded', () => {
+//     window.avatarManager = new AvatarManager();
+//     window.avatarManager.initialize();
+// });
