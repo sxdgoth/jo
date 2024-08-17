@@ -30,3 +30,9 @@ class AvatarBody {
         });
     }
 }
+
+// Create and load the avatar body when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarBody = new AvatarBody('avatar-display');
+    avatarBody.loadAvatar();
+});
