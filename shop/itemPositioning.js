@@ -3,7 +3,12 @@ const itemPositions = {
         objectPosition: '-20px 10%',
         transform: 'scale(1.2)'
     },
-    shirts: {
+    shirt: {
+        objectPosition: '20px 25%',
+        transform: 'scale(1.2)'
+    },
+    
+      jacket: {
         objectPosition: '20px 25%',
         transform: 'scale(1.2)'
     },
