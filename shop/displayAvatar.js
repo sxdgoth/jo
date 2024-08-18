@@ -85,12 +85,13 @@ class AvatarDisplay {
     }
 
     // Add these new methods
- tryOnItem(item) {
+tryOnItem(item) {
         if (this.layers[item.type]) {
             console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
+            this.hiddenEquippedItems.delete(item.type); // Remove from hidden set when trying on
 
             // Hide conflicting items
             if (item.type === 'Shirt') this.layers['Jacket'].style.display = 'none';
@@ -98,13 +99,13 @@ class AvatarDisplay {
         }
     }
 
-      removeTriedOnItem(type) {
+    removeTriedOnItem(type) {
         if (this.layers[type]) {
             console.log(`Removing tried on item of type: ${type}`);
             delete this.triedOnItems[type];
 
-            // Show equipped item if exists, otherwise hide the layer
-            if (this.equippedItems[type]) {
+            // Show equipped item if exists and not manually hidden, otherwise hide the layer
+            if (this.equippedItems[type] && !this.hiddenEquippedItems.has(type)) {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
                 if (equippedItem) {
                     this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
@@ -114,9 +115,13 @@ class AvatarDisplay {
                 this.layers[type].style.display = 'none';
             }
 
-            // Show conflicting equipped items
-            if (type === 'Shirt' && this.equippedItems['Jacket']) this.layers['Jacket'].style.display = 'block';
-            if (type === 'Jacket' && this.equippedItems['Shirt']) this.layers['Shirt'].style.display = 'block';
+            // Show conflicting equipped items if not manually hidden
+            if (type === 'Shirt' && this.equippedItems['Jacket'] && !this.hiddenEquippedItems.has('Jacket')) {
+                this.layers['Jacket'].style.display = 'block';
+            }
+            if (type === 'Jacket' && this.equippedItems['Shirt'] && !this.hiddenEquippedItems.has('Shirt')) {
+                this.layers['Shirt'].style.display = 'block';
+            }
         }
     }
 
