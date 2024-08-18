@@ -39,25 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
-        if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            // Item is being tried on, so remove it
-            window.avatarDisplay.removeTriedOnItem(item.type);
-            console.log(`Removed ${item.name}`);
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (window.avatarDisplay.layers[item.type].style.display === 'none') {
-                // Item was equipped but hidden, so show it again
-                window.avatarDisplay.tryOnItem(item);
-                console.log(`Re-displayed equipped item ${item.name}`);
-            } else {
-                // Item is equipped and visible, so hide it temporarily
-                window.avatarDisplay.removeTriedOnItem(item.type);
-                console.log(`Temporarily removed equipped item ${item.name}`);
-            }
-        } else {
-            // Try on the new item
-            window.avatarDisplay.tryOnItem(item);
-            console.log(`Tried on ${item.name}`);
-        }
+        window.avatarDisplay.tryOnItem(item);
         updateItemImages();
     }
 }
@@ -69,14 +51,9 @@ function updateItemImages() {
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             image.classList.add('selected');
             image.classList.remove('equipped');
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (window.avatarDisplay.layers[item.type].style.display !== 'none') {
-                image.classList.add('equipped');
-                image.classList.remove('selected');
-            } else {
-                image.classList.remove('equipped');
-                image.classList.remove('selected');
-            }
+        } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.isItemHidden(item)) {
+            image.classList.add('equipped');
+            image.classList.remove('selected');
         } else {
             image.classList.remove('selected');
             image.classList.remove('equipped');
