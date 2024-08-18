@@ -36,53 +36,35 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-function toggleTryOn(itemId) {
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            // Item is being tried on, so remove it
-            window.avatarDisplay.removeTriedOnItem(item.type);
-            console.log(`Removed ${item.name}`);
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (window.avatarDisplay.layers[item.type].style.display === 'none') {
-                // Item was equipped but hidden, so show it again
-                window.avatarDisplay.tryOnItem(item);
-                console.log(`Re-displayed equipped item ${item.name}`);
-            } else {
-                // Item is equipped and visible, so hide it temporarily
-                window.avatarDisplay.removeTriedOnItem(item.type);
-                console.log(`Temporarily removed equipped item ${item.name}`);
-            }
-        } else {
-            // Try on the new item
-            window.avatarDisplay.tryOnItem(item);
-            console.log(`Tried on ${item.name}`);
-        }
-        updateItemImages();
-    }
-}
-
-function updateItemImages() {
-    document.querySelectorAll('.item-image').forEach(image => {
-        const itemId = image.dataset.id;
+    function toggleTryOn(itemId) {
         const item = shopItems.find(i => i.id === itemId);
-        if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            image.classList.add('selected');
-            image.classList.remove('equipped');
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (window.avatarDisplay.layers[item.type].style.display !== 'none') {
-                image.classList.add('equipped');
-                image.classList.remove('selected');
+        if (item) {
+            if (triedOnItems[item.type] === item) {
+                // Item is already tried on, so remove it
+                delete triedOnItems[item.type];
+                updateAvatarDisplay(item.type, null);
+                console.log(`Removed ${item.name}`);
             } else {
-                image.classList.remove('equipped');
+                // Try on the new item
+                triedOnItems[item.type] = item;
+                updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                console.log(`Tried on ${item.name}`);
+            }
+            updateItemImages();
+        }
+    }
+
+    function updateItemImages() {
+        document.querySelectorAll('.item-image').forEach(image => {
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            if (triedOnItems[item.type] === item) {
+                image.classList.add('selected');
+            } else {
                 image.classList.remove('selected');
             }
-        } else {
-            image.classList.remove('selected');
-            image.classList.remove('equipped');
-        }
-    });
-}
+        });
+    }
 
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
