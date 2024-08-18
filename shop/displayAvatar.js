@@ -87,7 +87,20 @@ updateLayer(type, src) {
             this.layers[type].data = src;
             this.layers[type].style.display = 'block';
         } else {
-            this.layers[type].style.display = 'none';
+            // If src is null, revert to the original equipped item or hide if none
+            const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+            const equippedItem = equippedItems[type];
+            if (equippedItem) {
+                const item = shopItems.find(item => item.id === equippedItem);
+                if (item) {
+                    this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
+                    this.layers[type].style.display = 'block';
+                } else {
+                    this.layers[type].style.display = 'none';
+                }
+            } else {
+                this.layers[type].style.display = 'none';
+            }
         }
     }
     this.reorderLayers();
