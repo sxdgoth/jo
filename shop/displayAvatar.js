@@ -9,7 +9,6 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {}; // Add this line
     }
 
     loadAvatar() {
@@ -64,7 +63,6 @@ class AvatarDisplay {
             }
 
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
-
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
         });
@@ -80,31 +78,11 @@ class AvatarDisplay {
             }
         });
     }
-
-    // Add these new methods
-    tryOnItem(item) {
-        if (this.layers[item.type]) {
-            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
-            this.layers[item.type].style.display = 'block';
-            this.triedOnItems[item.type] = item;
-        }
-    }
-
-    removeTriedOnItem(type) {
-        if (this.layers[type]) {
-            this.layers[type].style.display = 'none';
-            delete this.triedOnItems[type];
-        }
-    }
-
-    isItemEquipped(item) {
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        return equippedItems[item.type] === item.id;
-    }
 }
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
-    window.avatarDisplay = new AvatarDisplay('avatar-display');
-    window.avatarDisplay.loadAvatar();
+    const avatarDisplay = new AvatarDisplay('avatar-display');
+    avatarDisplay.loadAvatar();
+});
