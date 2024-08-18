@@ -15,12 +15,15 @@ class SkinToneManager {
         this.createSkinToneButtons();
     }
 
-    createSkinToneButtons() {
-        const container = document.createElement('div');
-        container.id = 'skin-tone-buttons';
-        container.style.display = 'flex';
-        container.style.justifyContent = 'center';
-        container.style.marginTop = '10px';
+   createSkinToneButtons() {
+    const container = document.createElement('div');
+    container.id = 'skin-tone-buttons';
+    container.style.position = 'absolute';
+    container.style.bottom = '-40px';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
 
         this.skinTones.forEach(tone => {
             const button = document.createElement('button');
