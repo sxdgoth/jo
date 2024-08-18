@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
- function toggleTryOn(itemId) {
+function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
@@ -44,9 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
             window.avatarDisplay.removeTriedOnItem(item.type);
             console.log(`Removed ${item.name}`);
         } else if (window.avatarDisplay.isItemEquipped(item)) {
-            // Item is equipped, so remove it temporarily
-            window.avatarDisplay.removeTriedOnItem(item.type);
-            console.log(`Temporarily removed equipped item ${item.name}`);
+            if (window.avatarDisplay.layers[item.type].style.display === 'none') {
+                // Item was equipped but hidden, so show it again
+                window.avatarDisplay.tryOnItem(item);
+                console.log(`Re-displayed equipped item ${item.name}`);
+            } else {
+                // Item is equipped and visible, so hide it temporarily
+                window.avatarDisplay.removeTriedOnItem(item.type);
+                console.log(`Temporarily removed equipped item ${item.name}`);
+            }
         } else {
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
@@ -62,8 +68,15 @@ function updateItemImages() {
         const item = shopItems.find(i => i.id === itemId);
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             image.classList.add('selected');
-        } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.triedOnItems[item.type]) {
-            image.classList.add('equipped');
+            image.classList.remove('equipped');
+        } else if (window.avatarDisplay.isItemEquipped(item)) {
+            if (window.avatarDisplay.layers[item.type].style.display !== 'none') {
+                image.classList.add('equipped');
+                image.classList.remove('selected');
+            } else {
+                image.classList.remove('equipped');
+                image.classList.remove('selected');
+            }
         } else {
             image.classList.remove('selected');
             image.classList.remove('equipped');
