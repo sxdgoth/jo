@@ -68,8 +68,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAvatarDisplay(type, src) {
-        const avatarDisplay = new AvatarDisplay('avatar-display');
-        avatarDisplay.updateLayer(type, src);
+        const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
+        if (layerElement) {
+            if (src) {
+                layerElement.data = src;
+                layerElement.style.display = 'block';
+            } else {
+                // If src is null, revert to the original equipped item or hide if none
+                const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+                const equippedItem = equippedItems[type];
+                if (equippedItem) {
+                    const item = shopItems.find(item => item.id === equippedItem);
+                    if (item) {
+                        layerElement.data = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+                        layerElement.style.display = 'block';
+                    } else {
+                        layerElement.style.display = 'none';
+                    }
+                } else {
+                    layerElement.style.display = 'none';
+                }
+            }
+        }
     }
 
     function buyItem(itemId) {
@@ -78,8 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetAvatarDisplay() {
         triedOnItems = {};
-        const avatarDisplay = new AvatarDisplay('avatar-display');
-        avatarDisplay.loadAvatar();
+        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+        Object.keys(equippedItems).forEach(type => {
+            updateAvatarDisplay(type, null);
+        });
         updateTryOnButtons();
     }
 
