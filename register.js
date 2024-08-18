@@ -14,7 +14,7 @@ function register() {
 
         const newUser = { username, password, coins: 1000 };
         
-        let users = JSON.parse(localStorage.getItem('users')) || []; // Added fallback to empty array
+        let users = getUsersFromStorage();
         console.log('Existing users:', users);
         
         users.push(newUser);
@@ -32,6 +32,17 @@ function register() {
 }
 
 function usernameExists(username) {
-    const users = JSON.parse(localStorage.getItem('users')) || []; // Added fallback to empty array
-    return users.some(user => user.username === username);
+    const users = getUsersFromStorage();
+    return Array.isArray(users) && users.some(user => user.username === username);
+}
+
+function getUsersFromStorage() {
+    try {
+        const usersData = localStorage.getItem('users');
+        const users = JSON.parse(usersData);
+        return Array.isArray(users) ? users : [];
+    } catch (error) {
+        console.error('Error parsing users data:', error);
+        return [];
+    }
 }
