@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
    function renderShopItems() {
     shopItemsContainer.innerHTML = ''; // Clear existing items
-
     shopItems.forEach(item => {
         const itemElement = document.createElement('div');
         itemElement.classList.add('shop-item');
@@ -21,24 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="buy-btn" data-id="${item.id}">Buy</button>
         `;
         shopItemsContainer.appendChild(itemElement);
-
         // Update buy button state
         const buyButton = itemElement.querySelector('.buy-btn');
         updateBuyButtonState(buyButton, item.id);
     });
-
     // Add event listeners to item images for try on/off
     document.querySelectorAll('.item-image').forEach(image => {
         image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
     });
-
     // Add event listeners to buy buttons
     document.querySelectorAll('.buy-btn').forEach(button => {
         button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
     });
-
     // Initialize inventory state
     initializeInventoryState();
+
+    // Apply item positioning
+    if (window.applyItemPositioning) {
+        window.applyItemPositioning();
+    }
 }
 
     function updateBuyButtonState(button, itemId) {
@@ -55,7 +55,6 @@ function toggleTryOn(itemId) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
-
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             // Item is being tried on, so remove it
             window.avatarDisplay.removeTriedOnItem(item.type);
@@ -96,7 +95,6 @@ function updateItemImages() {
     });
 }
 
-
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
         if (layerElement) {
@@ -128,13 +126,11 @@ function updateItemImages() {
         console.error('Item not found');
         return;
     }
-
     const currentCoins = UserManager.getUserCoins();
     if (currentCoins < item.price) {
         alert('Not enough coins to buy this item!');
         return;
     }
-
     // Deduct coins from user
     const newCoins = currentCoins - item.price;
     if (UserManager.updateUserCoins(newCoins)) {
@@ -142,23 +138,19 @@ function updateItemImages() {
         if (window.userInventory) {
             window.userInventory.addItem(item);
         }
-
         // Update user's coins display
         updateUserCoinsAfterPurchase(newCoins);
-
         // Update buy button state immediately
         const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
         if (buyButton) {
             updateBuyButtonState(buyButton, itemId);
         }
-
         // Update item image state
         const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
         if (itemImage) {
             itemImage.classList.add('equipped');
             itemImage.classList.remove('selected');
         }
-
         alert(`You have successfully purchased ${item.name}!`);
     } else {
         alert('Error updating user coins. Please try again.');
@@ -184,4 +176,9 @@ function updateItemImages() {
 
     // Initialize the shop
     renderShopItems();
+
+    // Apply item positioning when DOM content is loaded
+    if (window.applyItemPositioning) {
+        window.applyItemPositioning();
+    }
 });
