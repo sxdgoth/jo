@@ -2,6 +2,7 @@
 
 class SkinToneManager {
     constructor() {
+        console.log("SkinToneManager constructor called");
         this.skinTones = [
             { name: 'Light', color: '#FFD5B8' },
             { name: 'Medium', color: '#E5B887' },
@@ -12,18 +13,21 @@ class SkinToneManager {
     }
 
     initialize() {
+        console.log("SkinToneManager initialize method called");
         this.createSkinToneButtons();
     }
 
-   createSkinToneButtons() {
-    const container = document.createElement('div');
-    container.id = 'skin-tone-buttons';
-    container.style.position = 'absolute';
-    container.style.bottom = '-40px';
-    container.style.left = '0';
-    container.style.width = '100%';
-    container.style.display = 'flex';
-    container.style.justifyContent = 'center';
+    createSkinToneButtons() {
+        console.log("Creating skin tone buttons");
+        const container = document.createElement('div');
+        container.id = 'skin-tone-buttons';
+        container.style.position = 'fixed';
+        container.style.bottom = '20px';
+        container.style.left = '50%';
+        container.style.transform = 'translateX(-50%)';
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.zIndex = '1000';
 
         this.skinTones.forEach(tone => {
             const button = document.createElement('button');
@@ -40,12 +44,8 @@ class SkinToneManager {
             container.appendChild(button);
         });
 
-        const avatarDisplay = document.getElementById('avatar-display');
-        if (avatarDisplay && avatarDisplay.parentNode) {
-            avatarDisplay.parentNode.insertBefore(container, avatarDisplay.nextSibling);
-        } else {
-            console.error('Avatar display element not found');
-        }
+        document.body.appendChild(container);
+        console.log("Skin tone buttons created and added to body");
     }
 
     selectSkinTone(color) {
@@ -100,6 +100,7 @@ class SkinToneManager {
 
 // Initialize the SkinToneManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM content loaded, initializing SkinToneManager");
     window.skinToneManager = new SkinToneManager();
     window.skinToneManager.initialize();
 });
