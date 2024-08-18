@@ -92,7 +92,7 @@ main {
 }
 
 .shop-item {
-    border: 1px solid #000000;
+    border: 1px solid #000000; /* Black border */
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -101,7 +101,7 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 220px;
+    height: 250px; /* Increased height to accommodate larger image */
     box-sizing: border-box;
 }
 
@@ -124,7 +124,7 @@ main {
 }
 
 .item-image {
-    height: 100px;
+    height: 150px; /* Increased height for larger preview */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -134,8 +134,8 @@ main {
 
 .item-image img {
     max-width: 100%;
-    height: auto;
-    border-radius: 4px;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 
@@ -233,7 +233,7 @@ main {
 
 
 .shop-item.highlighted {
-    border-color: #4CAF50 !important;
-    border-width: 3px !important;
+    border-color: #4CAF50;
+    border-width: 2px;
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
