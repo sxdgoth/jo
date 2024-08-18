@@ -217,18 +217,14 @@ main {
 }
 
 
-.item-image.highlighted {
+.item-image {
     position: relative;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
 }
 
-.item-image.highlighted::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border: 2px solid #4CAF50;
-    border-radius: 6px;
-    pointer-events: none;
+.item-image.highlighted {
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
