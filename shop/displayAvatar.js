@@ -81,6 +81,18 @@ class AvatarDisplay {
     }
 }
 
+updateLayer(type, src) {
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+        } else {
+            this.layers[type].style.display = 'none';
+        }
+    }
+    this.reorderLayers();
+}
+
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
