@@ -31,17 +31,25 @@ class AvatarManager {
         }
     }
 
-    loadEquippedItems() {
-        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
+     loadEquippedItems() {
+        const savedData = localStorage.getItem(`avatarData_${this.username}`);
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            this.equippedItems = parsedData.equippedItems || {};
+            this.skinTone = parsedData.skinTone || 'default';
             this.tempEquippedItems = {...this.equippedItems};
         }
     }
 
+
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        // Include skin tone in the saved data
+        const savedData = {
+            equippedItems: this.equippedItems,
+            skinTone: this.skinTone
+        };
+        localStorage.setItem(`avatarData_${this.username}`, JSON.stringify(savedData));
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
