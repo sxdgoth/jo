@@ -227,19 +227,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-
-The main additions to make it work with the Apply Avatar button are:
-
-In the selectSkinTone method, we added a check to update the AvatarManager if it exists:
-if (window.avatarManager) {
-    window.avatarManager.changeSkinTone(this.getSkinToneKey(tone));
-}
-
-
-
-Avatar for supwezton-hjwkg
-
-
-
-
-
