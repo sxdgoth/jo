@@ -34,20 +34,16 @@ class AvatarManager {
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
-            const parsedData = JSON.parse(savedItems);
-            this.equippedItems = parsedData.equippedItems || {};
-            this.skinTone = parsedData.skinTone || 'default';
+            this.equippedItems = JSON.parse(savedItems);
             this.tempEquippedItems = {...this.equippedItems};
         }
     }
 
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
-        const savedData = {
-            equippedItems: this.equippedItems,
-            skinTone: this.skinTone
-        };
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(savedData));
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        // Save skin tone separately
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -131,8 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
 
+        // Load saved skin tone
+        const savedSkinTone = localStorage.getItem(`skinTone_${loggedInUser.username}`);
+        if (savedSkinTone) {
+            window.avatarManager.skinTone = savedSkinTone;
+        }
+
         const skinToneSelector = document.getElementById('skin-tone-selector');
         if (skinToneSelector) {
+            skinToneSelector.value = window.avatarManager.skinTone;
             skinToneSelector.addEventListener('change', (event) => {
                 const newTone = event.target.value;
                 window.avatarManager.changeSkinTone(newTone);
