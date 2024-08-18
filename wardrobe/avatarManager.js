@@ -31,7 +31,7 @@ class AvatarManager {
         }
     }
 
-     loadEquippedItems() {
+    loadEquippedItems() {
         const savedData = localStorage.getItem(`avatarData_${this.username}`);
         if (savedData) {
             const parsedData = JSON.parse(savedData);
@@ -41,10 +41,8 @@ class AvatarManager {
         }
     }
 
-
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
-        // Include skin tone in the saved data
         const savedData = {
             equippedItems: this.equippedItems,
             skinTone: this.skinTone
@@ -136,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const skinToneSelector = document.getElementById('skin-tone-selector');
         if (skinToneSelector) {
+            skinToneSelector.value = window.avatarManager.skinTone;
             skinToneSelector.addEventListener('change', (event) => {
                 const newTone = event.target.value;
                 window.avatarManager.changeSkinTone(newTone);
