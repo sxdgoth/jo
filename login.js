@@ -8,8 +8,6 @@ function login() {
     if (user) {
         console.log('User found:', user);
         sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-        // Clear any existing equippedItems in localStorage
-        localStorage.removeItem('equippedItems');
         window.location.href = 'home/index.html';
     } else {
         console.log('Invalid login attempt');
