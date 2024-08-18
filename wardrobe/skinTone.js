@@ -34,7 +34,7 @@ class SkinToneManager {
         this.createSkinToneButtons();
         this.saveOriginalColors();
     }
-    
+
     createSkinToneButtons() {
         console.log("Creating skin tone buttons...");
         const container = document.createElement('div');
@@ -100,7 +100,7 @@ class SkinToneManager {
         }
     }
 
-    aapplySkinTone(tone) {
+    applySkinTone(tone) {
         console.log(`Applying skin tone: ${tone.name}`);
         if (window.avatarBody && window.avatarBody.layers) {
             this.baseParts.forEach(part => {
@@ -126,23 +126,15 @@ class SkinToneManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-                let mainColorApplied = false;
-                let shadowColorApplied = false;
-
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        if (!mainColorApplied) {
-                            path.setAttribute('fill', tone.main);
-                            mainColorApplied = true;
-                        } else if (!shadowColorApplied) {
-                            path.setAttribute('fill', tone.shadow);
-                            shadowColorApplied = true;
-                        }
+                        const newColor = this.getLuminance(currentFill) > 0.5 ? tone.main : tone.shadow;
+                        path.setAttribute('fill', newColor);
                     }
                 });
 
-                console.log(`Colors applied to ${partName}: Main - ${mainColorApplied}, Shadow - ${shadowColorApplied}`);
+                console.log(`Skin tone applied to ${partName}`);
 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
