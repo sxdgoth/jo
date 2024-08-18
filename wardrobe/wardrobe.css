@@ -214,3 +214,30 @@ main {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
+
+/* skinTone.css */
+
+#skin-tone-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.skin-tone-button {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    border: 2px solid #000;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.skin-tone-button:hover {
+    transform: scale(1.1);
+}
+
+.skin-tone-button.selected {
+    border-color: #ff4500;
+    box-shadow: 0 0 5px #ff4500;
+}
