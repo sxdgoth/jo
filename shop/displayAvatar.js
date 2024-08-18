@@ -9,6 +9,7 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
+        this.triedOnItems = {};
     }
 
     loadAvatar() {
@@ -79,11 +80,38 @@ class AvatarDisplay {
             }
         });
     }
+
+    tryOnItem(item) {
+        if (this.layers[item.type]) {
+            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
+            this.layers[item.type].style.display = 'block';
+            this.triedOnItems[item.type] = item;
+        }
+    }
+
+    removeTriedOnItem(type) {
+        if (this.layers[type]) {
+            const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+            const equippedItem = equippedItems[type];
+            if (equippedItem) {
+                const item = shopItems.find(item => item.id === equippedItem);
+                if (item) {
+                    this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
+                    this.layers[type].style.display = 'block';
+                } else {
+                    this.layers[type].style.display = 'none';
+                }
+            } else {
+                this.layers[type].style.display = 'none';
+            }
+            delete this.triedOnItems[type];
+        }
+    }
 }
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
-    const avatarDisplay = new AvatarDisplay('avatar-display');
-    avatarDisplay.loadAvatar();
+    window.avatarDisplay = new AvatarDisplay('avatar-display');
+    window.avatarDisplay.loadAvatar();
 });
