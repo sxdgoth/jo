@@ -1,3 +1,5 @@
+// shopManager.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
@@ -48,16 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleTryOn(itemId) {
         const item = shopItems.find(i => i.id === itemId);
-        if (item) {
+        if (item && window.avatarManager) {
             if (triedOnItems[item.type] === item) {
                 // Item is already tried on, so remove it
                 delete triedOnItems[item.type];
-                updateAvatarDisplay(item.type, null);
+                window.avatarManager.removeItem(item.type);
                 console.log(`Removed ${item.name}`);
             } else {
                 // Try on the new item
                 triedOnItems[item.type] = item;
-                updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                window.avatarManager.tryOnItem(item);
                 console.log(`Tried on ${item.name}`);
             }
             updateItemImages();
@@ -79,19 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function buyItem(itemId) {
         // ... (keep existing buyItem function unchanged)
     }
-    
-    function updateAvatarDisplay(type, src) {
-        if (window.avatarBody && typeof window.avatarBody.updateLayer === 'function') {
-            window.avatarBody.updateLayer(type, src);
-        } else {
-            console.warn('avatarBody.updateLayer function not found. Make sure avatarTemplate.js is loaded and contains this function.');
-        }
-    }
 
     function resetAvatarDisplay() {
         triedOnItems = {};
         if (window.avatarManager) {
-            window.avatarManager.updateAvatarDisplay();
+            window.avatarManager.resetDisplay();
         }
         updateItemImages();
     }
