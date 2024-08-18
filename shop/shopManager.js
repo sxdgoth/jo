@@ -36,13 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-  function toggleTryOn(itemId) {
+ function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            // Item is already tried on, so remove it
+            // Item is being tried on, so remove it
             window.avatarDisplay.removeTriedOnItem(item.type);
             console.log(`Removed ${item.name}`);
+        } else if (window.avatarDisplay.isItemEquipped(item)) {
+            // Item is equipped, so remove it temporarily
+            window.avatarDisplay.removeTriedOnItem(item.type);
+            console.log(`Temporarily removed equipped item ${item.name}`);
         } else {
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
@@ -52,17 +56,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
 
-    function updateItemImages() {
-        document.querySelectorAll('.item-image').forEach(image => {
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            if (triedOnItems[item.type] === item) {
-                image.classList.add('selected');
-            } else {
-                image.classList.remove('selected');
-            }
-        });
-    }
+function updateItemImages() {
+    document.querySelectorAll('.item-image').forEach(image => {
+        const itemId = image.dataset.id;
+        const item = shopItems.find(i => i.id === itemId);
+        if (window.avatarDisplay.triedOnItems[item.type] === item) {
+            image.classList.add('selected');
+        } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.triedOnItems[item.type]) {
+            image.classList.add('equipped');
+        } else {
+            image.classList.remove('selected');
+            image.classList.remove('equipped');
+        }
+    });
+}
 
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
