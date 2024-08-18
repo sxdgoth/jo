@@ -2,13 +2,29 @@
 
 class SkinToneManager {
     constructor() {
-        this.skinTones = [
-            { name: 'Light', color: '#FFD5B8' },
-            { name: 'Medium', color: '#E5B887' },
-            { name: 'Tan', color: '#C68642' },
-            { name: 'Dark', color: '#8D5524' }
-        ];
-        this.currentSkinTone = this.skinTones[0].color;
+        this.skinTones = {
+            light: {
+                name: 'Light',
+                main: '#FEE2CA',
+                shadow: '#EFC1B7'
+            },
+            medium: {
+                name: 'Medium',
+                main: '#FFE0BD',
+                shadow: '#EFD0B1'
+            },
+            tan: {
+                name: 'Tan',
+                main: '#F1C27D',
+                shadow: '#E0B170'
+            },
+            dark: {
+                name: 'Dark',
+                main: '#8D5524',
+                shadow: '#7C4A1E'
+            }
+        };
+        this.currentSkinTone = this.skinTones.light;
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
     }
@@ -34,18 +50,18 @@ class SkinToneManager {
         container.style.padding = '5px';
         container.style.borderRadius = '5px';
 
-        this.skinTones.forEach(tone => {
+        Object.values(this.skinTones).forEach(tone => {
             const button = document.createElement('button');
             button.className = 'skin-tone-button';
             button.style.width = '30px';
             button.style.height = '30px';
-            button.style.backgroundColor = tone.color;
+            button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
             button.style.margin = '0 5px';
             button.style.border = '2px solid #000';
             button.style.borderRadius = '50%';
             button.style.cursor = 'pointer';
             button.title = tone.name;
-            button.onclick = () => this.selectSkinTone(tone.color);
+            button.onclick = () => this.selectSkinTone(tone);
             container.appendChild(button);
         });
 
@@ -53,14 +69,14 @@ class SkinToneManager {
         console.log("Skin tone buttons created and added to body");
     }
 
-    selectSkinTone(color) {
-        this.currentSkinTone = color;
-        console.log(`Selected skin tone: ${color}`);
+    selectSkinTone(tone) {
+        this.currentSkinTone = tone;
+        console.log(`Selected skin tone: ${tone.name}`);
         
         // Update button styles
         const buttons = document.querySelectorAll('.skin-tone-button');
         buttons.forEach(button => {
-            if (button.style.backgroundColor === color) {
+            if (button.title === tone.name) {
                 button.style.borderColor = '#ff4500';
                 button.style.boxShadow = '0 0 5px #ff4500';
             } else {
@@ -70,7 +86,7 @@ class SkinToneManager {
         });
 
         // Apply skin tone to avatar
-        this.applySkinTone(color);
+        this.applySkinTone(tone);
     }
 
     saveOriginalColors() {
@@ -84,15 +100,14 @@ class SkinToneManager {
         }
     }
 
-    applySkinTone(color) {
-        console.log(`Applying skin tone: ${color}`);
+    applySkinTone(tone) {
+        console.log(`Applying skin tone: ${tone.name}`);
         if (window.avatarBody && window.avatarBody.layers) {
             this.baseParts.forEach(part => {
                 const layer = window.avatarBody.layers[part];
                 if (layer) {
-                    // Always start from the original SVG
                     const originalSrc = this.originalColors[part];
-                    this.applySkinToneToSVG(layer, color, originalSrc);
+                    this.applySkinToneToSVG(layer, tone, originalSrc);
                 } else {
                     console.warn(`Layer ${part} not found`);
                 }
@@ -102,7 +117,7 @@ class SkinToneManager {
         }
     }
 
-    applySkinToneToSVG(img, newColor, originalSrc) {
+    applySkinToneToSVG(img, tone, originalSrc) {
         fetch(originalSrc)
             .then(response => response.text())
             .then(svgText => {
@@ -113,7 +128,8 @@ class SkinToneManager {
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        const newFill = this.blendColors(currentFill, newColor);
+                        const luminance = this.getLuminance(currentFill);
+                        const newFill = luminance > 0.5 ? tone.main : tone.shadow;
                         path.setAttribute('fill', newFill);
                     }
                 });
@@ -127,15 +143,9 @@ class SkinToneManager {
             .catch(error => console.error('Error applying skin tone:', error));
     }
 
-    blendColors(color1, color2) {
-        const [r1, g1, b1] = this.hexToRgb(color1);
-        const [r2, g2, b2] = this.hexToRgb(color2);
-        
-        const r = Math.round((r1 + r2) / 2);
-        const g = Math.round((g1 + g2) / 2);
-        const b = Math.round((b1 + b2) / 2);
-        
-        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    getLuminance(hex) {
+        const rgb = this.hexToRgb(hex);
+        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
     }
 
     hexToRgb(hex) {
