@@ -36,20 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-   function toggleTryOn(itemId) {
+  function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        
-        if (triedOnItems[item.type] === item) {
+        if (window.avatarDisplay.triedOnItems[item.type] === item) {
             // Item is already tried on, so remove it
-            delete triedOnItems[item.type];
-            updateAvatarDisplay(item.type, null);
+            window.avatarDisplay.removeTriedOnItem(item.type);
             console.log(`Removed ${item.name}`);
         } else {
             // Try on the new item
-            triedOnItems[item.type] = item;
-            updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            window.avatarDisplay.tryOnItem(item);
             console.log(`Tried on ${item.name}`);
         }
         updateItemImages();
