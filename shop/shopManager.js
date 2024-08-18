@@ -110,41 +110,50 @@ function updateItemImages() {
     }
 
     function buyItem(itemId) {
-        const item = shopItems.find(i => i.id === itemId);
-        if (!item) {
-            console.error('Item not found');
-            return;
-        }
+    const item = shopItems.find(i => i.id === itemId);
+    if (!item) {
+        console.error('Item not found');
+        return;
+    }
 
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (!loggedInUser) {
-            console.error('User not logged in');
-            return;
-        }
+    const currentCoins = UserManager.getUserCoins();
+    if (currentCoins < item.price) {
+        alert('Not enough coins to buy this item!');
+        return;
+    }
 
-        if (loggedInUser.coins < item.price) {
-            alert('Not enough coins to buy this item!');
-            return;
-        }
-
-        // Deduct coins from user
-        loggedInUser.coins -= item.price;
-        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
+    // Deduct coins from user
+    const newCoins = currentCoins - item.price;
+    if (UserManager.updateUserCoins(newCoins)) {
         // Add item to user's inventory
         if (window.userInventory) {
             window.userInventory.addItem(item);
         }
 
         // Update user's coins display
-        updateUserCoinsAfterPurchase(loggedInUser.coins);
+        updateUserCoinsAfterPurchase(newCoins);
 
-        // Update buy button state
-        updateBuyButtonState(itemId);
+        // Update buy button state immediately
+        const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
+        if (buyButton) {
+            buyButton.textContent = 'Owned';
+            buyButton.disabled = true;
+            buyButton.classList.add('owned');
+        }
+
+        // Update item image state
+        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
+        if (itemImage) {
+            itemImage.classList.add('equipped');
+            itemImage.classList.remove('selected');
+        }
 
         alert(`You have successfully purchased ${item.name}!`);
+    } else {
+        alert('Error updating user coins. Please try again.');
     }
-
+}
+    
     function resetAvatarDisplay() {
         triedOnItems = {};
         const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
