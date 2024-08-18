@@ -17,14 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>${item.name}</h3>
                 <p>Type: ${item.type}</p>
                 <p>Price: ${item.price} coins</p>
+                <button class="try-on-btn" data-id="${item.id}">Try On</button>
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
         });
 
-        // Add event listeners to item images for try on/off
-        document.querySelectorAll('.item-image').forEach(image => {
-            image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
+        // Add event listeners to try-on buttons
+        document.querySelectorAll('.try-on-btn').forEach(button => {
+            button.addEventListener('click', (e) => toggleTryOn(e.target.dataset.id));
         });
 
         // Add event listeners to buy buttons
@@ -34,14 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize inventory state
         initializeInventoryState();
-
-        // Initialize avatar display
-        initializeAvatarDisplay();
-    }
-
-    function initializeAvatarDisplay() {
-        const avatarDisplay = new AvatarDisplay('avatar-display');
-        avatarDisplay.loadAvatar();
     }
 
     function toggleTryOn(itemId) {
@@ -58,25 +51,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 console.log(`Tried on ${item.name}`);
             }
-            updateItemImages();
+            updateTryOnButtons();
         }
     }
 
-    function updateItemImages() {
-        document.querySelectorAll('.item-image').forEach(image => {
-            const itemId = image.dataset.id;
+    function updateTryOnButtons() {
+        document.querySelectorAll('.try-on-btn').forEach(button => {
+            const itemId = button.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             if (triedOnItems[item.type] === item) {
-                image.classList.add('tried-on');
+                button.textContent = 'Remove';
             } else {
-                image.classList.remove('tried-on');
+                button.textContent = 'Try On';
             }
         });
     }
 
     function updateAvatarDisplay(type, src) {
-        const avatarDisplay = new AvatarDisplay('avatar-display');
-        avatarDisplay.updateLayer(type, src);
+        const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
+        if (layerElement) {
+            if (src) {
+                layerElement.data = src;
+                layerElement.style.display = 'block';
+            } else {
+                layerElement.style.display = 'none';
+            }
+        }
     }
 
     function buyItem(itemId) {
@@ -85,9 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetAvatarDisplay() {
         triedOnItems = {};
-        const avatarDisplay = new AvatarDisplay('avatar-display');
-        avatarDisplay.loadAvatar();
-        updateItemImages();
+        shopItems.forEach(item => {
+            updateAvatarDisplay(item.type, null);
+        });
+        updateTryOnButtons();
     }
 
     // Expose necessary functions to the global scope
