@@ -92,7 +92,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buyItem(itemId) {
-        // ... (keep existing buyItem function unchanged)
+        const item = shopItems.find(i => i.id === itemId);
+        if (!item) {
+            console.error('Item not found');
+            return;
+        }
+
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (!loggedInUser) {
+            console.error('User not logged in');
+            return;
+        }
+
+        if (loggedInUser.coins < item.price) {
+            alert('Not enough coins to buy this item!');
+            return;
+        }
+
+        // Deduct coins from user
+        loggedInUser.coins -= item.price;
+        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+        // Add item to user's inventory
+        if (window.userInventory) {
+            window.userInventory.addItem(item);
+        }
+
+        // Update equipped items
+        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+        equippedItems[item.type] = item.id;
+        localStorage.setItem('equippedItems', JSON.stringify(equippedItems));
+
+        // Update avatar display
+        updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+
+        // Update user's coins display
+        updateUserCoinsAfterPurchase(loggedInUser.coins);
+
+        // Update buy button state
+        updateBuyButtonState(itemId);
+
+        alert(`You have successfully purchased ${item.name}!`);
     }
 
     function resetAvatarDisplay() {
