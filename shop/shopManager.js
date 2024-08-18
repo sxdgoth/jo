@@ -36,11 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
- function toggleTryOn(itemId) {
+function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
+        window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
+
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             // Item is being tried on, so remove it
             window.avatarDisplay.removeTriedOnItem(item.type);
