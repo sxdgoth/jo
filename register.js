@@ -44,25 +44,27 @@ function usernameExists(username) {
 }
 
 function getUsersFromStorage() {
+    const usersData = localStorage.getItem('users');
+    if (!usersData) return [];
     try {
-        const usersData = localStorage.getItem('users');
-        console.log('Raw users data:', usersData);
-        if (!usersData) {
-            console.log('No users data found, returning empty array');
-            return [];
-        }
         const users = JSON.parse(usersData);
-        console.log('Parsed users:', users);
-        if (!Array.isArray(users)) {
-            console.error('Parsed users is not an array, returning empty array');
-            return [];
-        }
-        return users;
+        return Array.isArray(users) ? users : [];
     } catch (error) {
         console.error('Error parsing users data:', error);
         return [];
     }
 }
+
+function usernameExists(username) {
+    const users = getUsersFromStorage();
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].username === username) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 // Clear users data (use this carefully)
 function clearUsersData() {
