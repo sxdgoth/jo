@@ -118,14 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.userInventory.addItem(item);
         }
 
-        // Update equipped items
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        equippedItems[item.type] = item.id;
-        localStorage.setItem('equippedItems', JSON.stringify(equippedItems));
-
-        // Update avatar display
-        updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-
         // Update user's coins display
         updateUserCoinsAfterPurchase(loggedInUser.coins);
 
