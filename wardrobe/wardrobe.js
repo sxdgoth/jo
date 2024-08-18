@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
             window.avatarBody.initializeAvatar(loggedInUser.username);
+            
+            // Apply skin tone after avatar initialization
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinTone(window.skinToneManager.currentSkinTone);
+            }
         }
         
         // Render owned items
