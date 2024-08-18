@@ -5,30 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avatar Shop</title>
     <link rel="stylesheet" href="https://sxdgoth.github.io/jo/shop/shop.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <header>
-        <h1>Welcome to the Avatar Shop</h1>
-        <div id="user-info">
-            <span>Welcome, <span id="user-name"></span>!</span>
-            <span>Coins: <span id="user-coins"></span></span>
-        </div>
-        <nav>
-            <a href="https://sxdgoth.github.io/jo/wardrobe/index.html" class="nav-button">Go to Wardrobe</a>
-            <button onclick="logout()" class="nav-button">Logout</button>
-        </nav>
-    </header>
-
     <main>
-        <div class="avatar-container">
-            <div id="avatar-display" style="width: 300px; height: 600px;"></div>
+        <div class="top-bar">
+            <div id="user-info">
+                <span>Welcome, <span id="user-name"></span>!</span>
+                <span>Coins: <span id="user-coins"></span></span>
+            </div>
+            <nav>
+                <a href="https://sxdgoth.github.io/jo/wardrobe/index.html" class="nav-button">Go to Wardrobe</a>
+                <button onclick="logout()" class="nav-button">Logout</button>
+            </nav>
         </div>
-        <div class="shop-section">
-            <h2>Shop Items</h2>
-            <div class="shop-items-container">
-                <div class="shop-items">
-                    <!-- Shop items will be dynamically added here -->
+        <div class="content">
+            <div class="avatar-container">
+                <div id="avatar-display" style="width: 300px; height: 600px;"></div>
+            </div>
+            <div class="shop-section">
+                <h2>Shop Items</h2>
+                <div class="shop-items-container">
+                    <div class="shop-items">
+                        <!-- Shop items will be dynamically added here -->
+                    </div>
                 </div>
             </div>
         </div>
