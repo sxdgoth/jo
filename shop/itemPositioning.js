@@ -7,7 +7,6 @@ const itemPositions = {
         objectPosition: '20px 25%',
         transform: 'scale(1.2)'
     },
-    
       jacket: {
         objectPosition: '20px 25%',
         transform: 'scale(1.2)'
