@@ -82,17 +82,16 @@ class AvatarDisplay {
     }
 
     // Add these new methods
-   tryOnItem(item) {
+  tryOnItem(item) {
         if (this.layers[item.type]) {
-            // Remove the previously tried-on item of the same type
-            if (this.triedOnItems[item.type]) {
-                this.removeTriedOnItem(item.type);
-            }
-
-            // Try on the new item
+            // Always update the layer with the new item
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
+            
+            // Update triedOnItems
             this.triedOnItems[item.type] = item;
+
+            console.log(`Trying on ${item.name} (ID: ${item.id})`);
 
             // If trying on a shirt, hide the jacket, and vice versa
             if (item.type === 'Shirt' && this.triedOnItems['Jacket']) {
