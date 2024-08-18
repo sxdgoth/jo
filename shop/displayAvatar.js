@@ -13,7 +13,17 @@ class AvatarDisplay {
         this.triedOnItems = {};
         this.equippedItems = {};
         this.lastAction = {}; // Track the last action for each item type
-        this.hiddenEquippedItems = new Set(); // Add this line
+        this.hiddenEquippedItems = new Set();
+        this.skinTone = 'light'; // New: Default skin tone
+        this.loadSkinTone(); // New: Load saved skin tone
+    }
+
+    // New: Load saved skin tone
+    loadSkinTone() {
+        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+        if (savedSkinTone) {
+            this.skinTone = savedSkinTone;
+        }
     }
 
     loadAvatar() {
@@ -33,7 +43,9 @@ class AvatarDisplay {
             { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
             { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
+            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+            // New: Add skin tone layer
+            { name: 'SkinTone', file: `home/assets/body/skintones/${this.skinTone}.svg`, type: 'SkinTone', isBase: true }
         ];
 
         bodyParts.forEach(part => {
@@ -68,7 +80,6 @@ class AvatarDisplay {
             }
 
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
-
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
         });
@@ -77,7 +88,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+        const order = ['SkinTone', 'Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head']; // New: Add SkinTone to the order
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -85,15 +96,14 @@ class AvatarDisplay {
         });
     }
 
-    // Add these new methods
- tryOnItem(item) {
+    // The rest of the methods remain unchanged
+    tryOnItem(item) {
         if (this.layers[item.type]) {
             console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
             this.lastAction[item.type] = 'triedOn';
-
             // Hide conflicting items
             if (item.type === 'Shirt') this.layers['Jacket'].style.display = 'none';
             if (item.type === 'Jacket') this.layers['Shirt'].style.display = 'none';
@@ -104,7 +114,6 @@ class AvatarDisplay {
         if (this.layers[type]) {
             console.log(`Removing tried on item of type: ${type}`);
             delete this.triedOnItems[type];
-
             if (this.lastAction[type] === 'hidden') {
                 // If the last action was to hide the equipped item, keep it hidden
                 this.layers[type].style.display = 'none';
@@ -119,7 +128,6 @@ class AvatarDisplay {
                 // If no equipped item, hide the layer
                 this.layers[type].style.display = 'none';
             }
-
             this.lastAction[type] = 'removed';
         }
     }
