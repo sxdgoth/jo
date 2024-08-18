@@ -108,4 +108,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     window.avatarDisplay = new AvatarDisplay('avatar-display');
     window.avatarDisplay.loadAvatar();
-});
