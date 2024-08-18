@@ -3,7 +3,7 @@ class AvatarManager {
         this.username = username;
         this.equippedItems = {};
         this.tempEquippedItems = {};
-        this.skinTone = 'default'; // New line
+        this.skinTone = 'light'; // New line
         this.loadEquippedItems();
     }
 
@@ -37,12 +37,17 @@ class AvatarManager {
             this.equippedItems = JSON.parse(savedItems);
             this.tempEquippedItems = {...this.equippedItems};
         }
+        // New: Load skin tone
+        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+        if (savedSkinTone) {
+            this.skinTone = savedSkinTone;
+        }
     }
 
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        // Save skin tone separately
+        // New: Save skin tone
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
@@ -58,8 +63,10 @@ class AvatarManager {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
-            // Apply skin tone
-            window.avatarBody.updateLayer('skinTone', `https://sxdgoth.github.io/jo/home/assets/body/skintones/${this.skinTone}.svg`);
+            // New: Apply skin tone
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinTone(window.skinToneManager.skinTones[this.skinTone]);
+            }
 
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
@@ -100,8 +107,10 @@ class AvatarManager {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
-            // Apply skin tone
-            window.avatarBody.updateLayer('skinTone', `https://sxdgoth.github.io/jo/home/assets/body/skintones/${this.skinTone}.svg`);
+            // New: Apply skin tone
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinTone(window.skinToneManager.skinTones[this.skinTone]);
+            }
 
             Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
@@ -114,6 +123,7 @@ class AvatarManager {
         }
     }
 
+    // New method
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
@@ -126,21 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loggedInUser) {
         window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
-
-        // Load saved skin tone
-        const savedSkinTone = localStorage.getItem(`skinTone_${loggedInUser.username}`);
-        if (savedSkinTone) {
-            window.avatarManager.skinTone = savedSkinTone;
-        }
-
-        const skinToneSelector = document.getElementById('skin-tone-selector');
-        if (skinToneSelector) {
-            skinToneSelector.value = window.avatarManager.skinTone;
-            skinToneSelector.addEventListener('change', (event) => {
-                const newTone = event.target.value;
-                window.avatarManager.changeSkinTone(newTone);
-            });
-        }
     } else {
         console.error('No logged in user found');
     }
