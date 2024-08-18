@@ -104,9 +104,17 @@ main {
     align-items: center;
 }
 
-.shop-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+.shop-item {
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 220px;
 }
 
 .item-image {
@@ -217,14 +225,7 @@ main {
 }
 
 
-.item-image {
-    position: relative;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    transition: border-color 0.3s ease;
-}
-
-.item-image.highlighted {
+.shop-item.highlighted {
     border-color: #4CAF50;
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
