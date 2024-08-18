@@ -40,26 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeAvatarDisplay() {
-        if (window.avatarManager) {
-            window.avatarManager.loadEquippedItems();
-            window.avatarManager.updateAvatarDisplay();
-        } else {
-            console.warn('avatarManager not found. Make sure it\'s properly initialized.');
-        }
+        const avatarDisplay = new AvatarDisplay('avatar-display');
+        avatarDisplay.loadAvatar();
     }
 
     function toggleTryOn(itemId) {
         const item = shopItems.find(i => i.id === itemId);
-        if (item && window.avatarManager) {
+        if (item) {
             if (triedOnItems[item.type] === item) {
                 // Item is already tried on, so remove it
                 delete triedOnItems[item.type];
-                window.avatarManager.removeItem(item.type);
+                updateAvatarDisplay(item.type, null);
                 console.log(`Removed ${item.name}`);
             } else {
                 // Try on the new item
                 triedOnItems[item.type] = item;
-                window.avatarManager.tryOnItem(item);
+                updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 console.log(`Tried on ${item.name}`);
             }
             updateItemImages();
@@ -78,15 +74,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function updateAvatarDisplay(type, src) {
+        const avatarDisplay = new AvatarDisplay('avatar-display');
+        avatarDisplay.updateLayer(type, src);
+    }
+
     function buyItem(itemId) {
         // ... (keep existing buyItem function unchanged)
     }
 
     function resetAvatarDisplay() {
         triedOnItems = {};
-        if (window.avatarManager) {
-            window.avatarManager.resetDisplay();
-        }
+        const avatarDisplay = new AvatarDisplay('avatar-display');
+        avatarDisplay.loadAvatar();
         updateItemImages();
     }
 
