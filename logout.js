@@ -1,5 +1,4 @@
 function logout() {
     sessionStorage.removeItem('loggedInUser');
-    localStorage.removeItem('equippedItems');
-    window.location.href = '../index.html';
+    window.location.href = '/index.html'; // Adjust this path if needed
 }
