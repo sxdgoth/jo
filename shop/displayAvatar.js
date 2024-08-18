@@ -9,7 +9,7 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {}; // Add this line
+        this.triedOnItems = {};
     }
 
     loadAvatar() {
@@ -81,21 +81,8 @@ class AvatarDisplay {
         });
     }
 
-    // Add these new methods
-      tryOnItem(item) {
+    tryOnItem(item) {
         if (this.layers[item.type]) {
-            // Remove previously tried on item of the same type
-            if (this.triedOnItems[item.type]) {
-                this.removeTriedOnItem(item.type);
-            }
-
-            // Handle conflicts between shirts and jackets
-            if (item.type === 'Shirt' && this.triedOnItems['Jacket']) {
-                this.removeTriedOnItem('Jacket');
-            } else if (item.type === 'Jacket' && this.triedOnItems['Shirt']) {
-                this.removeTriedOnItem('Shirt');
-            }
-
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
@@ -105,20 +92,22 @@ class AvatarDisplay {
     removeTriedOnItem(type) {
         if (this.layers[type]) {
             const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-            if (equippedItems[type]) {
-                // If there's an equipped item, show it
-                const equippedItem = shopItems.find(item => item.id === equippedItems[type]);
-                if (equippedItem) {
-                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+            const equippedItem = equippedItems[type];
+            if (equippedItem) {
+                const item = shopItems.find(item => item.id === equippedItem);
+                if (item) {
+                    this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
                     this.layers[type].style.display = 'block';
+                } else {
+                    this.layers[type].style.display = 'none';
                 }
             } else {
-                // If no equipped item, hide the layer
                 this.layers[type].style.display = 'none';
             }
             delete this.triedOnItems[type];
         }
     }
+}
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
