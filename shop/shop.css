@@ -92,16 +92,21 @@ main {
 }
 
 .shop-item {
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #e0e0e0; /* This is the regular border for all items */
+    border-radius: 8px;
     padding: 10px;
     text-align: center;
-    cursor: pointer;
     transition: all 0.3s ease;
     background-color: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
+    height: 220px;
+}
+
+.shop-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
 .shop-item {
@@ -227,5 +232,6 @@ main {
 
 .shop-item.highlighted {
     border-color: #4CAF50;
+    border-width: 2px;
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
