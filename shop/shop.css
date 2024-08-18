@@ -217,11 +217,18 @@ main {
 }
 
 
-.shop-item.highlighted {
-    border: 2px solid #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+.item-image.highlighted {
+    position: relative;
 }
 
-.item-image.highlighted {
-    background-color: rgba(76, 175, 80, 0.1);
+.item-image.highlighted::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid #4CAF50;
+    border-radius: 6px;
+    pointer-events: none;
 }
