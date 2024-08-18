@@ -126,12 +126,14 @@ class SkinToneManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-                let isFirstColor = true;
+                const colors = this.getUniqueColors(paths);
+                const mainColor = this.findMainSkinColor(colors);
+                
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        path.setAttribute('fill', isFirstColor ? tone.main : tone.shadow);
-                        isFirstColor = !isFirstColor; // Alternate between main and shadow
+                        const newColor = this.getNewColor(currentFill, mainColor, tone);
+                        path.setAttribute('fill', newColor);
                     }
                 });
 
@@ -144,6 +146,59 @@ class SkinToneManager {
                 img.src = url;
             })
             .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
+    }
+
+    getUniqueColors(paths) {
+        const colors = new Set();
+        paths.forEach(path => {
+            const fill = path.getAttribute('fill');
+            if (fill && fill.toLowerCase() !== 'none') {
+                colors.add(fill.toLowerCase());
+            }
+        });
+        return Array.from(colors);
+    }
+
+    findMainSkinColor(colors) {
+        // This is a simple heuristic. You might need to adjust this based on your specific SVGs.
+        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
+    }
+
+    getNewColor(currentColor, mainColor, tone) {
+        const currentLuminance = this.getLuminance(currentColor);
+        const mainLuminance = this.getLuminance(mainColor);
+        const luminanceDiff = currentLuminance - mainLuminance;
+        
+        if (Math.abs(luminanceDiff) < 0.1) {
+            return tone.main;
+        } else if (luminanceDiff < 0) {
+            return tone.shadow;
+        } else {
+            // For colors lighter than the main color, we'll create a lighter version of the main tone
+            return this.lightenColor(tone.main, luminanceDiff);
+        }
+    }
+
+    lightenColor(color, amount) {
+        const rgb = this.hexToRgb(color);
+        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
+        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
+    }
+
+    getLuminance(hex) {
+        const rgb = this.hexToRgb(hex);
+        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+    }
+
+    hexToRgb(hex) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
     }
 }
 
