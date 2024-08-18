@@ -92,7 +92,7 @@ main {
 }
 
 .shop-item {
-    border: 1px solid #e0e0e0; /* This is the regular border for all items */
+    border: 1px solid #000000; /* This is the black border for all items */
     border-radius: 8px;
     padding: 10px;
     text-align: center;
