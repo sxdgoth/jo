@@ -100,14 +100,15 @@ class SkinToneManager {
         }
     }
 
-    applySkinTone(tone) {
+    aapplySkinTone(tone) {
         console.log(`Applying skin tone: ${tone.name}`);
         if (window.avatarBody && window.avatarBody.layers) {
             this.baseParts.forEach(part => {
                 const layer = window.avatarBody.layers[part];
                 if (layer) {
+                    console.log(`Applying skin tone to ${part}`);
                     const originalSrc = this.originalColors[part];
-                    this.applySkinToneToSVG(layer, tone, originalSrc);
+                    this.applySkinToneToSVG(layer, tone, originalSrc, part);
                 } else {
                     console.warn(`Layer ${part} not found`);
                 }
@@ -117,7 +118,7 @@ class SkinToneManager {
         }
     }
 
-   applySkinToneToSVG(img, tone, originalSrc) {
+    applySkinToneToSVG(img, tone, originalSrc, partName) {
         fetch(originalSrc)
             .then(response => response.text())
             .then(svgText => {
@@ -125,21 +126,23 @@ class SkinToneManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-                let mainColorFound = false;
-                let shadowColorFound = false;
+                let mainColorApplied = false;
+                let shadowColorApplied = false;
 
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        if (!mainColorFound) {
+                        if (!mainColorApplied) {
                             path.setAttribute('fill', tone.main);
-                            mainColorFound = true;
-                        } else if (!shadowColorFound) {
+                            mainColorApplied = true;
+                        } else if (!shadowColorApplied) {
                             path.setAttribute('fill', tone.shadow);
-                            shadowColorFound = true;
+                            shadowColorApplied = true;
                         }
                     }
                 });
+
+                console.log(`Colors applied to ${partName}: Main - ${mainColorApplied}, Shadow - ${shadowColorApplied}`);
 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -147,7 +150,7 @@ class SkinToneManager {
                 const url = URL.createObjectURL(blob);
                 img.src = url;
             })
-            .catch(error => console.error('Error applying skin tone:', error));
+            .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
     }
 
     getLuminance(hex) {
