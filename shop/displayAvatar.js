@@ -11,7 +11,8 @@ class AvatarDisplay {
         this.layers = {};
         this.triedOnItems = {};
         this.equippedItems = {};
-this.lastAction = {}; // Add this line to track the last action for each item type
+        this.lastAction = {}; // Track the last action for each item type
+        this.hiddenEquippedItems = new Set(); // Add this line
     }
 
     loadAvatar() {
@@ -122,7 +123,7 @@ this.lastAction = {}; // Add this line to track the last action for each item ty
         }
     }
 
-     toggleEquippedItem(type) {
+    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 // Show the equipped item
@@ -131,11 +132,13 @@ this.lastAction = {}; // Add this line to track the last action for each item ty
                     this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
                     this.layers[type].style.display = 'block';
                     this.lastAction[type] = 'shown';
+                    this.hiddenEquippedItems.delete(type); // Remove from hidden set
                 }
             } else {
                 // Hide the equipped item
                 this.layers[type].style.display = 'none';
                 this.lastAction[type] = 'hidden';
+                this.hiddenEquippedItems.add(type); // Add to hidden set
             }
         }
     }
