@@ -36,21 +36,23 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-  function toggleTryOn(itemId) {
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            // Item is already tried on, so remove it
-            window.avatarDisplay.removeTriedOnItem(item.type);
-            console.log(`Removed ${item.name}`);
-        } else {
-            // Try on the new item
-            window.avatarDisplay.tryOnItem(item);
-            console.log(`Tried on ${item.name}`);
+    function toggleTryOn(itemId) {
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            if (triedOnItems[item.type] === item) {
+                // Item is already tried on, so remove it
+                delete triedOnItems[item.type];
+                updateAvatarDisplay(item.type, null);
+                console.log(`Removed ${item.name}`);
+            } else {
+                // Try on the new item
+                triedOnItems[item.type] = item;
+                updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                console.log(`Tried on ${item.name}`);
+            }
+            updateItemImages();
         }
-        updateItemImages();
     }
-}
 
     function updateItemImages() {
         document.querySelectorAll('.item-image').forEach(image => {
