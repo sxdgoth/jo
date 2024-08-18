@@ -92,7 +92,7 @@ main {
 }
 
 .shop-item {
-    border: 1px solid #000000; /* This is the black border for all items */
+    border: 2px solid #000000 !important; /* Increased width and added !important */
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -102,6 +102,7 @@ main {
     flex-direction: column;
     justify-content: space-between;
     height: 220px;
+    box-sizing: border-box; /* Ensure padding doesn't affect overall size */
 }
 
 .shop-item:hover {
@@ -123,18 +124,15 @@ main {
 }
 
 .item-image {
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    max-width: 100%;
+    max-height: 100px; /* Adjust as needed */
     overflow: hidden;
-    margin-bottom: 10px;
 }
 
 .item-image img {
     max-width: 100%;
-    height: auto;
-    border-radius: 4px;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .shop-item h3 {
@@ -231,7 +229,7 @@ main {
 
 
 .shop-item.highlighted {
-    border-color: #4CAF50;
-    border-width: 2px;
+    border-color: #4CAF50 !important;
+    border-width: 3px !important;
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
