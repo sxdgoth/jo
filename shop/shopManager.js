@@ -60,7 +60,6 @@ function toggleTryOn(itemId) {
         
         // Add highlight to the clicked item
         const clickedItemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
-        clickedItemImage.classList.add('highlighted');
         
         window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
@@ -73,10 +72,12 @@ function toggleTryOn(itemId) {
             // Item is equipped, toggle its visibility
             window.avatarDisplay.toggleEquippedItem(item.type);
             console.log(`Toggled equipped item ${item.name}`);
+            clickedItemImage.classList.add('highlighted');
         } else {
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
             console.log(`Tried on ${item.name}`);
+            clickedItemImage.classList.add('highlighted');
         }
         
         updateItemImages();
@@ -95,7 +96,7 @@ function updateItemImages() {
             if (!window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
                 image.classList.add('equipped');
                 image.classList.remove('selected');
-                image.classList.remove('highlighted');
+                image.classList.add('highlighted');
             } else {
                 image.classList.remove('equipped');
                 image.classList.remove('selected');
@@ -108,7 +109,7 @@ function updateItemImages() {
         }
     });
 }
-
+    
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
         if (layerElement) {
