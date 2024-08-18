@@ -92,65 +92,66 @@ class AvatarBody {
     }
 
     // New methods for skin tone
-   updateSkinTone(color) {
-    console.log(`Updating skin tone to: ${color}`);
-    const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
-    baseParts.forEach(part => {
-        const layer = this.layers[part];
-        if (layer) {
-            this.applySkinToneToSVG(layer, color);
-        } else {
-            console.warn(`Layer ${part} not found`);
-        }
-    });
-}
+  
+ updateSkinTone(color) {
+        console.log(`Updating skin tone to: ${color}`);
+        const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+        baseParts.forEach(part => {
+            const layer = this.layers[part];
+            if (layer) {
+                this.applySkinToneToSVG(layer, color);
+            } else {
+                console.warn(`Layer ${part} not found`);
+            }
+        });
+    }
 
-applySkinToneToSVG(img, newColor) {
-    fetch(img.src)
-        .then(response => response.text())
-        .then(svgText => {
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-            
-            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            paths.forEach(path => {
-                const currentFill = path.getAttribute('fill');
-                if (currentFill && currentFill.toLowerCase() !== 'none') {
-                    const newFill = this.blendColors(currentFill, newColor);
-                    path.setAttribute('fill', newFill);
-                }
-            });
+    applySkinToneToSVG(img, newColor) {
+        fetch(img.src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                paths.forEach(path => {
+                    const currentFill = path.getAttribute('fill');
+                    if (currentFill && currentFill.toLowerCase() !== 'none') {
+                        const newFill = this.blendColors(currentFill, newColor);
+                        path.setAttribute('fill', newFill);
+                    }
+                });
 
-            const serializer = new XMLSerializer();
-            const modifiedSvgString = serializer.serializeToString(svgDoc);
-            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            img.src = url;
-        })
-        .catch(error => console.error('Error applying skin tone:', error));
-}
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                img.src = url;
+            })
+            .catch(error => console.error('Error applying skin tone:', error));
+    }
 
-blendColors(color1, color2) {
-    const [r1, g1, b1] = this.hexToRgb(color1);
-    const [r2, g2, b2] = this.hexToRgb(color2);
+    blendColors(color1, color2) {
+        const [r1, g1, b1] = this.hexToRgb(color1);
+        const [r2, g2, b2] = this.hexToRgb(color2);
+        
+        const r = Math.round((r1 + r2) / 2);
+        const g = Math.round((g1 + g2) / 2);
+        const b = Math.round((b1 + b2) / 2);
+        
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
+
+    hexToRgb(hex) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
     
-    const r = Math.round((r1 + r2) / 2);
-    const g = Math.round((g1 + g2) / 2);
-    const b = Math.round((b1 + b2) / 2);
-    
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-}
-
-hexToRgb(hex) {
-    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16)
-    ] : null;
-}
 
 
 // Create and load the avatar body when the DOM is fully loaded
