@@ -1,5 +1,6 @@
 class AvatarManager {
-    constructor() {
+    constructor(username) {
+        this.username = username;
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.loadEquippedItems();
@@ -30,16 +31,16 @@ class AvatarManager {
     }
 
     loadEquippedItems() {
-        const savedItems = localStorage.getItem('equippedItems');
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
             this.tempEquippedItems = {...this.equippedItems};
         }
     }
 
-    applyAvatar() {
+   applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
-        localStorage.setItem('equippedItems', JSON.stringify(this.equippedItems));
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -106,6 +107,11 @@ class AvatarManager {
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.avatarManager = new AvatarManager();
-    window.avatarManager.initialize();
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
+    } else {
+        console.error('No logged in user found');
+    }
 });
