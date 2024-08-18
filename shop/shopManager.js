@@ -4,38 +4,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
 
-    function renderShopItems() {
-        shopItemsContainer.innerHTML = ''; // Clear existing items
-        shopItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('shop-item');
-            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-            itemElement.innerHTML = `
-                <div class="item-image" data-id="${item.id}">
-                    <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
-                </div>
-                <h3>${item.name}</h3>
-                <p>Type: ${item.type}</p>
-                <p>Price: ${item.price} coins</p>
-                <button class="buy-btn" data-id="${item.id}">Buy</button>
-            `;
-            shopItemsContainer.appendChild(itemElement);
-        });
+   function renderShopItems() {
+    shopItemsContainer.innerHTML = ''; // Clear existing items
 
-        // Add event listeners to item images for try on/off
-        document.querySelectorAll('.item-image').forEach(image => {
-            image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
-        });
+    shopItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('shop-item');
+        const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+        itemElement.innerHTML = `
+            <div class="item-image" data-id="${item.id}">
+                <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
+            </div>
+            <h3>${item.name}</h3>
+            <p>Type: ${item.type}</p>
+            <p>Price: ${item.price} coins</p>
+            <button class="buy-btn" data-id="${item.id}">Buy</button>
+        `;
+        shopItemsContainer.appendChild(itemElement);
 
-        // Add event listeners to buy buttons
-        document.querySelectorAll('.buy-btn').forEach(button => {
-            button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
-        });
+        // Update buy button state
+        const buyButton = itemElement.querySelector('.buy-btn');
+        updateBuyButtonState(buyButton, item.id);
+    });
 
-        // Initialize inventory state
-        initializeInventoryState();
+    // Add event listeners to item images for try on/off
+    document.querySelectorAll('.item-image').forEach(image => {
+        image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
+    });
+
+    // Add event listeners to buy buttons
+    document.querySelectorAll('.buy-btn').forEach(button => {
+        button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
+    });
+
+    // Initialize inventory state
+    initializeInventoryState();
+}
+
+    function updateBuyButtonState(button, itemId) {
+    if (window.userInventory && window.userInventory.hasItem(itemId)) {
+        button.textContent = 'Owned';
+        button.disabled = true;
+        button.classList.add('owned');
     }
-
+}
+    
 function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
@@ -109,7 +122,7 @@ function updateItemImages() {
         }
     }
 
-    function buyItem(itemId) {
+  function buyItem(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (!item) {
         console.error('Item not found');
@@ -136,9 +149,7 @@ function updateItemImages() {
         // Update buy button state immediately
         const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
         if (buyButton) {
-            buyButton.textContent = 'Owned';
-            buyButton.disabled = true;
-            buyButton.classList.add('owned');
+            updateBuyButtonState(buyButton, itemId);
         }
 
         // Update item image state
