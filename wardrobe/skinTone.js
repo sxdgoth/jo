@@ -38,7 +38,11 @@ class SkinToneManager {
         });
 
         const avatarDisplay = document.getElementById('avatar-display');
-        avatarDisplay.parentNode.insertBefore(container, avatarDisplay);
+        if (avatarDisplay && avatarDisplay.parentNode) {
+            avatarDisplay.parentNode.insertBefore(container, avatarDisplay);
+        } else {
+            console.error('Avatar display element not found');
+        }
     }
 
     applySkinTone(color) {
