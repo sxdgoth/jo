@@ -11,9 +11,8 @@ class AvatarDisplay {
         this.layers = {};
         this.triedOnItems = {};
         this.equippedItems = {};
-     this.hiddenEquippedItems = new Set(); // Add this line
+this.lastAction = {}; // Add this line to track the last action for each item type
     }
-
 
     loadAvatar() {
         console.log("Loading avatar...");
@@ -85,20 +84,20 @@ class AvatarDisplay {
     }
 
     // Add these new methods
-tryOnItem(item) {
+ tryOnItem(item) {
         if (this.layers[item.type]) {
             console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
-            this.hiddenEquippedItems.delete(item.type); // Remove from hidden set when trying on
+            this.lastAction[item.type] = 'triedOn';
 
             // Hide conflicting items
             if (item.type === 'Shirt') this.layers['Jacket'].style.display = 'none';
             if (item.type === 'Jacket') this.layers['Shirt'].style.display = 'none';
         }
     }
-
+    
     removeTriedOnItem(type) {
         if (this.layers[type]) {
             console.log(`Removing tried on item of type: ${type}`);
