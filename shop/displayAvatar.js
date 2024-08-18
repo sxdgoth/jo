@@ -137,26 +137,45 @@ class AvatarDisplay {
         if (svgDoc && this.skinTones[this.skinTone]) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
             const tone = this.skinTones[this.skinTone];
+            const colors = this.getUniqueColors(paths);
+            const mainColor = this.findMainSkinColor(colors);
+            
             paths.forEach((path, index) => {
                 const currentFill = path.getAttribute('fill');
                 if (currentFill && currentFill.toLowerCase() !== 'none') {
-                    const newColor = this.getNewColor(currentFill, this.originalColors[type][index], tone);
+                    const newColor = this.getNewColor(currentFill, mainColor, tone);
                     path.setAttribute('fill', newColor);
                 }
             });
         }
     }
 
-    getNewColor(currentColor, originalColor, tone) {
+    getUniqueColors(paths) {
+        const colors = new Set();
+        paths.forEach(path => {
+            const fill = path.getAttribute('fill');
+            if (fill && fill.toLowerCase() !== 'none') {
+                colors.add(fill.toLowerCase());
+            }
+        });
+        return Array.from(colors);
+    }
+
+    findMainSkinColor(colors) {
+        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
+    }
+
+    getNewColor(currentColor, mainColor, tone) {
         const currentLuminance = this.getLuminance(currentColor);
-        const originalLuminance = this.getLuminance(originalColor);
-        const luminanceDiff = currentLuminance - originalLuminance;
+        const mainLuminance = this.getLuminance(mainColor);
+        const luminanceDiff = currentLuminance - mainLuminance;
         
         if (Math.abs(luminanceDiff) < 0.1) {
             return tone.main;
         } else if (luminanceDiff < 0) {
             return tone.shadow;
         } else {
+            // For colors lighter than the main color, we'll create a lighter version of the main tone
             return this.lightenColor(tone.main, luminanceDiff);
         }
     }
@@ -183,12 +202,69 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-    // Existing methods remain unchanged
-    tryOnItem(item) { /* ... */ }
-    removeTriedOnItem(type) { /* ... */ }
-    toggleEquippedItem(type) { /* ... */ }
-    isItemEquipped(item) { /* ... */ }
-    updateEquippedItems() { /* ... */ }
+    tryOnItem(item) {
+        if (this.layers[item.type]) {
+            console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
+            this.layers[item.type].style.display = 'block';
+            this.triedOnItems[item.type] = item;
+            this.lastAction[item.type] = 'triedOn';
+            // Hide conflicting items
+            if (item.type === 'Shirt') this.layers['Jacket'].style.display = 'none';
+            if (item.type === 'Jacket') this.layers['Shirt'].style.display = 'none';
+        }
+    }
+    
+    removeTriedOnItem(type) {
+        if (this.layers[type]) {
+            console.log(`Removing tried on item of type: ${type}`);
+            delete this.triedOnItems[type];
+            if (this.lastAction[type] === 'hidden') {
+                // If the last action was to hide the equipped item, keep it hidden
+                this.layers[type].style.display = 'none';
+            } else if (this.equippedItems[type]) {
+                // Show equipped item if exists
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                }
+            } else {
+                // If no equipped item, hide the layer
+                this.layers[type].style.display = 'none';
+            }
+            this.lastAction[type] = 'removed';
+        }
+    }
+
+    toggleEquippedItem(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            if (this.layers[type].style.display === 'none') {
+                // Show the equipped item
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                    this.lastAction[type] = 'shown';
+                    this.hiddenEquippedItems.delete(type); // Remove from hidden set
+                }
+            } else {
+                // Hide the equipped item
+                this.layers[type].style.display = 'none';
+                this.lastAction[type] = 'hidden';
+                this.hiddenEquippedItems.add(type); // Add to hidden set
+            }
+        }
+    }
+
+    isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
+    }
+
+    updateEquippedItems() {
+        const savedItems = localStorage.getItem('equippedItems');
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
+    }
 }
 
 // Initialize the avatar display when the DOM is loaded
