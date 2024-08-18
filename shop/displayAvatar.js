@@ -81,7 +81,7 @@ class AvatarDisplay {
         });
     }
 
-    tryOnItem(item) {
+     tryOnItem(item) {
         if (this.layers[item.type]) {
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
@@ -91,21 +91,14 @@ class AvatarDisplay {
 
     removeTriedOnItem(type) {
         if (this.layers[type]) {
-            const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-            const equippedItem = equippedItems[type];
-            if (equippedItem) {
-                const item = shopItems.find(item => item.id === equippedItem);
-                if (item) {
-                    this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
-                    this.layers[type].style.display = 'block';
-                } else {
-                    this.layers[type].style.display = 'none';
-                }
-            } else {
-                this.layers[type].style.display = 'none';
-            }
+            this.layers[type].style.display = 'none';
             delete this.triedOnItems[type];
         }
+    }
+
+    isItemEquipped(item) {
+        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+        return equippedItems[item.type] === item.id;
     }
 }
 
