@@ -4,6 +4,7 @@ class AvatarManager {
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.loadEquippedItems();
+        this.skinTone = 'default';
     }
 
     initialize() {
