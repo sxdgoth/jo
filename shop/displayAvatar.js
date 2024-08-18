@@ -9,7 +9,7 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {};
+        this.triedOnItems = {}; // Add this line
     }
 
     loadAvatar() {
@@ -81,7 +81,8 @@ class AvatarDisplay {
         });
     }
 
-     tryOnItem(item) {
+    // Add these new methods
+    tryOnItem(item) {
         if (this.layers[item.type]) {
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
