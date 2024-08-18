@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update buy button state
         const buyButton = itemElement.querySelector('.buy-btn');
         updateBuyButtonState(buyButton, item.id);
+
+        // Apply item positioning
+        const imgElement = itemElement.querySelector('.item-image img');
+        if (window.applyItemPosition) {
+            window.applyItemPosition(imgElement, item.type.toLowerCase());
+        }
     });
     // Add event listeners to item images for try on/off
     document.querySelectorAll('.item-image').forEach(image => {
@@ -34,11 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // Initialize inventory state
     initializeInventoryState();
-
-    // Apply item positioning
-    if (window.applyItemPositioning) {
-        window.applyItemPositioning();
-    }
 }
 
     function updateBuyButtonState(button, itemId) {
@@ -176,9 +177,4 @@ function updateItemImages() {
 
     // Initialize the shop
     renderShopItems();
-
-    // Apply item positioning when DOM content is loaded
-    if (window.applyItemPositioning) {
-        window.applyItemPositioning();
-    }
 });
