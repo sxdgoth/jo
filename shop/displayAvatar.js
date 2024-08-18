@@ -10,14 +10,13 @@ class AvatarDisplay {
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
         this.triedOnItems = {};
-        this.equippedItems = {};
     }
 
     loadAvatar() {
         console.log("Loading avatar...");
         const savedItems = localStorage.getItem('equippedItems');
         console.log("Saved items:", savedItems);
-        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
+        const equippedItems = savedItems ? JSON.parse(savedItems) : {};
 
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
@@ -49,14 +48,14 @@ class AvatarDisplay {
                 obj.data = this.baseUrl + part.file;
                 obj.style.display = 'block';
                 console.log(`Loading base part: ${part.name}, src: ${obj.data}`);
-            } else if (this.equippedItems[part.type]) {
-                const item = shopItems.find(item => item.id === this.equippedItems[part.type]);
+            } else if (equippedItems[part.type]) {
+                const item = shopItems.find(item => item.id === equippedItems[part.type]);
                 if (item) {
                     obj.data = `${this.baseUrl}${item.path}${item.id}`;
                     obj.style.display = 'block';
                     console.log(`Loading equipped part: ${part.name}, src: ${obj.data}`);
                 } else {
-                    console.warn(`Item not found: ${this.equippedItems[part.type]}`);
+                    console.warn(`Item not found: ${equippedItems[part.type]}`);
                     obj.style.display = 'none';
                 }
             } else {
@@ -84,38 +83,61 @@ class AvatarDisplay {
 
     tryOnItem(item) {
         if (this.layers[item.type]) {
-            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
-            this.layers[item.type].style.display = 'block';
-            this.triedOnItems[item.type] = item;
+            if (this.triedOnItems[item.type] === item) {
+                // Item is already tried on, so remove it
+                this.removeTriedOnItem(item.type);
+            } else {
+                // Try on the new item
+                this.triedOnItems[item.type] = item;
+                this.updateLayerDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+                console.log(`Tried on ${item.name}`);
 
-            // Hide conflicting layers
-            if (item.type === 'Shirt') {
-                this.hideLayer('Jacket');
-            } else if (item.type === 'Jacket') {
-                this.hideLayer('Shirt');
+                // Handle conflicting items
+                if (item.type === 'Shirt') {
+                    this.hideLayer('Jacket');
+                } else if (item.type === 'Jacket') {
+                    this.hideLayer('Shirt');
+                }
             }
         }
     }
 
     removeTriedOnItem(type) {
         if (this.layers[type]) {
-            this.layers[type].style.display = 'none';
             delete this.triedOnItems[type];
+            this.updateLayerDisplay(type, null);
+            console.log(`Removed ${type}`);
 
-            // Show originally equipped item if it exists
-            if (this.equippedItems[type]) {
-                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-                if (equippedItem) {
-                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
-                    this.layers[type].style.display = 'block';
-                }
+            // Show conflicting items if they were equipped
+            if (type === 'Shirt') {
+                this.showLayerIfEquipped('Jacket');
+            } else if (type === 'Jacket') {
+                this.showLayerIfEquipped('Shirt');
             }
+        }
+    }
 
-            // Show conflicting layers if they were originally equipped
-            if (type === 'Shirt' && this.equippedItems['Jacket']) {
-                this.showLayer('Jacket');
-            } else if (type === 'Jacket' && this.equippedItems['Shirt']) {
-                this.showLayer('Shirt');
+    updateLayerDisplay(type, src) {
+        const layerElement = this.layers[type];
+        if (layerElement) {
+            if (src) {
+                layerElement.data = src;
+                layerElement.style.display = 'block';
+            } else {
+                // If src is null, revert to the original equipped item or hide if none
+                const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+                const equippedItem = equippedItems[type];
+                if (equippedItem) {
+                    const item = shopItems.find(item => item.id === equippedItem);
+                    if (item) {
+                        layerElement.data = `${this.baseUrl}${item.path}${item.id}`;
+                        layerElement.style.display = 'block';
+                    } else {
+                        layerElement.style.display = 'none';
+                    }
+                } else {
+                    layerElement.style.display = 'none';
+                }
             }
         }
     }
@@ -126,9 +148,10 @@ class AvatarDisplay {
         }
     }
 
-    showLayer(type) {
-        if (this.layers[type] && this.equippedItems[type]) {
-            const item = shopItems.find(item => item.id === this.equippedItems[type]);
+    showLayerIfEquipped(type) {
+        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+        if (equippedItems[type] && this.layers[type]) {
+            const item = shopItems.find(item => item.id === equippedItems[type]);
             if (item) {
                 this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
                 this.layers[type].style.display = 'block';
@@ -137,7 +160,8 @@ class AvatarDisplay {
     }
 
     isItemEquipped(item) {
-        return this.equippedItems[item.type] === item.id;
+        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+        return equippedItems[item.type] === item.id;
     }
 }
 
