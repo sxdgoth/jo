@@ -34,7 +34,7 @@ class SkinToneManager {
         this.createSkinToneButtons();
         this.saveOriginalColors();
     }
-    
+
     createSkinToneButtons() {
         console.log("Creating skin tone buttons...");
         const container = document.createElement('div');
@@ -89,7 +89,7 @@ class SkinToneManager {
         this.applySkinTone(tone);
     }
 
-     saveOriginalColors() {
+    saveOriginalColors() {
         if (window.avatarBody && window.avatarBody.layers) {
             this.baseParts.forEach(part => {
                 const layer = window.avatarBody.layers[part];
@@ -144,24 +144,6 @@ class SkinToneManager {
                 img.src = url;
             })
             .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
-    }
-}
-
-
-    getLuminance(hex) {
-        const rgb = this.hexToRgb(hex);
-        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    }
-
-    hexToRgb(hex) {
-        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
     }
 }
 
