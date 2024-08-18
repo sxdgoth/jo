@@ -103,23 +103,39 @@ this.lastAction = {}; // Add this line to track the last action for each item ty
             console.log(`Removing tried on item of type: ${type}`);
             delete this.triedOnItems[type];
 
-            // Show equipped item if exists and not manually hidden, otherwise hide the layer
-            if (this.equippedItems[type] && !this.hiddenEquippedItems.has(type)) {
+            if (this.lastAction[type] === 'hidden') {
+                // If the last action was to hide the equipped item, keep it hidden
+                this.layers[type].style.display = 'none';
+            } else if (this.equippedItems[type]) {
+                // Show equipped item if exists
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
                 if (equippedItem) {
                     this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
                     this.layers[type].style.display = 'block';
                 }
             } else {
+                // If no equipped item, hide the layer
                 this.layers[type].style.display = 'none';
             }
 
-            // Show conflicting equipped items if not manually hidden
-            if (type === 'Shirt' && this.equippedItems['Jacket'] && !this.hiddenEquippedItems.has('Jacket')) {
-                this.layers['Jacket'].style.display = 'block';
-            }
-            if (type === 'Jacket' && this.equippedItems['Shirt'] && !this.hiddenEquippedItems.has('Shirt')) {
-                this.layers['Shirt'].style.display = 'block';
+            this.lastAction[type] = 'removed';
+        }
+    }
+
+     toggleEquippedItem(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            if (this.layers[type].style.display === 'none') {
+                // Show the equipped item
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                    this.lastAction[type] = 'shown';
+                }
+            } else {
+                // Hide the equipped item
+                this.layers[type].style.display = 'none';
+                this.lastAction[type] = 'hidden';
             }
         }
     }
