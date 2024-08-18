@@ -97,7 +97,7 @@ class AvatarDisplay {
         }
     }
 
-    removeTriedOnItem(type) {
+      removeTriedOnItem(type) {
         if (this.layers[type]) {
             console.log(`Removing tried on item of type: ${type}`);
             delete this.triedOnItems[type];
@@ -112,10 +112,20 @@ class AvatarDisplay {
             } else {
                 this.layers[type].style.display = 'none';
             }
-    
+
+            // Show conflicting equipped items
+            if (type === 'Shirt' && this.equippedItems['Jacket']) this.layers['Jacket'].style.display = 'block';
+            if (type === 'Jacket' && this.equippedItems['Shirt']) this.layers['Shirt'].style.display = 'block';
+        }
+    }
+
     isItemEquipped(item) {
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        return equippedItems[item.type] === item.id;
+        return this.equippedItems[item.type] === item.id;
+    }
+
+    updateEquippedItems() {
+        const savedItems = localStorage.getItem('equippedItems');
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 }
 
