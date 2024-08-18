@@ -10,11 +10,13 @@ class SkinToneManager {
         ];
         this.currentSkinTone = this.skinTones[0].color;
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+        this.originalColors = {};
     }
 
     initialize() {
         console.log("SkinToneManager initializing...");
         this.createSkinToneButtons();
+        this.saveOriginalColors();
     }
 
     createSkinToneButtons() {
@@ -71,13 +73,26 @@ class SkinToneManager {
         this.applySkinTone(color);
     }
 
+    saveOriginalColors() {
+        if (window.avatarBody && window.avatarBody.layers) {
+            this.baseParts.forEach(part => {
+                const layer = window.avatarBody.layers[part];
+                if (layer) {
+                    this.originalColors[part] = layer.src;
+                }
+            });
+        }
+    }
+
     applySkinTone(color) {
         console.log(`Applying skin tone: ${color}`);
         if (window.avatarBody && window.avatarBody.layers) {
             this.baseParts.forEach(part => {
                 const layer = window.avatarBody.layers[part];
                 if (layer) {
-                    this.applySkinToneToSVG(layer, color);
+                    // Always start from the original SVG
+                    const originalSrc = this.originalColors[part];
+                    this.applySkinToneToSVG(layer, color, originalSrc);
                 } else {
                     console.warn(`Layer ${part} not found`);
                 }
@@ -87,8 +102,8 @@ class SkinToneManager {
         }
     }
 
-    applySkinToneToSVG(img, newColor) {
-        fetch(img.src)
+    applySkinToneToSVG(img, newColor, originalSrc) {
+        fetch(originalSrc)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
