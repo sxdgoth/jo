@@ -51,7 +51,7 @@ function updateItemImages() {
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             image.classList.add('selected');
             image.classList.remove('equipped');
-        } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.isItemHidden(item)) {
+        } else if (window.avatarDisplay.isItemEquipped(item) && window.avatarDisplay.layers[item.type].style.display !== 'none') {
             image.classList.add('equipped');
             image.classList.remove('selected');
         } else {
