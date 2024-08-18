@@ -12,15 +12,29 @@ class SkinToneManager {
     }
 
     initialize() {
-        this.createSkinToneButtons();
+        console.log("SkinToneManager initializing...");
+        // Wait for the DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.createSkinToneButtons());
+        } else {
+            this.createSkinToneButtons();
+        }
     }
 
     createSkinToneButtons() {
+        console.log("Creating skin tone buttons...");
         const container = document.createElement('div');
         container.id = 'skin-tone-buttons';
+        container.style.position = 'fixed';
+        container.style.bottom = '20px';
+        container.style.left = '50%';
+        container.style.transform = 'translateX(-50%)';
         container.style.display = 'flex';
         container.style.justifyContent = 'center';
-        container.style.marginTop = '10px';
+        container.style.zIndex = '1000';
+        container.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        container.style.padding = '5px';
+        container.style.borderRadius = '5px';
 
         this.skinTones.forEach(tone => {
             const button = document.createElement('button');
@@ -37,12 +51,8 @@ class SkinToneManager {
             container.appendChild(button);
         });
 
-        const avatarDisplay = document.getElementById('avatar-display');
-        if (avatarDisplay && avatarDisplay.parentNode) {
-            avatarDisplay.parentNode.insertBefore(container, avatarDisplay.nextSibling);
-        } else {
-            console.error('Avatar display element not found');
-        }
+        document.body.appendChild(container);
+        console.log("Skin tone buttons created and added to body");
     }
 
     selectSkinTone(color) {
@@ -66,12 +76,15 @@ class SkinToneManager {
     }
 
     applySkinTone(color) {
+        console.log(`Applying skin tone: ${color}`);
         if (window.avatarDisplay && window.avatarDisplay.layers) {
             const baseParts = ['Head', 'Body', 'Arms', 'Legs'];
             baseParts.forEach(part => {
                 const layer = window.avatarDisplay.layers[part];
                 if (layer && layer.contentDocument) {
                     this.applySkinToneToSVG(layer.contentDocument, color);
+                } else {
+                    console.warn(`Layer ${part} not found or not loaded`);
                 }
             });
         } else {
@@ -86,11 +99,13 @@ class SkinToneManager {
                 path.setAttribute('fill', color);
             }
         });
+        console.log(`Applied skin tone to SVG elements`);
     }
 }
 
-// Initialize the SkinToneManager when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.skinToneManager = new SkinToneManager();
-    window.skinToneManager.initialize();
-});
+// Create and initialize the SkinToneManager
+const skinToneManager = new SkinToneManager();
+skinToneManager.initialize();
+
+// Make it globally accessible
+window.skinToneManager = skinToneManager;
