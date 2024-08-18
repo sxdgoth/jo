@@ -92,29 +92,66 @@ class AvatarBody {
     }
 
     // New methods for skin tone
-    updateSkinTone(color) {
-        console.log(`Updating skin tone to: ${color}`);
-        const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
-        baseParts.forEach(part => {
-            const layer = this.layers[part];
-            if (layer) {
-                layer.style.filter = this.createSkinToneFilter(color);
-            } else {
-                console.warn(`Layer ${part} not found`);
-            }
-        });
-    }
-
-    createSkinToneFilter(hexColor) {
-        // Convert hex to RGB
-        const r = parseInt(hexColor.slice(1, 3), 16) / 255;
-        const g = parseInt(hexColor.slice(3, 5), 16) / 255;
-        const b = parseInt(hexColor.slice(5, 7), 16) / 255;
-
-        // Create and return the filter string
-        return `brightness(0) saturate(100%) invert(${r}) sepia(${g}) saturate(${b}) hue-rotate(0deg)`;
-    }
+   updateSkinTone(color) {
+    console.log(`Updating skin tone to: ${color}`);
+    const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+    baseParts.forEach(part => {
+        const layer = this.layers[part];
+        if (layer) {
+            this.applySkinToneToSVG(layer, color);
+        } else {
+            console.warn(`Layer ${part} not found`);
+        }
+    });
 }
+
+applySkinToneToSVG(img, newColor) {
+    fetch(img.src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+            paths.forEach(path => {
+                const currentFill = path.getAttribute('fill');
+                if (currentFill && currentFill.toLowerCase() !== 'none') {
+                    const newFill = this.blendColors(currentFill, newColor);
+                    path.setAttribute('fill', newFill);
+                }
+            });
+
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        })
+        .catch(error => console.error('Error applying skin tone:', error));
+}
+
+blendColors(color1, color2) {
+    const [r1, g1, b1] = this.hexToRgb(color1);
+    const [r2, g2, b2] = this.hexToRgb(color2);
+    
+    const r = Math.round((r1 + r2) / 2);
+    const g = Math.round((g1 + g2) / 2);
+    const b = Math.round((b1 + b2) / 2);
+    
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+hexToRgb(hex) {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+    ] : null;
+}
+
 
 // Create and load the avatar body when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
