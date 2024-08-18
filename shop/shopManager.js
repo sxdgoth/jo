@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-function toggleTryOn(itemId) {
+  function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
@@ -52,18 +52,17 @@ function toggleTryOn(itemId) {
     }
 }
 
-function updateItemImages() {
-    document.querySelectorAll('.item-image').forEach(image => {
-        const itemId = image.dataset.id;
-        const item = shopItems.find(i => i.id === itemId);
-        if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            image.classList.add('selected');
-        } else {
-            image.classList.remove('selected');
-        }
-    });
-}
-
+    function updateItemImages() {
+        document.querySelectorAll('.item-image').forEach(image => {
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            if (triedOnItems[item.type] === item) {
+                image.classList.add('selected');
+            } else {
+                image.classList.remove('selected');
+            }
+        });
+    }
 
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
