@@ -84,31 +84,54 @@ class AvatarDisplay {
     // Add these new methods
   tryOnItem(item) {
         if (this.layers[item.type]) {
-            // Always update the layer with the new item
+            console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            // Remove any currently tried on item of the same type
+            if (this.triedOnItems[item.type]) {
+                this.removeTriedOnItem(item.type);
+            }
+
+            // Update the layer with the new item
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             
             // Update triedOnItems
             this.triedOnItems[item.type] = item;
 
-            console.log(`Trying on ${item.name} (ID: ${item.id})`);
-
             // If trying on a shirt, hide the jacket, and vice versa
-            if (item.type === 'Shirt' && this.triedOnItems['Jacket']) {
-                this.removeTriedOnItem('Jacket');
-            } else if (item.type === 'Jacket' && this.triedOnItems['Shirt']) {
-                this.removeTriedOnItem('Shirt');
+            if (item.type === 'Shirt' && this.layers['Jacket'].style.display !== 'none') {
+                this.layers['Jacket'].style.display = 'none';
+            } else if (item.type === 'Jacket' && this.layers['Shirt'].style.display !== 'none') {
+                this.layers['Shirt'].style.display = 'none';
             }
         }
     }
 
     removeTriedOnItem(type) {
         if (this.layers[type]) {
+            console.log(`Removing tried on item of type: ${type}`);
             this.layers[type].style.display = 'none';
             delete this.triedOnItems[type];
+
+            // If removing a shirt or jacket, check if we need to show the other
+            if (type === 'Shirt' && this.triedOnItems['Jacket']) {
+                this.layers['Jacket'].style.display = 'block';
+            } else if (type === 'Jacket' && this.triedOnItems['Shirt']) {
+                this.layers['Shirt'].style.display = 'block';
+            }
+
+            // If there's an equipped item for this type, show it
+            const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+            if (equippedItems[type]) {
+                const equippedItem = shopItems.find(item => item.id === equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                }
+            }
         }
     }
-
+    
     isItemEquipped(item) {
         const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
         return equippedItems[item.type] === item.id;
