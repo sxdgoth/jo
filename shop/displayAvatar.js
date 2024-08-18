@@ -1,3 +1,5 @@
+// displayAvatar.js
+
 class AvatarDisplay {
     constructor(containerId, username) {
         this.username = username;
@@ -12,7 +14,6 @@ class AvatarDisplay {
         this.equippedItems = {};
         this.lastAction = {}; // Track the last action for each item type
         this.hiddenEquippedItems = new Set(); // Add this line
-        this.skinTone = 'default'; // New line
     }
 
     loadAvatar() {
@@ -27,7 +28,6 @@ class AvatarDisplay {
         this.container.style.height = '100%';
 
         const bodyParts = [
-            { name: 'SkinTone', file: `home/assets/body/skintones/${this.skinTone}.svg`, type: 'SkinTone', isBase: true },
             { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
             { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
             { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
@@ -77,7 +77,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-        const order = ['SkinTone', 'Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+        const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -85,7 +85,8 @@ class AvatarDisplay {
         });
     }
 
-    tryOnItem(item) {
+    // Add these new methods
+ tryOnItem(item) {
         if (this.layers[item.type]) {
             console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
@@ -150,13 +151,6 @@ class AvatarDisplay {
     updateEquippedItems() {
         const savedItems = localStorage.getItem('equippedItems');
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
-    }
-
-    changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        if (this.layers['SkinTone']) {
-            this.layers['SkinTone'].data = `${this.baseUrl}home/assets/body/skintones/${this.skinTone}.svg`;
-        }
     }
 }
 
