@@ -24,23 +24,32 @@ class SkinToneManager {
 
         this.skinTones.forEach(tone => {
             const button = document.createElement('button');
-            button.style.width = '50px';
-            button.style.height = '50px';
+            button.className = 'skin-tone-button';
             button.style.backgroundColor = tone.color;
-            button.style.margin = '0 5px';
-            button.style.border = '2px solid #000';
-            button.style.borderRadius = '5px';
-            button.style.cursor = 'pointer';
             button.title = tone.name;
             button.onclick = () => this.selectSkinTone(tone.color);
             container.appendChild(button);
         });
+
+        // Select the default skin tone
+        this.selectSkinTone(this.currentSkinTone);
     }
 
     selectSkinTone(color) {
         this.currentSkinTone = color;
         console.log(`Selected skin tone: ${color}`);
-        // You can add more logic here to apply the skin tone or save it
+        
+        // Update button styles
+        const buttons = document.querySelectorAll('.skin-tone-button');
+        buttons.forEach(button => {
+            if (button.style.backgroundColor === color) {
+                button.classList.add('selected');
+            } else {
+                button.classList.remove('selected');
+            }
+        });
+
+        // You can add more logic here to apply the skin tone to your avatar
     }
 }
 
