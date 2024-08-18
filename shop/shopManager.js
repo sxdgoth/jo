@@ -36,11 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-   function toggleTryOn(itemId) {
+  function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
+        window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
+
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             // Item is being tried on, so remove it
             window.avatarDisplay.removeTriedOnItem(item.type);
@@ -63,13 +65,8 @@ function updateItemImages() {
             image.classList.add('selected');
             image.classList.remove('equipped');
         } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (window.avatarDisplay.layers[item.type].style.display !== 'none') {
-                image.classList.add('equipped');
-                image.classList.remove('selected');
-            } else {
-                image.classList.remove('equipped');
-                image.classList.remove('selected');
-            }
+            image.classList.add('equipped');
+            image.classList.remove('selected');
         } else {
             image.classList.remove('selected');
             image.classList.remove('equipped');
