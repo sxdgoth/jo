@@ -9,8 +9,10 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {}; // Add this line
+        this.triedOnItems = {};
+        this.equippedItems = {};
     }
+
 
     loadAvatar() {
         console.log("Loading avatar...");
@@ -82,55 +84,34 @@ class AvatarDisplay {
     }
 
     // Add these new methods
-  tryOnItem(item) {
+ tryOnItem(item) {
         if (this.layers[item.type]) {
             console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            // Remove any currently tried on item of the same type
-            if (this.triedOnItems[item.type]) {
-                this.removeTriedOnItem(item.type);
-            }
-
-            // Update the layer with the new item
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
-            
-            // Update triedOnItems
             this.triedOnItems[item.type] = item;
 
-            // If trying on a shirt, hide the jacket, and vice versa
-            if (item.type === 'Shirt' && this.layers['Jacket'].style.display !== 'none') {
-                this.layers['Jacket'].style.display = 'none';
-            } else if (item.type === 'Jacket' && this.layers['Shirt'].style.display !== 'none') {
-                this.layers['Shirt'].style.display = 'none';
-            }
+            // Hide conflicting items
+            if (item.type === 'Shirt') this.layers['Jacket'].style.display = 'none';
+            if (item.type === 'Jacket') this.layers['Shirt'].style.display = 'none';
         }
     }
 
     removeTriedOnItem(type) {
         if (this.layers[type]) {
             console.log(`Removing tried on item of type: ${type}`);
-            this.layers[type].style.display = 'none';
             delete this.triedOnItems[type];
 
-            // If removing a shirt or jacket, check if we need to show the other
-            if (type === 'Shirt' && this.triedOnItems['Jacket']) {
-                this.layers['Jacket'].style.display = 'block';
-            } else if (type === 'Jacket' && this.triedOnItems['Shirt']) {
-                this.layers['Shirt'].style.display = 'block';
-            }
-
-            // If there's an equipped item for this type, show it
-            const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-            if (equippedItems[type]) {
-                const equippedItem = shopItems.find(item => item.id === equippedItems[type]);
+            // Show equipped item if exists, otherwise hide the layer
+            if (this.equippedItems[type]) {
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
                 if (equippedItem) {
                     this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
                     this.layers[type].style.display = 'block';
                 }
+            } else {
+                this.layers[type].style.display = 'none';
             }
-        }
-    }
     
     isItemEquipped(item) {
         const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
