@@ -21,6 +21,7 @@ class AvatarBody {
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
         this.container.style.height = '100%';
+
         this.bodyParts.forEach(part => {
             const img = document.createElement('img');
             img.src = part.file ? this.baseUrl + part.file : '';
@@ -37,6 +38,7 @@ class AvatarBody {
             this.container.appendChild(img);
             this.layers[part.type] = img;
         });
+
         this.reorderLayers();
     }
 
@@ -78,7 +80,6 @@ class AvatarBody {
         }
     }
 
-    // New method for clearing all non-base layers
     clearAllLayers() {
         Object.entries(this.layers).forEach(([type, layer]) => {
             const bodyPart = this.bodyParts.find(part => part.type === type);
@@ -88,12 +89,6 @@ class AvatarBody {
             }
         });
         this.reorderLayers();
-    }
-}
-
-applySkinTone(color) {
-    if (window.skinToneManager) {
-        window.skinToneManager.applySkinTone(color);
     }
 }
 
