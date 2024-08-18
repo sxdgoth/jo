@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createUserInventory(loggedInUser.username);
         
         // Initialize AvatarManager
-        window.avatarManager = new AvatarManager();
+        window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
         
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
-            window.avatarBody.initializeAvatar();
+            window.avatarBody.initializeAvatar(loggedInUser.username);
         }
         
         // Render owned items
