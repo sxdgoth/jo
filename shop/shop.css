@@ -92,7 +92,7 @@ main {
 }
 
 .shop-item {
-    border: 2px solid #000000 !important; /* Increased width and added !important */
+    border: 1px solid #000000;
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -102,7 +102,7 @@ main {
     flex-direction: column;
     justify-content: space-between;
     height: 220px;
-    box-sizing: border-box; /* Ensure padding doesn't affect overall size */
+    box-sizing: border-box;
 }
 
 .shop-item:hover {
@@ -124,9 +124,12 @@ main {
 }
 
 .item-image {
-    max-width: 100%;
-    max-height: 100px; /* Adjust as needed */
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
+    margin-bottom: 10px;
 }
 
 .item-image img {
@@ -134,6 +137,7 @@ main {
     max-height: 100%;
     object-fit: contain;
 }
+
 
 .shop-item h3 {
     font-weight: bold;
