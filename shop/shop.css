@@ -87,21 +87,21 @@ main {
 
 .shop-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
 }
 
 .shop-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     padding: 10px;
     text-align: center;
+    cursor: pointer;
     transition: all 0.3s ease;
     background-color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 220px;
+    align-items: center;
 }
 
 .shop-item:hover {
@@ -120,8 +120,8 @@ main {
 
 .item-image img {
     max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    height: auto;
+    border-radius: 4px;
 }
 
 .shop-item h3 {
