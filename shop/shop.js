@@ -37,6 +37,13 @@ function updateUserCoinsAfterPurchase(newCoins) {
         loggedInUser.coins = newCoins;
         sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         updateUserCoins(newCoins);
+
+        // Update the user's coins in localStorage as well
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const updatedUsers = users.map(user => 
+            user.username === loggedInUser.username ? {...user, coins: newCoins} : user
+        );
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
     }
 }
 
