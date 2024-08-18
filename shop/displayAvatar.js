@@ -11,6 +11,7 @@ class AvatarDisplay {
         this.layers = {};
         this.triedOnItems = {};
         this.equippedItems = {};
+     this.hiddenEquippedItems = new Set(); // Add this line
     }
 
 
