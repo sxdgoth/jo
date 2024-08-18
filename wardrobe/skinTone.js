@@ -87,6 +87,16 @@ class SkinToneManager {
 
         // Apply skin tone to avatar
         this.applySkinTone(tone);
+
+        // New: Update AvatarManager if it exists
+        if (window.avatarManager) {
+            window.avatarManager.changeSkinTone(this.getSkinToneKey(tone));
+        }
+    }
+
+    // New method to get the key of a skin tone
+    getSkinToneKey(tone) {
+        return Object.keys(this.skinTones).find(key => this.skinTones[key] === tone);
     }
 
     saveOriginalColors() {
@@ -206,4 +216,30 @@ class SkinToneManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.skinToneManager = new SkinToneManager();
     window.skinToneManager.initialize();
+
+    // New: Set initial skin tone based on AvatarManager if it exists
+    if (window.avatarManager && window.avatarManager.skinTone) {
+        const initialTone = window.skinToneManager.skinTones[window.avatarManager.skinTone];
+        if (initialTone) {
+            window.skinToneManager.selectSkinTone(initialTone);
+        }
+    }
 });
+
+
+
+The main additions to make it work with the Apply Avatar button are:
+
+In the selectSkinTone method, we added a check to update the AvatarManager if it exists:
+if (window.avatarManager) {
+    window.avatarManager.changeSkinTone(this.getSkinToneKey(tone));
+}
+
+
+
+Avatar for supwezton-hjwkg
+
+
+
+
+
