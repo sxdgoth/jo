@@ -93,18 +93,20 @@ class AvatarBody {
 
     // New methods for skin tone
   
- updateSkinTone(color) {
-        console.log(`Updating skin tone to: ${color}`);
-        const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
-        baseParts.forEach(part => {
-            const layer = this.layers[part];
-            if (layer) {
-                this.applySkinToneToSVG(layer, color);
-            } else {
-                console.warn(`Layer ${part} not found`);
-            }
-        });
-    }
+updateSkinTone(color) {
+    console.log(`Attempting to update skin tone to: ${color}`);
+    const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+    baseParts.forEach(part => {
+        const layer = this.layers[part];
+        if (layer) {
+            console.log(`Applying color ${color} to ${part}`);
+            // Instead of modifying the SVG, let's just change the background color
+            layer.style.backgroundColor = color;
+        } else {
+            console.warn(`Layer ${part} not found`);
+        }
+    });
+}
 
     applySkinToneToSVG(img, newColor) {
         fetch(img.src)
