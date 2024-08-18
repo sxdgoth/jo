@@ -13,12 +13,7 @@ class SkinToneManager {
 
     initialize() {
         console.log("SkinToneManager initializing...");
-        // Wait for the DOM to be fully loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.createSkinToneButtons());
-        } else {
-            this.createSkinToneButtons();
-        }
+        this.createSkinToneButtons();
     }
 
     createSkinToneButtons() {
@@ -77,29 +72,11 @@ class SkinToneManager {
 
     applySkinTone(color) {
         console.log(`Applying skin tone: ${color}`);
-        if (window.avatarDisplay && window.avatarDisplay.layers) {
-            const baseParts = ['Head', 'Body', 'Arms', 'Legs'];
-            baseParts.forEach(part => {
-                const layer = window.avatarDisplay.layers[part];
-                if (layer && layer.contentDocument) {
-                    this.applySkinToneToSVG(layer.contentDocument, color);
-                } else {
-                    console.warn(`Layer ${part} not found or not loaded`);
-                }
-            });
+        if (window.avatarBody && typeof window.avatarBody.updateSkinTone === 'function') {
+            window.avatarBody.updateSkinTone(color);
         } else {
-            console.error('Avatar display or layers not found');
+            console.error('Avatar body or updateSkinTone method not found');
         }
-    }
-
-    applySkinToneToSVG(svgDoc, color) {
-        const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-        paths.forEach(path => {
-            if (path.getAttribute('fill') && path.getAttribute('fill') !== 'none') {
-                path.setAttribute('fill', color);
-            }
-        });
-        console.log(`Applied skin tone to SVG elements`);
     }
 }
 
