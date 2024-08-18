@@ -92,23 +92,24 @@ main {
 }
 
 .shop-item {
+    border: 1px solid #000000; /* Black line around item container */
+    border-radius: 8px;
+    padding: 10px;
     text-align: center;
     background-color: #fff;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 250px;
+    height: 280px; /* Increased height to accommodate larger preview */
 }
 
 .item-image {
-    height: 180px;
+    height: 200px; /* Increased height for larger preview */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     margin-bottom: 10px;
-    border: 1px solid #000000; /* Black border around the preview image */
-    border-radius: 4px;
 }
 
 .item-image img {
@@ -201,10 +202,10 @@ main {
     }
 
     .shop-item {
-        height: 220px;
+        height: 250px;
     }
 
     .item-image {
-        height: 150px;
+        height: 170px;
     }
 }
