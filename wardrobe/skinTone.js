@@ -1,90 +1,88 @@
 // skinTone.js
 
-document.addEventListener('DOMContentLoaded', function() {
-    const skinToneButtons = document.querySelectorAll('.skin-tone-btn');
-    const avatarContainer = document.getElementById('avatar-container');
-
-    const skinToneColors = {
-        default: {
-            main: '#FEE2CA',
-            shadow: '#EFC1B7'
-        },
-        light: {
-            main: '#FFE0BD',
-            shadow: '#EFD0B1'
-        },
-        medium: {
-            main: '#F1C27D',
-            shadow: '#E0B170'
-        },
-        dark: {
-            main: '#8D5524',
-            shadow: '#7C4A1E'
-        }
-    };
-
-    let currentColors = {...skinToneColors.default};
-
-    function changeSkinTone(tone) {
-    const avatarSVG = document.querySelector('#avatar-container svg');
-    if (!avatarSVG) {
-        console.error('Avatar SVG not found');
-        return;
+class SkinToneManager {
+    constructor() {
+        this.skinTones = [
+            { name: 'Light', color: '#FFD5B8' },
+            { name: 'Medium', color: '#E5B887' },
+            { name: 'Tan', color: '#C68642' },
+            { name: 'Dark', color: '#8D5524' }
+        ];
+        this.currentSkinTone = this.skinTones[0].color; // Default to light skin tone
     }
 
-        const newColors = skinToneColors[tone];
-
-        // Change main skin color
-        avatarSVG.querySelectorAll(`[fill="${currentColors.main}"]`).forEach(el => {
-            el.setAttribute('fill', newColors.main);
-        });
-
-        // Change shadow color
-        avatarSVG.querySelectorAll(`[fill="${currentColors.shadow}"]`).forEach(el => {
-            el.setAttribute('fill', newColors.shadow);
-        });
-
-        // Update current colors
-        currentColors = {...newColors};
-
-        // Dispatch an event to notify that the skin tone has changed
-        const event = new CustomEvent('skinToneChanged', { detail: { tone: tone } });
-        document.dispatchEvent(event);
-
-        console.log('Skin tone changed to:', tone);
+    initialize() {
+        console.log("SkinToneManager initializing...");
+        this.createSkinToneButtons();
     }
 
-    skinToneButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const skinTone = this.dataset.skinTone;
-            changeSkinTone(skinTone);
-        });
-    });
+    createSkinToneButtons() {
+        console.log("Creating skin tone buttons...");
+        const container = document.createElement('div');
+        container.id = 'skin-tone-buttons';
+        container.style.position = 'fixed';
+        container.style.bottom = '20px';
+        container.style.left = '50%';
+        container.style.transform = 'translateX(-50%)';
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.zIndex = '1000';
+        container.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        container.style.padding = '5px';
+        container.style.borderRadius = '5px';
 
-    // Function to get the current skin tone
-    window.getCurrentSkinTone = function() {
-        for (let tone in skinToneColors) {
-            if (skinToneColors[tone].main === currentColors.main) {
-                return tone;
+        this.skinTones.forEach(tone => {
+            const button = document.createElement('button');
+            button.className = 'skin-tone-button';
+            button.style.width = '30px';
+            button.style.height = '30px';
+            button.style.backgroundColor = tone.color;
+            button.style.margin = '0 5px';
+            button.style.border = '2px solid #000';
+            button.style.borderRadius = '50%';
+            button.style.cursor = 'pointer';
+            button.title = tone.name;
+            button.onclick = () => this.selectSkinTone(tone.color);
+            container.appendChild(button);
+        });
+
+        document.body.appendChild(container);
+        console.log("Skin tone buttons created and added to body");
+    }
+
+    selectSkinTone(color) {
+        this.currentSkinTone = color;
+        console.log(`Selected skin tone: ${color}`);
+        
+        // Update button styles
+        const buttons = document.querySelectorAll('.skin-tone-button');
+        buttons.forEach(button => {
+            if (button.style.backgroundColor === color) {
+                button.style.borderColor = '#ff4500';
+                button.style.boxShadow = '0 0 5px #ff4500';
+            } else {
+                button.style.borderColor = '#000';
+                button.style.boxShadow = 'none';
             }
-        }
-        return 'default';
-    };
-
-    // Function to set skin tone (can be called from outside)
-    window.setSkinTone = changeSkinTone;
-
-    // Initialize with default skin tone
-    changeSkinTone('default');
-});
-
-// Add this initialization function
-window.initializeSkinToneButtons = function() {
-    const skinToneButtons = document.querySelectorAll('.skin-tone-btn');
-    skinToneButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const skinTone = this.dataset.skinTone;
-            window.setSkinTone(skinTone);
         });
-    });
-};
+
+        // Apply skin tone to avatar
+        this.applySkinTone(color);
+    }
+
+    applySkinTone(color) {
+        console.log(`Applying skin tone: ${color}`);
+        if (window.avatarBody && typeof window.avatarBody.updateSkinTone === 'function') {
+            window.avatarBody.updateSkinTone(color);
+        } else {
+            console.error('Avatar body or updateSkinTone method not found');
+        }
+    }
+}
+
+// Create and initialize the SkinToneManager
+const skinToneManager = new SkinToneManager();
+skinToneManager.initialize();
+
+// Make it globally accessible
+window.skinToneManager = skinToneManager;
