@@ -2,7 +2,6 @@
 
 class SkinToneManager {
     constructor() {
-        console.log("SkinToneManager constructor called");
         this.skinTones = [
             { name: 'Light', color: '#FFD5B8' },
             { name: 'Medium', color: '#E5B887' },
@@ -13,21 +12,15 @@ class SkinToneManager {
     }
 
     initialize() {
-        console.log("SkinToneManager initialize method called");
         this.createSkinToneButtons();
     }
 
     createSkinToneButtons() {
-        console.log("Creating skin tone buttons");
         const container = document.createElement('div');
         container.id = 'skin-tone-buttons';
-        container.style.position = 'fixed';
-        container.style.bottom = '20px';
-        container.style.left = '50%';
-        container.style.transform = 'translateX(-50%)';
         container.style.display = 'flex';
         container.style.justifyContent = 'center';
-        container.style.zIndex = '1000';
+        container.style.marginTop = '10px';
 
         this.skinTones.forEach(tone => {
             const button = document.createElement('button');
@@ -44,8 +37,12 @@ class SkinToneManager {
             container.appendChild(button);
         });
 
-        document.body.appendChild(container);
-        console.log("Skin tone buttons created and added to body");
+        const avatarDisplay = document.getElementById('avatar-display');
+        if (avatarDisplay && avatarDisplay.parentNode) {
+            avatarDisplay.parentNode.insertBefore(container, avatarDisplay.nextSibling);
+        } else {
+            console.error('Avatar display element not found');
+        }
     }
 
     selectSkinTone(color) {
@@ -73,8 +70,8 @@ class SkinToneManager {
             const baseParts = ['Head', 'Body', 'Arms', 'Legs'];
             baseParts.forEach(part => {
                 const layer = window.avatarDisplay.layers[part];
-                if (layer) {
-                    this.applySkinToneFilter(layer, color);
+                if (layer && layer.contentDocument) {
+                    this.applySkinToneToSVG(layer.contentDocument, color);
                 }
             });
         } else {
@@ -82,25 +79,18 @@ class SkinToneManager {
         }
     }
 
-    applySkinToneFilter(element, color) {
-        const rgb = this.hexToRgb(color);
-        const filter = `brightness(0) saturate(100%) invert(${rgb.r / 255}) sepia(${rgb.g / 255}) saturate(${rgb.b / 255}) hue-rotate(0deg)`;
-        element.style.filter = filter;
-    }
-
-    hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
+    applySkinToneToSVG(svgDoc, color) {
+        const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        paths.forEach(path => {
+            if (path.getAttribute('fill') && path.getAttribute('fill') !== 'none') {
+                path.setAttribute('fill', color);
+            }
+        });
     }
 }
 
 // Initialize the SkinToneManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM content loaded, initializing SkinToneManager");
     window.skinToneManager = new SkinToneManager();
     window.skinToneManager.initialize();
 });
