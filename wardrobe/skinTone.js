@@ -34,7 +34,7 @@ class SkinToneManager {
         this.createSkinToneButtons();
         this.saveOriginalColors();
     }
-
+    
     createSkinToneButtons() {
         console.log("Creating skin tone buttons...");
         const container = document.createElement('div');
@@ -89,7 +89,7 @@ class SkinToneManager {
         this.applySkinTone(tone);
     }
 
-    saveOriginalColors() {
+     saveOriginalColors() {
         if (window.avatarBody && window.avatarBody.layers) {
             this.baseParts.forEach(part => {
                 const layer = window.avatarBody.layers[part];
@@ -126,11 +126,12 @@ class SkinToneManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                let isFirstColor = true;
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        const newColor = this.getLuminance(currentFill) > 0.5 ? tone.main : tone.shadow;
-                        path.setAttribute('fill', newColor);
+                        path.setAttribute('fill', isFirstColor ? tone.main : tone.shadow);
+                        isFirstColor = !isFirstColor; // Alternate between main and shadow
                     }
                 });
 
@@ -144,6 +145,8 @@ class SkinToneManager {
             })
             .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
     }
+}
+
 
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
