@@ -82,11 +82,24 @@ class AvatarDisplay {
     }
 
     // Add these new methods
-    tryOnItem(item) {
+   tryOnItem(item) {
         if (this.layers[item.type]) {
+            // Remove the previously tried-on item of the same type
+            if (this.triedOnItems[item.type]) {
+                this.removeTriedOnItem(item.type);
+            }
+
+            // Try on the new item
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
+
+            // If trying on a shirt, hide the jacket, and vice versa
+            if (item.type === 'Shirt' && this.triedOnItems['Jacket']) {
+                this.removeTriedOnItem('Jacket');
+            } else if (item.type === 'Jacket' && this.triedOnItems['Shirt']) {
+                this.removeTriedOnItem('Shirt');
+            }
         }
     }
 
