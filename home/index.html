@@ -13,11 +13,12 @@ he<!DOCTYPE html>
             <span>Welcome, <span id="user-name"></span>!</span>
             <span>Coins: <span id="user-coins"></span></span>
         </div>
-        <button onclick="logout()">Logout</button>
+       <button onclick="logout()">Logout</button>
     </header>
 <div id="avatar-display" style="width: 200px; height: 400px;"></div>
    <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
 <script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/logout.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
