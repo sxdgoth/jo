@@ -47,6 +47,15 @@ function toggleTryOn(itemId) {
             // Item is being tried on, so remove it
             window.avatarDisplay.removeTriedOnItem(item.type);
             console.log(`Removed ${item.name}`);
+        } else if (window.avatarDisplay.isItemEquipped(item)) {
+            // Item is equipped, toggle its visibility
+            if (window.avatarDisplay.layers[item.type].style.display === 'none') {
+                window.avatarDisplay.layers[item.type].style.display = 'block';
+                console.log(`Showed equipped item ${item.name}`);
+            } else {
+                window.avatarDisplay.layers[item.type].style.display = 'none';
+                console.log(`Hid equipped item ${item.name}`);
+            }
         } else {
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
@@ -65,14 +74,20 @@ function updateItemImages() {
             image.classList.add('selected');
             image.classList.remove('equipped');
         } else if (window.avatarDisplay.isItemEquipped(item)) {
-            image.classList.add('equipped');
-            image.classList.remove('selected');
+            if (window.avatarDisplay.layers[item.type].style.display !== 'none') {
+                image.classList.add('equipped');
+                image.classList.remove('selected');
+            } else {
+                image.classList.remove('equipped');
+                image.classList.remove('selected');
+            }
         } else {
             image.classList.remove('selected');
             image.classList.remove('equipped');
         }
     });
 }
+
 
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
