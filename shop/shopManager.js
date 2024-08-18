@@ -68,15 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateAvatarDisplay(type, src) {
-        const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
-        if (layerElement) {
-            if (src) {
-                layerElement.data = src;
-                layerElement.style.display = 'block';
-            } else {
-                layerElement.style.display = 'none';
-            }
-        }
+        const avatarDisplay = new AvatarDisplay('avatar-display');
+        avatarDisplay.updateLayer(type, src);
     }
 
     function buyItem(itemId) {
@@ -85,9 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetAvatarDisplay() {
         triedOnItems = {};
-        shopItems.forEach(item => {
-            updateAvatarDisplay(item.type, null);
-        });
+        const avatarDisplay = new AvatarDisplay('avatar-display');
+        avatarDisplay.loadAvatar();
         updateTryOnButtons();
     }
 
