@@ -56,10 +56,10 @@ function toggleTryOn(itemId) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         // Remove highlight from all items
-        document.querySelectorAll('.item-image').forEach(el => el.classList.remove('highlighted'));
+        document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('highlighted'));
         
         // Add highlight to the clicked item
-        const clickedItemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
+        const clickedItem = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
         
         window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
@@ -67,17 +67,17 @@ function toggleTryOn(itemId) {
             window.avatarDisplay.removeTriedOnItem(item.type);
             console.log(`Removed ${item.name}`);
             // Remove highlight when item is removed
-            clickedItemImage.classList.remove('highlighted');
+            clickedItem.classList.remove('highlighted');
         } else if (window.avatarDisplay.isItemEquipped(item)) {
             // Item is equipped, toggle its visibility
             window.avatarDisplay.toggleEquippedItem(item.type);
             console.log(`Toggled equipped item ${item.name}`);
-            clickedItemImage.classList.add('highlighted');
+            clickedItem.classList.add('highlighted');
         } else {
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
             console.log(`Tried on ${item.name}`);
-            clickedItemImage.classList.add('highlighted');
+            clickedItem.classList.add('highlighted');
         }
         
         updateItemImages();
@@ -85,27 +85,28 @@ function toggleTryOn(itemId) {
 }
 
 function updateItemImages() {
-    document.querySelectorAll('.item-image').forEach(image => {
+    document.querySelectorAll('.shop-item').forEach(shopItem => {
+        const image = shopItem.querySelector('.item-image');
         const itemId = image.dataset.id;
         const item = shopItems.find(i => i.id === itemId);
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             image.classList.add('selected');
             image.classList.remove('equipped');
-            image.classList.add('highlighted');
+            shopItem.classList.add('highlighted');
         } else if (window.avatarDisplay.isItemEquipped(item)) {
             if (!window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
                 image.classList.add('equipped');
                 image.classList.remove('selected');
-                image.classList.add('highlighted');
+                shopItem.classList.add('highlighted');
             } else {
                 image.classList.remove('equipped');
                 image.classList.remove('selected');
-                image.classList.remove('highlighted');
+                shopItem.classList.remove('highlighted');
             }
         } else {
             image.classList.remove('selected');
             image.classList.remove('equipped');
-            image.classList.remove('highlighted');
+            shopItem.classList.remove('highlighted');
         }
     });
 }
