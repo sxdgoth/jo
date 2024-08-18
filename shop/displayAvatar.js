@@ -1,7 +1,8 @@
 // displayAvatar.js
 
 class AvatarDisplay {
-    constructor(containerId) {
+    constructor(containerId, username) {
+        this.username = username;
         this.container = document.getElementById(containerId);
         if (!this.container) {
             console.error(`Container with id "${containerId}" not found`);
@@ -17,7 +18,7 @@ class AvatarDisplay {
 
     loadAvatar() {
         console.log("Loading avatar...");
-        const savedItems = localStorage.getItem('equippedItems');
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         console.log("Saved items:", savedItems);
         const equippedItems = savedItems ? JSON.parse(savedItems) : {};
 
@@ -156,6 +157,11 @@ class AvatarDisplay {
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
-    window.avatarDisplay = new AvatarDisplay('avatar-display');
-    window.avatarDisplay.loadAvatar();
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+        window.avatarDisplay.loadAvatar();
+    } else {
+        console.error('No logged in user found');
+    }
 });
