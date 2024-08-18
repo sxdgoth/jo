@@ -8,7 +8,8 @@ class SkinToneManager {
             { name: 'Tan', color: '#C68642' },
             { name: 'Dark', color: '#8D5524' }
         ];
-        this.currentSkinTone = this.skinTones[0].color; // Default to light skin tone
+        this.currentSkinTone = this.skinTones[0].color;
+        this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
     }
 
     initialize() {
@@ -72,17 +73,70 @@ class SkinToneManager {
 
     applySkinTone(color) {
         console.log(`Applying skin tone: ${color}`);
-        if (window.avatarBody && typeof window.avatarBody.updateSkinTone === 'function') {
-            window.avatarBody.updateSkinTone(color);
+        if (window.avatarBody && window.avatarBody.layers) {
+            this.baseParts.forEach(part => {
+                const layer = window.avatarBody.layers[part];
+                if (layer) {
+                    this.applySkinToneToSVG(layer, color);
+                } else {
+                    console.warn(`Layer ${part} not found`);
+                }
+            });
         } else {
-            console.error('Avatar body or updateSkinTone method not found');
+            console.error('Avatar body or layers not found');
         }
+    }
+
+    applySkinToneToSVG(img, newColor) {
+        fetch(img.src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                paths.forEach(path => {
+                    const currentFill = path.getAttribute('fill');
+                    if (currentFill && currentFill.toLowerCase() !== 'none') {
+                        const newFill = this.blendColors(currentFill, newColor);
+                        path.setAttribute('fill', newFill);
+                    }
+                });
+
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                img.src = url;
+            })
+            .catch(error => console.error('Error applying skin tone:', error));
+    }
+
+    blendColors(color1, color2) {
+        const [r1, g1, b1] = this.hexToRgb(color1);
+        const [r2, g2, b2] = this.hexToRgb(color2);
+        
+        const r = Math.round((r1 + r2) / 2);
+        const g = Math.round((g1 + g2) / 2);
+        const b = Math.round((b1 + b2) / 2);
+        
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
+
+    hexToRgb(hex) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
     }
 }
 
 // Create and initialize the SkinToneManager
-const skinToneManager = new SkinToneManager();
-skinToneManager.initialize();
-
-// Make it globally accessible
-window.skinToneManager = skinToneManager;
+document.addEventListener('DOMContentLoaded', () => {
+    window.skinToneManager = new SkinToneManager();
+    window.skinToneManager.initialize();
+});
