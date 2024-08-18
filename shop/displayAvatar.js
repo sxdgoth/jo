@@ -9,7 +9,7 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {};
+        this.triedOnItems = {}; // Add this line
     }
 
     loadAvatar() {
@@ -81,81 +81,19 @@ class AvatarDisplay {
         });
     }
 
+    // Add these new methods
     tryOnItem(item) {
         if (this.layers[item.type]) {
-            if (this.triedOnItems[item.type] === item) {
-                // Item is already tried on, so remove it
-                this.removeTriedOnItem(item.type);
-            } else {
-                // Try on the new item
-                this.triedOnItems[item.type] = item;
-                this.updateLayerDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-                console.log(`Tried on ${item.name}`);
-
-                // Handle conflicting items
-                if (item.type === 'Shirt') {
-                    this.hideLayer('Jacket');
-                } else if (item.type === 'Jacket') {
-                    this.hideLayer('Shirt');
-                }
-            }
+            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
+            this.layers[item.type].style.display = 'block';
+            this.triedOnItems[item.type] = item;
         }
     }
 
     removeTriedOnItem(type) {
         if (this.layers[type]) {
-            delete this.triedOnItems[type];
-            this.updateLayerDisplay(type, null);
-            console.log(`Removed ${type}`);
-
-            // Show conflicting items if they were equipped
-            if (type === 'Shirt') {
-                this.showLayerIfEquipped('Jacket');
-            } else if (type === 'Jacket') {
-                this.showLayerIfEquipped('Shirt');
-            }
-        }
-    }
-
-    updateLayerDisplay(type, src) {
-        const layerElement = this.layers[type];
-        if (layerElement) {
-            if (src) {
-                layerElement.data = src;
-                layerElement.style.display = 'block';
-            } else {
-                // If src is null, revert to the original equipped item or hide if none
-                const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-                const equippedItem = equippedItems[type];
-                if (equippedItem) {
-                    const item = shopItems.find(item => item.id === equippedItem);
-                    if (item) {
-                        layerElement.data = `${this.baseUrl}${item.path}${item.id}`;
-                        layerElement.style.display = 'block';
-                    } else {
-                        layerElement.style.display = 'none';
-                    }
-                } else {
-                    layerElement.style.display = 'none';
-                }
-            }
-        }
-    }
-
-    hideLayer(type) {
-        if (this.layers[type]) {
             this.layers[type].style.display = 'none';
-        }
-    }
-
-    showLayerIfEquipped(type) {
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        if (equippedItems[type] && this.layers[type]) {
-            const item = shopItems.find(item => item.id === equippedItems[type]);
-            if (item) {
-                this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
-                this.layers[type].style.display = 'block';
-            }
+            delete this.triedOnItems[type];
         }
     }
 
