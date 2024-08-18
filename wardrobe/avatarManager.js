@@ -106,6 +106,13 @@ class AvatarManager {
     }
 }
 
+ changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        this.updateAvatarDisplay();
+        this.updateTempAvatarDisplay();
+    }
+
+
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
