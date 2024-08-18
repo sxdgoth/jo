@@ -90,6 +90,30 @@ class AvatarBody {
         });
         this.reorderLayers();
     }
+
+    // New methods for skin tone
+    updateSkinTone(color) {
+        console.log(`Updating skin tone to: ${color}`);
+        const baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+        baseParts.forEach(part => {
+            const layer = this.layers[part];
+            if (layer) {
+                layer.style.filter = this.createSkinToneFilter(color);
+            } else {
+                console.warn(`Layer ${part} not found`);
+            }
+        });
+    }
+
+    createSkinToneFilter(hexColor) {
+        // Convert hex to RGB
+        const r = parseInt(hexColor.slice(1, 3), 16) / 255;
+        const g = parseInt(hexColor.slice(3, 5), 16) / 255;
+        const b = parseInt(hexColor.slice(5, 7), 16) / 255;
+
+        // Create and return the filter string
+        return `brightness(0) saturate(100%) invert(${r}) sepia(${g}) saturate(${b}) hue-rotate(0deg)`;
+    }
 }
 
 // Create and load the avatar body when the DOM is fully loaded
