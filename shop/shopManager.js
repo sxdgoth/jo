@@ -17,15 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>${item.name}</h3>
                 <p>Type: ${item.type}</p>
                 <p>Price: ${item.price} coins</p>
-                <button class="try-on-btn" data-id="${item.id}">Try On</button>
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
         });
 
-        // Add event listeners to try-on buttons
-        document.querySelectorAll('.try-on-btn').forEach(button => {
-            button.addEventListener('click', (e) => toggleTryOn(e.target.dataset.id));
+        // Add event listeners to item images for try on/off
+        document.querySelectorAll('.item-image').forEach(image => {
+            image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
         });
 
         // Add event listeners to buy buttons
@@ -51,18 +50,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 console.log(`Tried on ${item.name}`);
             }
-            updateTryOnButtons();
+            updateItemImages();
         }
     }
 
-    function updateTryOnButtons() {
-        document.querySelectorAll('.try-on-btn').forEach(button => {
-            const itemId = button.dataset.id;
+    function updateItemImages() {
+        document.querySelectorAll('.item-image').forEach(image => {
+            const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             if (triedOnItems[item.type] === item) {
-                button.textContent = 'Remove';
+                image.classList.add('selected');
             } else {
-                button.textContent = 'Try On';
+                image.classList.remove('selected');
             }
         });
     }
@@ -102,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(equippedItems).forEach(type => {
             updateAvatarDisplay(type, null);
         });
-        updateTryOnButtons();
+        updateItemImages();
     }
 
     // Expose necessary functions to the global scope
