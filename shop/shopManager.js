@@ -51,9 +51,11 @@ function toggleTryOn(itemId) {
             // Item is equipped, toggle its visibility
             if (window.avatarDisplay.layers[item.type].style.display === 'none') {
                 window.avatarDisplay.layers[item.type].style.display = 'block';
+                window.avatarDisplay.hiddenEquippedItems.delete(item.type);
                 console.log(`Showed equipped item ${item.name}`);
             } else {
                 window.avatarDisplay.layers[item.type].style.display = 'none';
+                window.avatarDisplay.hiddenEquippedItems.add(item.type);
                 console.log(`Hid equipped item ${item.name}`);
             }
         } else {
