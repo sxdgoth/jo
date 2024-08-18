@@ -13,8 +13,10 @@
             <span>Welcome, <span id="user-name"></span>!</span>
             <span>Coins: <span id="user-coins"></span></span>
         </div>
-        <a href="https://sxdgoth.github.io/jo/wardrobe/index.html">Go to Wardrobe</a>
-        <button onclick="logout()">Logout</button>
+        <nav>
+            <a href="https://sxdgoth.github.io/jo/wardrobe/index.html" class="nav-button">Go to Wardrobe</a>
+            <button onclick="logout()" class="nav-button">Logout</button>
+        </nav>
     </header>
 
     <main>
@@ -23,8 +25,10 @@
         </div>
         <div class="shop-section">
             <h2>Shop Items</h2>
-            <div class="shop-items">
-                <!-- Shop items will be dynamically added here -->
+            <div class="shop-items-container">
+                <div class="shop-items">
+                    <!-- Shop items will be dynamically added here -->
+                </div>
             </div>
         </div>
     </main>
@@ -41,9 +45,3 @@
     <script src="https://sxdgoth.github.io/jo/shop/welcome.js"></script>
 </body>
 </html>
-
-
-
-
-
-
