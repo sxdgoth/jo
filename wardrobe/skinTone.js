@@ -124,13 +124,22 @@ class SkinToneManager {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
+                // Create a linear gradient definition
+                const defs = svgDoc.createElementNS("http://www.w3.org/2000/svg", "defs");
+                const gradient = svgDoc.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+                gradient.setAttribute("id", "skinToneGradient");
+                gradient.innerHTML = `
+                    <stop offset="0%" stop-color="${tone.main}" />
+                    <stop offset="100%" stop-color="${tone.shadow}" />
+                `;
+                defs.appendChild(gradient);
+                svgDoc.documentElement.appendChild(defs);
+
                 const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        const luminance = this.getLuminance(currentFill);
-                        const newFill = luminance > 0.5 ? tone.main : tone.shadow;
-                        path.setAttribute('fill', newFill);
+                        path.setAttribute('fill', 'url(#skinToneGradient)');
                     }
                 });
 
