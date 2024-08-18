@@ -91,6 +91,12 @@ class AvatarBody {
     }
 }
 
+applySkinTone(color) {
+    if (window.skinToneManager) {
+        window.skinToneManager.applySkinTone(color);
+    }
+}
+
 // Create and load the avatar body when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     window.avatarBody = new AvatarBody('avatar-display');
