@@ -82,8 +82,20 @@ class AvatarDisplay {
     }
 
     // Add these new methods
-    tryOnItem(item) {
+      tryOnItem(item) {
         if (this.layers[item.type]) {
+            // Remove previously tried on item of the same type
+            if (this.triedOnItems[item.type]) {
+                this.removeTriedOnItem(item.type);
+            }
+
+            // Handle conflicts between shirts and jackets
+            if (item.type === 'Shirt' && this.triedOnItems['Jacket']) {
+                this.removeTriedOnItem('Jacket');
+            } else if (item.type === 'Jacket' && this.triedOnItems['Shirt']) {
+                this.removeTriedOnItem('Shirt');
+            }
+
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
@@ -92,16 +104,21 @@ class AvatarDisplay {
 
     removeTriedOnItem(type) {
         if (this.layers[type]) {
-            this.layers[type].style.display = 'none';
+            const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
+            if (equippedItems[type]) {
+                // If there's an equipped item, show it
+                const equippedItem = shopItems.find(item => item.id === equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                }
+            } else {
+                // If no equipped item, hide the layer
+                this.layers[type].style.display = 'none';
+            }
             delete this.triedOnItems[type];
         }
     }
-
-    isItemEquipped(item) {
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        return equippedItems[item.type] === item.id;
-    }
-}
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
