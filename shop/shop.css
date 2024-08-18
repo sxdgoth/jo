@@ -215,3 +215,13 @@ main {
         height: 80px;
     }
 }
+
+
+.shop-item.highlighted {
+    border: 2px solid #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.item-image.highlighted {
+    background-color: rgba(76, 175, 80, 0.1);
+}
