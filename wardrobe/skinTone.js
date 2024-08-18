@@ -34,7 +34,7 @@ class SkinToneManager {
         this.createSkinToneButtons();
         this.saveOriginalColors();
     }
-
+    
     createSkinToneButtons() {
         console.log("Creating skin tone buttons...");
         const container = document.createElement('div');
@@ -117,29 +117,27 @@ class SkinToneManager {
         }
     }
 
-    applySkinToneToSVG(img, tone, originalSrc) {
+   applySkinToneToSVG(img, tone, originalSrc) {
         fetch(originalSrc)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                // Create a linear gradient definition
-                const defs = svgDoc.createElementNS("http://www.w3.org/2000/svg", "defs");
-                const gradient = svgDoc.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
-                gradient.setAttribute("id", "skinToneGradient");
-                gradient.innerHTML = `
-                    <stop offset="0%" stop-color="${tone.main}" />
-                    <stop offset="100%" stop-color="${tone.shadow}" />
-                `;
-                defs.appendChild(gradient);
-                svgDoc.documentElement.appendChild(defs);
-
                 const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                let mainColorFound = false;
+                let shadowColorFound = false;
+
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        path.setAttribute('fill', 'url(#skinToneGradient)');
+                        if (!mainColorFound) {
+                            path.setAttribute('fill', tone.main);
+                            mainColorFound = true;
+                        } else if (!shadowColorFound) {
+                            path.setAttribute('fill', tone.shadow);
+                            shadowColorFound = true;
+                        }
                     }
                 });
 
