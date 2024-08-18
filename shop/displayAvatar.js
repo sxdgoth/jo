@@ -9,14 +9,15 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {}; // Add this line
+        this.triedOnItems = {};
+        this.equippedItems = {};
     }
 
     loadAvatar() {
         console.log("Loading avatar...");
         const savedItems = localStorage.getItem('equippedItems');
         console.log("Saved items:", savedItems);
-        const equippedItems = savedItems ? JSON.parse(savedItems) : {};
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
 
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
@@ -48,14 +49,14 @@ class AvatarDisplay {
                 obj.data = this.baseUrl + part.file;
                 obj.style.display = 'block';
                 console.log(`Loading base part: ${part.name}, src: ${obj.data}`);
-            } else if (equippedItems[part.type]) {
-                const item = shopItems.find(item => item.id === equippedItems[part.type]);
+            } else if (this.equippedItems[part.type]) {
+                const item = shopItems.find(item => item.id === this.equippedItems[part.type]);
                 if (item) {
                     obj.data = `${this.baseUrl}${item.path}${item.id}`;
                     obj.style.display = 'block';
                     console.log(`Loading equipped part: ${part.name}, src: ${obj.data}`);
                 } else {
-                    console.warn(`Item not found: ${equippedItems[part.type]}`);
+                    console.warn(`Item not found: ${this.equippedItems[part.type]}`);
                     obj.style.display = 'none';
                 }
             } else {
@@ -81,12 +82,18 @@ class AvatarDisplay {
         });
     }
 
-    // Add these new methods
     tryOnItem(item) {
         if (this.layers[item.type]) {
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
             this.layers[item.type].style.display = 'block';
             this.triedOnItems[item.type] = item;
+
+            // Hide conflicting layers
+            if (item.type === 'Shirt') {
+                this.hideLayer('Jacket');
+            } else if (item.type === 'Jacket') {
+                this.hideLayer('Shirt');
+            }
         }
     }
 
@@ -94,12 +101,43 @@ class AvatarDisplay {
         if (this.layers[type]) {
             this.layers[type].style.display = 'none';
             delete this.triedOnItems[type];
+
+            // Show originally equipped item if it exists
+            if (this.equippedItems[type]) {
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                }
+            }
+
+            // Show conflicting layers if they were originally equipped
+            if (type === 'Shirt' && this.equippedItems['Jacket']) {
+                this.showLayer('Jacket');
+            } else if (type === 'Jacket' && this.equippedItems['Shirt']) {
+                this.showLayer('Shirt');
+            }
+        }
+    }
+
+    hideLayer(type) {
+        if (this.layers[type]) {
+            this.layers[type].style.display = 'none';
+        }
+    }
+
+    showLayer(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            const item = shopItems.find(item => item.id === this.equippedItems[type]);
+            if (item) {
+                this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
+                this.layers[type].style.display = 'block';
+            }
         }
     }
 
     isItemEquipped(item) {
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        return equippedItems[item.type] === item.id;
+        return this.equippedItems[item.type] === item.id;
     }
 }
 
