@@ -36,28 +36,21 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeInventoryState();
     }
 
-    function toggleTryOn(itemId) {
+   function toggleTryOn(itemId) {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
             // Item is being tried on, so remove it
             window.avatarDisplay.removeTriedOnItem(item.type);
             console.log(`Removed ${item.name}`);
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (window.avatarDisplay.layers[item.type].style.display === 'none') {
-                // Item was equipped but hidden, so show it again
-                window.avatarDisplay.tryOnItem(item);
-                console.log(`Re-displayed equipped item ${item.name}`);
-            } else {
-                // Item is equipped and visible, so hide it temporarily
-                window.avatarDisplay.removeTriedOnItem(item.type);
-                console.log(`Temporarily removed equipped item ${item.name}`);
-            }
         } else {
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
             console.log(`Tried on ${item.name}`);
         }
+        
         updateItemImages();
     }
 }
