@@ -18,11 +18,14 @@ def clean_svg(input_file, output_file):
     tree.write(output_file, encoding='unicode', xml_declaration=True)
     print(f"Saved processed file: {output_file}")
 
-current_dir = os.getcwd()
-input_dir = current_dir
-output_dir = os.path.join(os.path.dirname(current_dir), 'output')
+# Get the absolute path of the script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+repo_root = os.path.dirname(script_dir)
+input_dir = script_dir
+output_dir = os.path.join(repo_root, 'output')
 
-print(f"Current directory: {current_dir}")
+print(f"Script directory: {script_dir}")
+print(f"Repository root: {repo_root}")
 print(f"Input directory: {input_dir}")
 print(f"Output directory: {output_dir}")
 
