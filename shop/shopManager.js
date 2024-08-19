@@ -58,35 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   function toggleTryOn(itemId) {
-    console.log('Toggling item:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        // Remove highlight from all items of the same type
-        document.querySelectorAll(`.shop-item .item-image[data-id]`).forEach(el => {
-            const itemType = shopItems.find(i => i.id === el.dataset.id).type;
-            if (itemType === item.type) {
-                el.closest('.shop-item').classList.remove('highlighted');
+    function toggleTryOn(itemId) {
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            if (window.avatarDisplay.triedOnItems[item.type] === item) {
+                window.avatarDisplay.removeTriedOnItem(item.type);
+            } else {
+                window.avatarDisplay.tryOnItem(item);
             }
-        });
-        
-        const clickedItem = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
-        
-        if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            window.avatarDisplay.removeTriedOnItem(item.type);
-            console.log(`Removed ${item.name}`);
-            clickedItem.classList.remove('highlighted');
-        } else {
-            window.avatarDisplay.tryOnItem(item);
-            console.log(`Tried on ${item.name}`);
-            clickedItem.classList.add('highlighted');
+            
+            updateItemImages();
         }
-        
-        updateItemImages();
     }
-}
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
