@@ -207,49 +207,22 @@ class AvatarDisplay {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        // If it's not a Shirt or Jacket, remove any previously tried on item of the same type
-        if (item.type !== 'Shirt' && item.type !== 'Jacket') {
-            if (this.triedOnItems[item.type]) {
-                this.removeTriedOnItem(item.type);
-            }
-        }
-
-        // If the clicked item is already tried on, remove it
-        if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
-            this.removeTriedOnItem(item.type);
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            // If the same item is clicked again, remove it
+            this.removeItem(item.type);
         } else {
-            // Update the tried on items
-            this.triedOnItems[item.type] = item;
-
-            // Update the display
+            // Otherwise, update with the new item
+            this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-
-            this.lastAction[item.type] = 'triedOn';
         }
 
-        // Ensure proper layering for Shirt and Jacket
         this.reorderLayers();
     }
 
-    removeTriedOnItem(type) {
-        console.log(`Removing tried on item of type: ${type}`);
-        
-        delete this.triedOnItems[type];
-        this.lastAction[type] = 'removed';
-
-        // If there's an equipped item of this type, show it
-        if (this.equippedItems[type] && !this.hiddenEquippedItems.has(type)) {
-            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-            if (equippedItem) {
-                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-            }
-        } else {
-            // If no equipped item, hide the layer
-            this.updateAvatarDisplay(type, null);
-        }
-
-        // Ensure proper layering
-        this.reorderLayers();
+    removeItem(type) {
+        console.log(`Removing item of type: ${type}`);
+        delete this.currentItems[type];
+        this.updateAvatarDisplay(type, null);
     }
 
     updateAvatarDisplay(type, src) {
@@ -265,7 +238,7 @@ class AvatarDisplay {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
-
+    
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
