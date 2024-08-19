@@ -1,5 +1,3 @@
-// shopManager.js
-
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
@@ -10,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
-
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
@@ -25,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             shopItemsContainer.appendChild(itemElement);
 
+            // Add highlight if item is equipped or tried on
+            if (window.avatarDisplay.isItemEquipped(item) || window.avatarDisplay.triedOnItems[item.type] === item) {
+                itemElement.classList.add('highlighted');
+            }
+
             // Update buy button state
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
@@ -35,24 +37,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
-
         // Add event listeners to item images for try on/off
         document.querySelectorAll('.item-image').forEach(image => {
             image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
         });
-
         // Add event listeners to buy buttons
         document.querySelectorAll('.buy-btn').forEach(button => {
             button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
-
         // Initialize inventory state
         initializeInventoryState();
-
         // Update category buttons
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === currentCategory);
         });
+
+        // Update item highlights
+        updateItemHighlights();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -68,23 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item) {
             console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             
-            // Remove highlight from all items of the same type
-            document.querySelectorAll(`.shop-item .item-image[data-id]`).forEach(el => {
-                const itemType = shopItems.find(i => i.id === el.dataset.id).type;
-                if (itemType === item.type) {
-                    el.closest('.shop-item').classList.remove('highlighted');
-                }
-            });
-            
-            // Add highlight to the clicked item
             const clickedItem = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
             
-            window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
+            window.avatarDisplay.updateEquippedItems();
             if (window.avatarDisplay.triedOnItems[item.type] === item) {
                 // Item is being tried on, so remove it
                 window.avatarDisplay.removeTriedOnItem(item.type);
                 console.log(`Removed ${item.name}`);
-                // Remove highlight when item is removed
                 clickedItem.classList.remove('highlighted');
             } else {
                 // Try on the new item
@@ -93,48 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 clickedItem.classList.add('highlighted');
             }
             
-            updateItemImages();
+            updateItemHighlights();
         }
     }
 
-    function updateItemImages() {
+    function updateItemHighlights() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (window.avatarDisplay.triedOnItems[item.type] === item) {
-                shopItem.classList.add('highlighted');
-            } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
+            if (window.avatarDisplay.triedOnItems[item.type] === item || 
+                (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.hiddenEquippedItems.has(item.type))) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
             }
         });
-    }
-    
-    function updateAvatarDisplay(type, src) {
-        const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
-        if (layerElement) {
-            if (src) {
-                layerElement.data = src;
-                layerElement.style.display = 'block';
-            } else {
-                // If src is null, revert to the original equipped item or hide if none
-                const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-                const equippedItem = equippedItems[type];
-                if (equippedItem) {
-                    const item = shopItems.find(item => item.id === equippedItem);
-                    if (item) {
-                        layerElement.data = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-                        layerElement.style.display = 'block';
-                    } else {
-                        layerElement.style.display = 'none';
-                    }
-                } else {
-                    layerElement.style.display = 'none';
-                }
-            }
-        }
     }
 
     function buyItem(itemId) {
@@ -180,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(equippedItems).forEach(type => {
             updateAvatarDisplay(type, null);
         });
-        updateItemImages();
+        updateItemHighlights();
     }
 
     function filterItemsByCategory(category) {
@@ -194,7 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
-        filterItemsByCategory
+        filterItemsByCategory,
+        updateItemHighlights
     };
 
     // Initialize the shop
