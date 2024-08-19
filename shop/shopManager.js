@@ -1,12 +1,10 @@
-// shopManager.js
-
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
     let currentCategory = 'All';
 
     function renderShopItems() {
-        shopItemsContainer.innerHTML = ''; // Clear existing items
+        shopItemsContainer.innerHTML = '';
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
@@ -25,31 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             shopItemsContainer.appendChild(itemElement);
 
-            // Update buy button state
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
 
-            // Apply item positioning
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
 
-        // Add event listeners to item images for try on/off
         document.querySelectorAll('.item-image').forEach(image => {
-            image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
+            image.addEventListener('click', (e) => {
+                console.log('Item clicked:', e.currentTarget.dataset.id);
+                toggleTryOn(e.currentTarget.dataset.id);
+            });
         });
 
-        // Add event listeners to buy buttons
         document.querySelectorAll('.buy-btn').forEach(button => {
             button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
 
-        // Initialize inventory state
         initializeInventoryState();
 
-        // Update category buttons
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === currentCategory);
         });
@@ -62,13 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('owned');
         }
     }
-    
+
     function toggleTryOn(itemId) {
+        console.log('Toggling item:', itemId);
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            console.log(`Item type: ${item.type}`);
             
-            // Remove highlight from all items of the same type
             document.querySelectorAll(`.shop-item .item-image[data-id]`).forEach(el => {
                 const itemType = shopItems.find(i => i.id === el.dataset.id).type;
                 if (itemType === item.type) {
@@ -76,18 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            // Add highlight to the clicked item
             const clickedItem = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
             
-            window.avatarDisplay.updateEquippedItems(); // Update equipped items from localStorage
+            window.avatarDisplay.updateEquippedItems();
             if (window.avatarDisplay.triedOnItems[item.type] === item) {
-                // Item is being tried on, so remove it
                 window.avatarDisplay.removeTriedOnItem(item.type);
                 console.log(`Removed ${item.name}`);
-                // Remove highlight when item is removed
                 clickedItem.classList.remove('highlighted');
             } else {
-                // Try on the new item
                 window.avatarDisplay.tryOnItem(item);
                 console.log(`Tried on ${item.name}`);
                 clickedItem.classList.add('highlighted');
@@ -111,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
         if (layerElement) {
@@ -119,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 layerElement.data = src;
                 layerElement.style.display = 'block';
             } else {
-                // If src is null, revert to the original equipped item or hide if none
                 const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
                 const equippedItem = equippedItems[type];
                 if (equippedItem) {
@@ -148,21 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Not enough coins to buy this item!');
             return;
         }
-        // Deduct coins from user
         const newCoins = currentCoins - item.price;
         if (UserManager.updateUserCoins(newCoins)) {
-            // Add item to user's inventory
             if (window.userInventory) {
                 window.userInventory.addItem(item);
             }
-            // Update user's coins display
             updateUserCoinsAfterPurchase(newCoins);
-            // Update buy button state immediately
             const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
             if (buyButton) {
                 updateBuyButtonState(buyButton, itemId);
             }
-            // Update item image state
             const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
             if (itemImage) {
                 itemImage.classList.add('equipped');
@@ -173,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error updating user coins. Please try again.');
         }
     }
-    
+
     function resetAvatarDisplay() {
         triedOnItems = {};
         const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
@@ -188,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderShopItems();
     }
 
-    // Expose necessary functions to the global scope
     window.shopManager = {
         toggleTryOn,
         buyItem,
@@ -197,10 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
         filterItemsByCategory
     };
 
-    // Initialize the shop
     renderShopItems();
 
-    // Set up category button click listeners
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const category = e.target.dataset.category;
