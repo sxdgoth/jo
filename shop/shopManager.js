@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleTryOn(e.currentTarget.dataset.id);
             });
         });
-
+        
         document.querySelectorAll('.buy-btn').forEach(button => {
             button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateItemImages() {
+   function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
@@ -76,9 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
                 shopItem.classList.add('highlighted');
             } else if (window.avatarDisplay.equippedItems[item.type] === item.id && !window.avatarDisplay.triedOnItems[item.type]) {
-                shopItem.classList.add('highlighted');
+                shopItem.classList.add('equipped');
             } else {
                 shopItem.classList.remove('highlighted');
+                shopItem.classList.remove('equipped');
             }
         });
     }
