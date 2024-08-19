@@ -187,6 +187,15 @@ function filterItemsByCategory(category) {
     renderShopItems();
 }
 
+let currentCategory = 'All';
+
+function filterItemsByCategory(category) {
+    currentCategory = category;
+    renderShopItems();
+}
+
+
+
 function renderShopItems() {
     shopItemsContainer.innerHTML = ''; // Clear existing items
     const filteredItems = currentCategory === 'All' 
@@ -194,7 +203,7 @@ function renderShopItems() {
         : shopItems.filter(item => item.type === currentCategory);
 
     filteredItems.forEach(item => {
-        // ... (rest of your existing renderShopItems code)
+        // ... (your existing item rendering code)
     });
 
     // Update category buttons
