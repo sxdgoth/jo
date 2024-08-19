@@ -232,8 +232,8 @@ main {
 }
 
 .shop-item.highlighted {
-    border-color: #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  border: 2px solid #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
 
@@ -270,7 +270,3 @@ main {
     border-color: #4CAF50;
 }
 
-.shop-item.highlighted {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-}
