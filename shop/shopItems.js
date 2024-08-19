@@ -13,6 +13,6 @@ const shopItems = [
     { id: 'ScarEye.svg', name: 'Scar Eyes', type: 'Eyes', price: 180, path: 'home/assets/eyes/' },
     { id: 'zestyeyes.svg', name: 'Zesty Eyes', type: 'Eyes', price: 180, path: 'home/assets/eyes/' },
     { id: 'AngryBrows.svg', name: 'Angry Brows', type: 'Eyebrows', price: 180, path: 'home/assets/brows/' },
-    { id: 'AngryBrows.svg', name: 'Chipmunk Cheeks', type: 'Face', price: 180, path: 'home/assets/brows/' },
+    { id: 'chipmunkcheeks.svg', name: 'Chipmunk Cheeks', type: 'Face', price: 180, path: 'output/' },
     // Add more items as needed
 ];
