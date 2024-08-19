@@ -54,8 +54,13 @@ function toggleTryOn(itemId) {
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        // Remove highlight from all items
-        document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('highlighted'));
+        // Remove highlight from all items of the same type
+        document.querySelectorAll(`.shop-item .item-image[data-id]`).forEach(el => {
+            const itemType = shopItems.find(i => i.id === el.dataset.id).type;
+            if (itemType === item.type) {
+                el.closest('.shop-item').classList.remove('highlighted');
+            }
+        });
         
         // Add highlight to the clicked item
         const clickedItem = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
@@ -68,10 +73,6 @@ function toggleTryOn(itemId) {
             // Remove highlight when item is removed
             clickedItem.classList.remove('highlighted');
         } else {
-            // Remove any previously tried on item of the same type
-            if (window.avatarDisplay.triedOnItems[item.type]) {
-                window.avatarDisplay.removeTriedOnItem(item.type);
-            }
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
             console.log(`Tried on ${item.name}`);
@@ -81,7 +82,6 @@ function toggleTryOn(itemId) {
         updateItemImages();
     }
 }
-
 function updateItemImages() {
     document.querySelectorAll('.shop-item').forEach(shopItem => {
         const image = shopItem.querySelector('.item-image');
