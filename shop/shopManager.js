@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
 
@@ -7,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
-
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
@@ -21,16 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
-
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
-
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
-
         updateCategoryButtons();
         updateItemImages();
     }
@@ -51,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (window.avatarDisplay) {
                 window.avatarDisplay.tryOnItem(item);
+                window.avatarDisplay.reapplySkinTone(); // Add this line
             } else {
                 console.error('window.avatarDisplay is not defined');
             }
