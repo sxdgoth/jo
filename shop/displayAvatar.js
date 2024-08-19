@@ -1,5 +1,4 @@
 class AvatarDisplay {
-
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
@@ -46,9 +45,10 @@ class AvatarDisplay {
 
     loadSkinTone() {
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
+        if (savedSkinTone && this.skinTones[savedSkinTone]) {
             this.skinTone = savedSkinTone;
         }
+        console.log("Loaded skin tone:", this.skinTone);
     }
 
     loadEquippedItems() {
@@ -149,22 +149,24 @@ class AvatarDisplay {
             const tone = this.skinTones[this.skinTone];
             
             elements.forEach((element) => {
-                ['fill', 'stroke'].forEach((attr) => {
-                    const color = element.getAttribute(attr);
-                    if (color && color.toLowerCase() !== 'none') {
-                        if (this.isSkinTone(color)) {
-                            const newColor = this.getNewColor(color, tone.main, tone);
-                            element.setAttribute(attr, newColor);
-                        }
-                    }
-                });
+                this.applySkinToneToElement(element, type);
             });
         }
     }
 
+    applySkinToneToElement(element, type) {
+        ['fill', 'stroke'].forEach((attr) => {
+            const color = element.getAttribute(attr);
+            if (color && color.toLowerCase() !== 'none' && this.isSkinTone(color)) {
+                const newColor = this.getNewColor(color, this.skinTones[this.skinTone].main, this.skinTones[this.skinTone]);
+                element.setAttribute(attr, newColor);
+            }
+        });
+    }
+
     isSkinTone(color) {
         const rgb = this.hexToRgb(color);
-        // This is a simple check and might need adjustment
+        if (!rgb) return false;
         return (rgb[0] > rgb[1] && rgb[1] > rgb[2] && rgb[0] - rgb[2] > 20);
     }
 
@@ -203,12 +205,11 @@ class AvatarDisplay {
 
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
+        if (!rgb) return 0;
         return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
     }
 
     hexToRgb(hex) {
-        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? [
             parseInt(result[1], 16),
@@ -219,12 +220,14 @@ class AvatarDisplay {
 
     lightenColor(color, amount) {
         const rgb = this.hexToRgb(color);
+        if (!rgb) return color;
         const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
     darkenColor(color, amount) {
         const rgb = this.hexToRgb(color);
+        if (!rgb) return color;
         const newRgb = rgb.map(c => Math.max(0, c - Math.round(amount * 255)));
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
@@ -316,35 +319,28 @@ class AvatarDisplay {
     }
 
     changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        this.reapplySkinTone();
-        localStorage.setItem(`skinTone_${this.username}`, newTone);
-    }
-
-    applySkinToneToShopItem(imgElement, item) {
-        if (item.type === 'Eyes' || item.type === 'Eyebrows' || item.type === 'Nose' || item.type === 'Mouth') {
-            imgElement.addEventListener('load', () => {
-                const svgDoc = imgElement.contentDocument;
-                if (svgDoc) {
-                    const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-                    elements.forEach(element => {
-                        this.applySkinToneToElement(element, item.type);
-                           });
-                }
-            });
+        if (this.skinTones[newTone]) {
+            this.skinTone = newTone;
+            this.reapplySkinTone();
+            localStorage.setItem(`skinTone_${this.username}`, newTone);
+            console.log("Skin tone changed to:", newTone);
+        } else {
+            console.error("Invalid skin tone:", newTone);
         }
     }
 
-    applySkinToneToElement(element, type) {
-        ['fill', 'stroke'].forEach((attr) => {
-            const color = element.getAttribute(attr);
-            if (color && color.toLowerCase() !== 'none') {
-                if (this.isSkinTone(color)) {
-                    const newColor = this.getNewColor(color, this.skinTones[this.skinTone].main, this.skinTones[this.skinTone]);
-                    element.setAttribute(attr, newColor);
+    applySkinToneToShopItem(imgElement, item) {
+        if (['Eyes', 'Eyebrows', 'Nose', 'Mouth'].includes(item.type)) {
+            imgElement.addEventListener('load', () => {
+                const svgDoc = imgElement.contentDocument;
+                if (svgDoc) {
+                      const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                    elements.forEach(element => {
+                        this.applySkinToneToElement(element, item.type);
+                    });
                 }
-            }
-        });
+            });
+        }
     }
 }
 
