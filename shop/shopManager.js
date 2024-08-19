@@ -98,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (window.avatarDisplay.triedOnItems[item.type] === item) {
+            if (window.avatarDisplay.triedOnItems[item.type] === item || 
+                (window.avatarDisplay.equippedItems[item.type] === item.id && 
+                 !window.avatarDisplay.hiddenEquippedItems.has(item.type))) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
@@ -162,6 +164,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 itemImage.classList.add('equipped');
                 itemImage.classList.remove('selected');
             }
+            
+            // Update AvatarDisplay equipped items and highlights
+            if (window.avatarDisplay) {
+                window.avatarDisplay.equippedItems[item.type] = item.id;
+                window.avatarDisplay.updateShopHighlights();
+            }
+
             alert(`You have successfully purchased ${item.name}!`);
         } else {
             alert('Error updating user coins. Please try again.');
