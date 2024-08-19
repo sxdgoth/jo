@@ -204,18 +204,25 @@ class AvatarDisplay {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        // Remove any previously tried on item of the same type
-        if (this.triedOnItems[item.type]) {
+        // Remove all previously tried on items
+        Object.keys(this.triedOnItems).forEach(type => {
+            if (type !== item.type) {
+                this.removeTriedOnItem(type);
+            }
+        });
+
+        // If the clicked item is already tried on, remove it
+        if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
             this.removeTriedOnItem(item.type);
+        } else {
+            // Update the tried on items
+            this.triedOnItems[item.type] = item;
+
+            // Update the display
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+
+            this.lastAction[item.type] = 'triedOn';
         }
-
-        // Update the tried on items
-        this.triedOnItems[item.type] = item;
-
-        // Update the display
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-
-        this.lastAction[item.type] = 'triedOn';
 
         // Special handling for shirt and jacket
         if (item.type === 'Shirt' || item.type === 'Jacket') {
@@ -319,4 +326,3 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No logged in user found');
     }
 });
-
