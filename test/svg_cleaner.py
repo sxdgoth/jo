@@ -1,50 +1,49 @@
 import os
 import xml.etree.ElementTree as ET
-import urllib.parse
+import urllib.request
 
-def clean_svg(input_file, output_file):
-    print(f"Processing file: {input_file}")
-    tree = ET.parse(input_file)
-    root = tree.getroot()
+def clean_svg(input_url, output_file):
+    print(f"Processing file from URL: {input_url}")
+    
+    # Fetch SVG content from URL
+    with urllib.request.urlopen(input_url) as response:
+        svg_content = response.read()
+    
+    # Parse the SVG content
+    tree = ET.fromstring(svg_content)
+    
+    # Define the SVG namespace
     ns = {'svg': 'http://www.w3.org/2000/svg'}
+    
+    # Remove known body parts (adjust these selectors as needed)
     body_parts = [
-        ".//svg:path[@fill='#F4D5BF']",
-        ".//svg:path[@fill='#E6BBA8']",
+        ".//svg:path[@fill='#FFFFFF']",  # Assuming the body is white
+        ".//svg:path[@fill='#999999']",  # Assuming some parts might be grey
     ]
+    
+    elements_removed = 0
     for selector in body_parts:
-        for element in root.findall(selector, ns):
-            parent = element.getparent()
+        for element in tree.findall(selector, ns):
+            parent = element.find('..')
             if parent is not None:
                 parent.remove(element)
-    tree.write(output_file, encoding='unicode', xml_declaration=True)
+                elements_removed += 1
+    
+    # Write the modified SVG to the output file
+    ET.ElementTree(tree).write(output_file, encoding='unicode', xml_declaration=True)
     print(f"Saved processed file: {output_file}")
+    print(f"Elements removed: {elements_removed}")
 
-# Set up directories and URLs
-base_url = "https://sxdgoth.github.io/jo"
-input_dir = os.path.dirname(os.path.abspath(__file__))
-output_dir = os.path.join(os.path.dirname(input_dir), 'output')
-
-print(f"Input directory: {input_dir}")
-print(f"Output directory: {output_dir}")
+# Set up input URL and output path
+input_url = "https://sxdgoth.github.io/jo/test/trollface.svg"
+output_dir = "output"
+output_file = os.path.join(output_dir, "cleaned_trollface.svg")
 
 # Ensure output directory exists
 os.makedirs(output_dir, exist_ok=True)
 
-# Process SVG files
-svg_files = [f for f in os.listdir(input_dir) if f.endswith('.svg') and f != 'svg_cleaner.py']
-print(f"SVG files found: {svg_files}")
-
-for filename in svg_files:
-    input_path = os.path.join(input_dir, filename)
-    output_path = os.path.join(output_dir, filename)
-    clean_svg(input_path, output_path)
-    
-    # Generate URL for the processed file
-    relative_path = os.path.relpath(output_path, os.path.dirname(input_dir))
-    url_path = urllib.parse.quote(relative_path)
-    full_url = f"{base_url}/{url_path}"
-    print(f"Processed file URL: {full_url}")
+# Process the SVG file
+clean_svg(input_url, output_file)
 
 print("SVG cleaning complete!")
-print("Contents of output directory:")
-print(os.listdir(output_dir))
+print("Output file:", output_file)
