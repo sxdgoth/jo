@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.querySelectorAll('.item-image').forEach(image => {
+      document.querySelectorAll('.item-image').forEach(image => {
             image.addEventListener('click', (e) => {
                 console.log('Item clicked:', e.currentTarget.dataset.id);
                 toggleTryOn(e.currentTarget.dataset.id);
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleTryOn(itemId) {
+     function toggleTryOn(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
             console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
@@ -68,18 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   function updateItemImages() {
+  function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
+            
+            if (window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === item.id) {
                 shopItem.classList.add('highlighted');
-            } else if (window.avatarDisplay.equippedItems[item.type] === item.id && !window.avatarDisplay.triedOnItems[item.type]) {
-                shopItem.classList.add('equipped');
             } else {
                 shopItem.classList.remove('highlighted');
-                shopItem.classList.remove('equipped');
             }
         });
     }
