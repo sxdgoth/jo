@@ -17,7 +17,7 @@ class AvatarBody {
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
-            { name: 'Dress', file: '', type: 'Dress', isBase: false }, // Added Dress
+            { name: 'Dress', file: '', type: 'Dress', isBase: false },
         ];
         this.layers = {};
     }
@@ -97,8 +97,8 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-    // New method to handle item selection
     selectItem(item) {
+        console.log("Selecting item:", item);
         if (this.layers[item.type]) {
             const fullPath = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             this.updateLayer(item.type, fullPath);
@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const itemId = itemElement.dataset.itemId;
             const selectedItem = shopItems.find(item => item.id === itemId);
             if (selectedItem) {
+                console.log("Item clicked:", selectedItem);
                 window.avatarBody.selectItem(selectedItem);
             }
         }
