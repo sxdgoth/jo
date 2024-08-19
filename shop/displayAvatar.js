@@ -80,7 +80,6 @@ class AvatarDisplay {
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
-
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
@@ -321,6 +320,32 @@ class AvatarDisplay {
         this.reapplySkinTone();
         localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
+
+    applySkinToneToShopItem(imgElement, item) {
+        if (item.type === 'Eyes' || item.type === 'Eyebrows' || item.type === 'Nose' || item.type === 'Mouth') {
+            imgElement.addEventListener('load', () => {
+                const svgDoc = imgElement.contentDocument;
+                if (svgDoc) {
+                    const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                    elements.forEach(element => {
+                        this.applySkinToneToElement(element, item.type);
+                           });
+                }
+            });
+        }
+    }
+
+    applySkinToneToElement(element, type) {
+        ['fill', 'stroke'].forEach((attr) => {
+            const color = element.getAttribute(attr);
+            if (color && color.toLowerCase() !== 'none') {
+                if (this.isSkinTone(color)) {
+                    const newColor = this.getNewColor(color, this.skinTones[this.skinTone].main, this.skinTones[this.skinTone]);
+                    element.setAttribute(attr, newColor);
+                }
+            }
+        });
+    }
 }
 
 // Initialize the avatar display when the DOM is loaded
@@ -331,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
         window.avatarManager = window.avatarDisplay; // For compatibility with existing code
-      } else {
+    } else {
         console.error('No logged in user found');
     }
 });
