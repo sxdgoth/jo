@@ -218,27 +218,29 @@ class AvatarDisplay {
     }
 }
     
-    removeTriedOnItem(type) {
-        if (this.layers[type]) {
-            console.log(`Removing tried on item of type: ${type}`);
-            delete this.triedOnItems[type];
-            if (this.lastAction[type] === 'hidden') {
-                // If the last action was to hide the equipped item, keep it hidden
-                this.layers[type].style.display = 'none';
-            } else if (this.equippedItems[type]) {
-                // Show equipped item if exists
-                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-                if (equippedItem) {
-                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
-                    this.layers[type].style.display = 'block';
+   removeTriedOnItem(type) {
+    if (this.layers[type]) {
+        console.log(`Removing tried on item of type: ${type}`);
+        delete this.triedOnItems[type];
+
+        // Always hide the layer when removing a tried-on item
+        this.layers[type].style.display = 'none';
+        this.lastAction[type] = 'removed';
+
+        // If it's a jacket or shirt, ensure both layers are visible if they have items
+        if (type === 'Jacket' || type === 'Shirt') {
+            ['Jacket', 'Shirt'].forEach(itemType => {
+                if (this.equippedItems[itemType] && !this.hiddenEquippedItems.has(itemType)) {
+                    const equippedItem = shopItems.find(item => item.id === this.equippedItems[itemType]);
+                    if (equippedItem) {
+                        this.layers[itemType].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                        this.layers[itemType].style.display = 'block';
+                    }
                 }
-            } else {
-                // If no equipped item, hide the layer
-                this.layers[type].style.display = 'none';
-            }
-            this.lastAction[type] = 'removed';
+            });
         }
     }
+}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
