@@ -202,47 +202,62 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-  tryOnItem(item) {
-    if (this.layers[item.type]) {
-        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
-        this.layers[item.type].style.display = 'block';
-        this.triedOnItems[item.type] = item;
-        this.lastAction[item.type] = 'triedOn';
+   tryOnItem(item) {
+        if (this.layers[item.type]) {
+            console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
+            this.layers[item.type].style.display = 'block';
+            this.triedOnItems[item.type] = item;
+            this.lastAction[item.type] = 'triedOn';
 
-        // If trying on a shirt or jacket, hide the other layer if it's not being tried on
-        if (item.type === 'Shirt' || item.type === 'Jacket') {
-            const otherType = item.type === 'Shirt' ? 'Jacket' : 'Shirt';
-            if (!this.triedOnItems[otherType]) {
-                this.layers[otherType].style.display = 'none';
+            // If trying on a shirt or jacket, hide the other layer if it's not being tried on
+            if (item.type === 'Shirt' || item.type === 'Jacket') {
+                const otherType = item.type === 'Shirt' ? 'Jacket' : 'Shirt';
+                if (!this.triedOnItems[otherType]) {
+                    this.layers[otherType].style.display = 'none';
+                }
+            }
+
+            // Highlight the item in the shop
+            const shopItem = document.querySelector(`.shop-item .item-image[data-id="${item.id}"]`).closest('.shop-item');
+            if (shopItem) {
+                shopItem.classList.add('highlighted');
             }
         }
     }
-}
-    
-   removeTriedOnItem(type) {
-    if (this.layers[type]) {
-        console.log(`Removing tried on item of type: ${type}`);
-        delete this.triedOnItems[type];
 
-        // Always hide the layer when removing a tried-on item
-        this.layers[type].style.display = 'none';
-        this.lastAction[type] = 'removed';
+    removeTriedOnItem(type) {
+        if (this.layers[type]) {
+            console.log(`Removing tried on item of type: ${type}`);
+            const removedItem = this.triedOnItems[type];
+            delete this.triedOnItems[type];
 
-        // If it's a jacket or shirt, ensure both layers are visible if they have items
-        if (type === 'Jacket' || type === 'Shirt') {
-            ['Jacket', 'Shirt'].forEach(itemType => {
-                if (this.equippedItems[itemType] && !this.hiddenEquippedItems.has(itemType)) {
-                    const equippedItem = shopItems.find(item => item.id === this.equippedItems[itemType]);
-                    if (equippedItem) {
-                        this.layers[itemType].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
-                        this.layers[itemType].style.display = 'block';
+            // Always hide the layer when removing a tried-on item
+            this.layers[type].style.display = 'none';
+            this.lastAction[type] = 'removed';
+
+            // If it's a jacket or shirt, ensure both layers are visible if they have items
+            if (type === 'Jacket' || type === 'Shirt') {
+                ['Jacket', 'Shirt'].forEach(itemType => {
+                    if (this.equippedItems[itemType] && !this.hiddenEquippedItems.has(itemType)) {
+                        const equippedItem = shopItems.find(item => item.id === this.equippedItems[itemType]);
+                        if (equippedItem) {
+                            this.layers[itemType].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                            this.layers[itemType].style.display = 'block';
+                        }
                     }
+                });
+            }
+
+            // Remove highlight from the item in the shop
+            if (removedItem) {
+                const shopItem = document.querySelector(`.shop-item .item-image[data-id="${removedItem.id}"]`).closest('.shop-item');
+                if (shopItem) {
+                    shopItem.classList.remove('highlighted');
                 }
-            });
+            }
         }
     }
-}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
