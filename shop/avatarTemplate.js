@@ -10,7 +10,15 @@ class AvatarBody {
             { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
             { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
+            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+            { name: 'Pants', file: '', type: 'Pants', isBase: false },
+            { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
+            { name: 'Hair', file: '', type: 'Hair', isBase: false },
+            { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
+            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
+            { name: 'Nose', file: '', type: 'Nose', isBase: false },
+            { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
         ];
         this.layers = {};
     }
@@ -63,7 +71,7 @@ class AvatarBody {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Head', 'Eyes', 'Mouth', 'Nose', 'Eyebrows', 'Accessories'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
