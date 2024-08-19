@@ -81,10 +81,14 @@ main {
 
 .shop-section {
     flex: 1;
+    border: 2px solid #cccccc; /* Add grey line around shop items container */
+    border-radius: 10px;
+    padding: 20px;
 }
 
 .shop-section h2 {
     margin-top: 0;
+    margin-bottom: 20px; /* Add some space below the title */
     font-size: 20px;
     color: #4CAF50;
 }
@@ -97,7 +101,7 @@ main {
 
 .shop-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Slightly smaller to fit more items */
     gap: 20px;
 }
 
@@ -111,11 +115,11 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 220px;
+    height: 250px; /* Increased height for larger preview */
 }
 
 .item-image {
-    height: 100px;
+    height: 150px; /* Increased height for larger preview */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,8 +129,8 @@ main {
 
 .item-image img {
     max-width: 100%;
-    height: auto;
-    border-radius: 4px;
+    max-height: 100%;
+    object-fit: contain; /* Ensure the image fits within the container */
 }
 
 .shop-item h3 {
@@ -210,15 +214,15 @@ main {
     }
 
     .shop-items {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
 
     .shop-item {
-        height: 200px;
+        height: 220px;
     }
 
     .item-image {
-        height: 80px;
+        height: 120px;
     }
 }
 
