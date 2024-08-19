@@ -1,3 +1,5 @@
+// shopManager.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let triedOnItems = {};
@@ -8,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
+
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
@@ -32,23 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
+
         // Add event listeners to item images for try on/off
         document.querySelectorAll('.item-image').forEach(image => {
             image.addEventListener('click', (e) => toggleTryOn(e.currentTarget.dataset.id));
         });
+
         // Add event listeners to buy buttons
         document.querySelectorAll('.buy-btn').forEach(button => {
             button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
+
         // Initialize inventory state
         initializeInventoryState();
+
         // Update category buttons
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.category === currentCategory);
         });
-
-        // Update item highlights
-        updateItemHighlights();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -89,25 +93,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 clickedItem.classList.add('highlighted');
             }
             
-            updateItemHighlights();
+            updateItemImages();
         }
     }
 
-    function updateItemHighlights() {
+    function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (window.avatarDisplay.triedOnItems[item.type] === item || 
-                (window.avatarDisplay.equippedItems[item.type] === item.id && 
-                 !window.avatarDisplay.hiddenEquippedItems.has(item.type))) {
+            if (window.avatarDisplay.triedOnItems[item.type] === item) {
+                shopItem.classList.add('highlighted');
+            } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
             }
         });
     }
-
+    
     function updateAvatarDisplay(type, src) {
         const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
         if (layerElement) {
@@ -164,13 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 itemImage.classList.add('equipped');
                 itemImage.classList.remove('selected');
             }
-            
-            // Update AvatarDisplay equipped items and highlights
-            if (window.avatarDisplay) {
-                window.avatarDisplay.equippedItems[item.type] = item.id;
-                window.avatarDisplay.updateShopHighlights();
-            }
-
             alert(`You have successfully purchased ${item.name}!`);
         } else {
             alert('Error updating user coins. Please try again.');
@@ -183,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(equippedItems).forEach(type => {
             updateAvatarDisplay(type, null);
         });
-        updateItemHighlights();
+        updateItemImages();
     }
 
     function filterItemsByCategory(category) {
