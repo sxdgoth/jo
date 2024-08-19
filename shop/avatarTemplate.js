@@ -11,7 +11,8 @@ class AvatarBody {
     { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
     { name: 'Pants', file: '', type: 'Pants', isBase: false },
     { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
-    { name: 'Shoes', file: '', type: 'Shoes', isBase: false }
+    { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
+    { name: 'Face', file: '', type: 'Face', isBase: false }
 ];
         this.layers = {};
     }
@@ -67,7 +68,7 @@ class AvatarBody {
     }
 
    reorderLayers() {
-    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Eyebrows', 'Accessories', 'Hair'];
+    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
     order.forEach((type, index) => {
         if (this.layers[type]) {
             this.layers[type].style.zIndex = index + 1;
