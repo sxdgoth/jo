@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://sxdgoth.github.io/jo/shop/shop.css">
 </head>
 <body>
+    <header>
         <h1>Welcome to the Avatar Shop</h1>
         <div id="user-info">
             <span>Welcome, <span id="user-name"></span>!</span>
@@ -18,33 +19,35 @@
         </nav>
     </header>
 
-   <div class="shop-container">
-    <main>
-        <div class="avatar-container">
-            <div id="avatar-display" style="width: 200px; height: 400px;"></div>
-        </div>
-        <div class="shop-section">
-            <h2>Shop Items</h2>
-            <div class="shop-items-container">
-                <div class="shop-items">
-                    <!-- Shop items will be dynamically added here -->
+    <div class="shop-container">
+        <main>
+            <div class="avatar-container">
+                <div id="avatar-display" style="width: 200px; height: 400px;"></div>
+            </div>
+            <div class="shop-section">
+                <h2>Shop Items</h2>
+                <!-- Category buttons -->
+                <div class="category-buttons">
+                    <button class="category-btn active" data-category="All">All</button>
+                    <button class="category-btn" data-category="Eyes">Eyes</button>
+                    <button class="category-btn" data-category="Nose">Nose</button>
+                    <button class="category-btn" data-category="Lips">Lips</button>
+                    <button class="category-btn" data-category="Shirt">Shirts</button>
+                    <button class="category-btn" data-category="Jacket">Jackets</button>
+                    <button class="category-btn" data-category="Pants">Pants</button>
+                    <button class="category-btn" data-category="Dress">Dresses</button>
+                    <button class="category-btn" data-category="Shoes">Shoes</button>
+                    <button class="category-btn" data-category="Accessories">Accessories</button>
+                </div>
+                <div class="shop-items-container">
+                    <div class="shop-items">
+                        <!-- Shop items will be dynamically added here -->
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="category-buttons">
-    <button class="category-btn active" data-category="All">All</button>
-    <button class="category-btn" data-category="Eyes">Eyes</button>
-    <button class="category-btn" data-category="Nose">Nose</button>
-    <button class="category-btn" data-category="Lips">Lips</button>
-    <button class="category-btn" data-category="Shirt">Shirts</button>
-    <button class="category-btn" data-category="Jacket">Jackets</button>
-    <button class="category-btn" data-category="Pants">Pants</button>
-    <button class="category-btn" data-category="Dress">Dresses</button>
-    <button class="category-btn" data-category="Shoes">Shoes</button>
-    <button class="category-btn" data-category="Accessories">Accessories</button>
-</div>
-    </main>
-</div>
+        </main>
+    </div>
+
     <!-- Scripts -->
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
