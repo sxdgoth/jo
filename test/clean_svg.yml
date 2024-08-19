@@ -1,0 +1,32 @@
+name: Clean SVG Files
+
+on:
+  push:
+    paths:
+      - 'input/**'
+
+jobs:
+  clean-svg:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install lxml
+    - name: Run SVG cleaner
+      run: python svg_cleaner.py
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add output/
+        git commit -m "Clean SVG files" -a || echo "No changes to commit"
+        git push
+
+
+
