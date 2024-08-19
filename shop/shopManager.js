@@ -196,7 +196,15 @@ function filterItemsByCategory(category) {
 
 
 
+let currentCategory = 'All';
+
+function filterItemsByCategory(category) {
+    currentCategory = category;
+    renderShopItems();
+}
+
 function renderShopItems() {
+    const shopItemsContainer = document.querySelector('.shop-items');
     shopItemsContainer.innerHTML = ''; // Clear existing items
     const filteredItems = currentCategory === 'All' 
         ? shopItems 
@@ -213,6 +221,13 @@ function renderShopItems() {
 }
 
 // Add this to your existing DOMContentLoaded event listener
-document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.addEventListener('click', () => filterItemsByCategory(btn.dataset.category));
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (your existing code)
+
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => filterItemsByCategory(btn.dataset.category));
+    });
+
+    // Initial render
+    renderShopItems();
 });
