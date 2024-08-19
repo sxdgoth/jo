@@ -35,39 +35,25 @@ class SkinToneManager {
         this.saveOriginalColors();
     }
 
-    createSkinToneButtons() {
-        console.log("Creating skin tone buttons...");
-        const container = document.createElement('div');
-        container.id = 'skin-tone-buttons';
-        container.style.position = 'fixed';
-        container.style.bottom = '20px';
-        container.style.left = '50%';
-        container.style.transform = 'translateX(-50%)';
-        container.style.display = 'flex';
-        container.style.justifyContent = 'center';
-        container.style.zIndex = '1000';
-        container.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-        container.style.padding = '5px';
-        container.style.borderRadius = '5px';
-
-        Object.values(this.skinTones).forEach(tone => {
-            const button = document.createElement('button');
-            button.className = 'skin-tone-button';
-            button.style.width = '30px';
-            button.style.height = '30px';
-            button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
-            button.style.margin = '0 5px';
-            button.style.border = '2px solid #000';
-            button.style.borderRadius = '50%';
-            button.style.cursor = 'pointer';
-            button.title = tone.name;
-            button.onclick = () => this.selectSkinTone(tone);
-            container.appendChild(button);
-        });
-
-        document.body.appendChild(container);
-        console.log("Skin tone buttons created and added to body");
+   createSkinToneButtons() {
+    console.log("Creating skin tone buttons...");
+    const container = document.getElementById('skin-tone-buttons');
+    if (!container) {
+        console.error("Skin tone buttons container not found");
+        return;
     }
+
+    Object.values(this.skinTones).forEach(tone => {
+        const button = document.createElement('button');
+        button.className = 'skin-tone-button';
+        button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
+        button.title = tone.name;
+        button.onclick = () => this.selectSkinTone(tone);
+        container.appendChild(button);
+    });
+
+    console.log("Skin tone buttons created and added to container");
+}
 
     selectSkinTone(tone) {
         this.currentSkinTone = tone;
