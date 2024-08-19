@@ -6,7 +6,7 @@ body {
     color: #333;
 }
 
-header {
+.top-bar {
     background-color: #2c3e50;
     color: white;
     padding: 1rem 2rem;
@@ -16,30 +16,30 @@ header {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 1.8rem;
-}
-
 #user-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
+    align-items: flex-start;
 }
 
 #user-info span {
     margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+}
+
+#user-name, #user-coins {
+    font-weight: bold;
+    color: #ffd700;
 }
 
 nav {
-    margin-top: 15px;
+    display: flex;
+    gap: 1rem;
 }
 
 .nav-button {
     display: inline-block;
     padding: 10px 15px;
-    margin: 0 5px;
     background-color: #45a049;
     color: white;
     text-decoration: none;
@@ -241,6 +241,15 @@ main {
 }
 
 @media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav {
+        margin-top: 1rem;
+    }
+
     main {
         flex-direction: column;
     }
