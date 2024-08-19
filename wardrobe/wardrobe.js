@@ -1,69 +1,47 @@
-// wardrobe.js
-
 document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    
     if (loggedInUser) {
-        document.getElementById('user-name').textContent = loggedInUser.username;
-        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
-        
-        // Initialize user's inventory
-        window.createUserInventory(loggedInUser.username);
-        
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
-        
-        // Render the avatar
-        if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
-            window.avatarBody.initializeAvatar(loggedInUser.username);
-        }
-        
-        // Initialize SkinToneManager after avatar is rendered
-        if (window.skinToneManager) {
-            window.skinToneManager.initialize();
-        }
-        
-        // Render owned items
-        renderOwnedItems();
+        displayUserInfo(loggedInUser);
+        loadInventory(loggedInUser.username);
     } else {
-        window.location.href = '../index.html';
+        window.location.href = 'https://sxdgoth.github.io/jo/login/index.html';
     }
 });
 
-function renderOwnedItems() {
-    const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
-    const ownedItems = window.userInventory.getItems();
+function displayUserInfo(user) {
+    document.getElementById('user-name').textContent = user.username;
+    document.getElementById('user-coins').textContent = user.coins;
+}
+
+function loadInventory(username) {
+    const inventory = JSON.parse(localStorage.getItem(`inventory_${username}`)) || [];
+    const wardrobeItems = document.querySelector('.wardrobe-items');
     
-    wardrobeItemsContainer.innerHTML = ''; // Clear existing items
-    
-    ownedItems.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.classList.add('wardrobe-item');
-        const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        itemElement.innerHTML = `
-            <div class="item-image" data-id="${item.id}">
-                <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
-            </div>
-            <h3>${item.name}</h3>
-            <p>Type: ${item.type}</p>
-        `;
-        wardrobeItemsContainer.appendChild(itemElement);
-        // Add click event listener to the item image
-        const itemImage = itemElement.querySelector('.item-image');
-        itemImage.addEventListener('click', () => toggleItem(item));
+    inventory.forEach(item => {
+        const itemElement = createItemElement(item);
+        wardrobeItems.appendChild(itemElement);
     });
 }
 
-function toggleItem(item) {
-    if (window.avatarManager) {
+function createItemElement(item) {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('item');
+    
+    const img = document.createElement('img');
+    img.src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+    img.alt = item.name;
+    img.classList.add('item-image');
+    img.dataset.id = item.id;
+    
+    img.addEventListener('click', () => {
         window.avatarManager.toggleItem(item);
-    } else {
-        console.error('AvatarManager not initialized');
-    }
+    });
+    
+    itemDiv.appendChild(img);
+    return itemDiv;
 }
 
 function logout() {
     sessionStorage.removeItem('loggedInUser');
-    window.location.href = '../index.html';
+    window.location.href = 'https://sxdgoth.github.io/jo/login/index.html';
 }
