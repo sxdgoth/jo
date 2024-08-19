@@ -3,21 +3,32 @@ import xml.etree.ElementTree as ET
 
 def clean_svg(input_file, output_file):
     print(f"Processing file: {input_file}")
+    ET.register_namespace('', "http://www.w3.org/2000/svg")
     tree = ET.parse(input_file)
     root = tree.getroot()
+    
+    # Define the SVG namespace
     ns = {'svg': 'http://www.w3.org/2000/svg'}
+    
+    # Remove known body parts (adjust these selectors as needed)
     body_parts = [
         ".//svg:path[@fill='#F4D5BF']",
         ".//svg:path[@fill='#E6BBA8']",
     ]
+    
+    elements_removed = 0
     for selector in body_parts:
         for element in root.findall(selector, ns):
             for parent in root.iter():
                 if element in parent:
                     parent.remove(element)
+                    elements_removed += 1
                     break
+    
+    # Write the modified SVG to the output file
     tree.write(output_file, encoding='unicode', xml_declaration=True)
     print(f"Saved processed file: {output_file}")
+    print(f"Elements removed: {elements_removed}")
 
 # Set up directories
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +43,7 @@ print(f"Output directory: {output_dir}")
 os.makedirs(output_dir, exist_ok=True)
 
 # Process SVG files
-svg_files = [f for f in os.listdir(input_dir) if f.endswith('.svg') and f != 'svg_cleaner.py']
+svg_files = [f for f in os.listdir(input_dir) if f.endswith('.svg')]
 print(f"SVG files found: {svg_files}")
 
 for filename in svg_files:
