@@ -44,7 +44,10 @@ class SkinToneManager {
             button.classList.add('skin-tone-button');
             button.dataset.tone = toneName;
             button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
-            button.onclick = () => this.selectSkinTone(toneName);
+            button.onclick = () => {
+                console.log(`Skin tone button clicked: ${toneName}`);
+                this.selectSkinTone(toneName);
+            };
             container.appendChild(button);
         });
 
@@ -52,6 +55,7 @@ class SkinToneManager {
     }
 
     selectSkinTone(toneName) {
+        console.log(`Selecting skin tone: ${toneName}`);
         const tone = this.skinTones[toneName];
         if (!tone) {
             console.error(`Invalid skin tone: ${toneName}`);
