@@ -9,8 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
         filteredItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('shop-item');
+            const imgElement = itemElement.querySelector('.item-image img');
+        if (window.applyItemPosition) {
+            window.applyItemPosition(imgElement, item.type.toLowerCase());
+        }
+        if (window.avatarDisplay) {
+            window.avatarDisplay.applySkinToneToShopItem(imgElement, item);
+        }
+    });
+
             const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
