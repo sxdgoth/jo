@@ -205,55 +205,52 @@ class AvatarDisplay {
     }
 
     tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    // If it's not a Shirt or Jacket, remove any previously tried on item of the same type
-    if (item.type !== 'Shirt' && item.type !== 'Jacket') {
-        this.removeTriedOnItem(item.type);
-    }
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        // If it's not a Shirt or Jacket, remove any previously tried on item of the same type
+        if (item.type !== 'Shirt' && item.type !== 'Jacket') {
+            if (this.triedOnItems[item.type]) {
+                this.removeTriedOnItem(item.type);
+            }
+        }
 
-    // If the clicked item is already tried on or equipped, remove it
-    if ((this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) ||
-        (this.equippedItems[item.type] === item.id && !this.triedOnItems[item.type])) {
-        this.removeTriedOnItem(item.type);
-    } else {
-        // Update the tried on items
-        this.triedOnItems[item.type] = item;
+        // If the clicked item is already tried on, remove it
+        if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
+            this.removeTriedOnItem(item.type);
+        } else {
+            // Update the tried on items
+            this.triedOnItems[item.type] = item;
 
-        // Update the display
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+            // Update the display
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
 
-        this.lastAction[item.type] = 'triedOn';
-    }
+            this.lastAction[item.type] = 'triedOn';
+        }
 
-    // Ensure proper layering for Shirt and Jacket
-    if (item.type === 'Shirt' || item.type === 'Jacket') {
+        // Ensure proper layering for Shirt and Jacket
         this.reorderLayers();
     }
-}
 
     removeTriedOnItem(type) {
-    console.log(`Removing tried on item of type: ${type}`);
-    
-    delete this.triedOnItems[type];
-    this.lastAction[type] = 'removed';
+        console.log(`Removing tried on item of type: ${type}`);
+        
+        delete this.triedOnItems[type];
+        this.lastAction[type] = 'removed';
 
-    // If there's an equipped item of this type, show it
-    if (this.equippedItems[type] && !this.hiddenEquippedItems.has(type)) {
-        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-        if (equippedItem) {
-            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+        // If there's an equipped item of this type, show it
+        if (this.equippedItems[type] && !this.hiddenEquippedItems.has(type)) {
+            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+            if (equippedItem) {
+                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+            }
+        } else {
+            // If no equipped item, hide the layer
+            this.updateAvatarDisplay(type, null);
         }
-    } else {
-        // If no equipped item, hide the layer
-        this.updateAvatarDisplay(type, null);
-    }
 
-    // Ensure proper layering for Shirt and Jacket
-    if (type === 'Shirt' || type === 'Jacket') {
+        // Ensure proper layering
         this.reorderLayers();
     }
-}
 
     updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
@@ -264,7 +261,6 @@ class AvatarDisplay {
             } else {
                 this.layers[type].style.display = 'none';
             }
-            this.reorderLayers();
         } else {
             console.warn(`Layer not found for type: ${type}`);
         }
