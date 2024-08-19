@@ -1,96 +1,79 @@
-class SkinToneManager {
-    constructor(avatarBody) {
-        this.avatarBody = avatarBody;
-        this.skinTones = {
-            light: {
-                name: 'Light',
-                main: '#FEE2CA',
-                shadow: '#EFC1B7'
-            },
-            medium: {
-                name: 'Medium',
-                main: '#FFE0BD',
-                shadow: '#EFD0B1'
-            },
-            tan: {
-                name: 'Tan',
-                main: '#F1C27D',
-                shadow: '#E0B170'
-            },
-            dark: {
-                name: 'Dark',
-                main: '#8D5524',
-                shadow: '#7C4A1E'
-            }
-        };
-        this.currentSkinTone = this.skinTones.light;
+class Inventory {
+    constructor(username) {
+        this.username = username;
+        this.items = this.loadInventory();
     }
 
-    initialize() {
-        console.log("SkinToneManager initializing...");
-        this.setupSkinToneButtons();
+    loadInventory() {
+        const savedInventory = localStorage.getItem(`userInventory_${this.username}`);
+        return savedInventory ? JSON.parse(savedInventory) : [];
     }
 
-    setupSkinToneButtons() {
-        const container = document.getElementById('skin-tone-buttons');
-        if (!container) {
-            console.error("Skin tone buttons container not found");
-            return;
-        }
-
-        Object.keys(this.skinTones).forEach(toneName => {
-            const tone = this.skinTones[toneName];
-            const button = document.createElement('button');
-            button.classList.add('skin-tone-button');
-            button.dataset.tone = toneName;
-            button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
-            button.onclick = () => {
-                console.log(`Skin tone button clicked: ${toneName}`);
-                this.selectSkinTone(toneName);
-            };
-            container.appendChild(button);
-        });
-
-        console.log("Skin tone buttons set up");
+    saveInventory() {
+        localStorage.setItem(`userInventory_${this.username}`, JSON.stringify(this.items));
     }
 
-    selectSkinTone(toneName) {
-        console.log(`Selecting skin tone: ${toneName}`);
-        const tone = this.skinTones[toneName];
-        if (!tone) {
-            console.error(`Invalid skin tone: ${toneName}`);
-            return;
+    addItem(item) {
+        if (!this.hasItem(item.id)) {
+            this.items.push(item);
+            this.saveInventory();
+            return true;
         }
+        return false;
+    }
 
-        this.currentSkinTone = tone;
-        console.log(`Selected skin tone: ${tone.name}`);
+    hasItem(itemId) {
+        return this.items.some(item => item.id === itemId);
+    }
 
-        // Update button styles
-        const buttons = document.querySelectorAll('.skin-tone-button');
-        buttons.forEach(button => {
-            if (button.dataset.tone === toneName) {
-                button.classList.add('selected');
-            } else {
-                button.classList.remove('selected');
-            }
-        });
-
-        // Apply skin tone to avatar
-        if (this.avatarBody && typeof this.avatarBody.changeSkinTone === 'function') {
-            this.avatarBody.changeSkinTone(toneName);
-        } else {
-            console.error('AvatarBody not found or changeSkinTone method not available');
-        }
+    getItems() {
+        return this.items;
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM loaded, initializing SkinToneManager");
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser && window.avatarBody) {
-        window.skinToneManager = new SkinToneManager(window.avatarBody);
-        window.skinToneManager.initialize();
+// Create a global inventory instance
+window.createUserInventory = function(username) {
+    window.userInventory = new Inventory(username);
+};
+
+// Function to update button state based on inventory
+function updateBuyButtonState(button, itemId) {
+    if (window.userInventory && window.userInventory.hasItem(itemId)) {
+        button.textContent = 'Owned';
+        button.disabled = true;
+        button.classList.add('owned');
+    }
+}
+
+// Function to be called when an item is successfully purchased
+function onItemPurchased(item) {
+    if (window.userInventory && window.userInventory.addItem(item)) {
+        console.log(`Added ${item.name} to inventory`);
+        // Update the button state for this item
+        const buyButton = document.querySelector(`.buy-btn[data-id="${item.id}"]`);
+        if (buyButton) {
+            updateBuyButtonState(buyButton, item.id);
+        }
     } else {
-        console.error('No logged in user found or AvatarBody not initialized');
+        console.log(`${item.name} is already in the inventory`);
+    }
+}
+
+// Function to initialize inventory state for shop items
+function initializeInventoryState() {
+    if (window.userInventory) {
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            const itemId = button.dataset.id;
+            updateBuyButtonState(button, itemId);
+        });
+    }
+}
+
+// Add this to your DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.createUserInventory(loggedInUser.username);
+        initializeInventoryState();
     }
 });
