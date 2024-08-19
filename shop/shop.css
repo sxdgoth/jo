@@ -74,8 +74,9 @@ main {
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
+    border: 2px solid #cccccc; /* Increased border width and changed to a solid grey */
     border-radius: 10px;
-    border: 1px solid #cccccc; /* Grey line around container */
+    box-sizing: border-box; /* Ensure padding doesn't affect overall width */
 }
 
 .shop-section {
@@ -189,9 +190,10 @@ main {
 }
 
 @media (max-width: 768px) {
-    main {
-        flex-direction: column;
-    }
+ main {
+    display: flex;
+    gap: 20px;
+}
 
     .avatar-container {
         width: 100%;
