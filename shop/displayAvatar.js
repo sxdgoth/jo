@@ -79,6 +79,7 @@ class AvatarDisplay {
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
+
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
@@ -122,7 +123,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -134,7 +135,10 @@ class AvatarDisplay {
         const svgDoc = obj.contentDocument;
         if (svgDoc) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
+            this.originalColors[type] = Array.from(paths).map(path => ({
+                fill: path.getAttribute('fill'),
+                stroke: path.getAttribute('stroke')
+            }));
         }
     }
 
@@ -148,9 +152,16 @@ class AvatarDisplay {
             
             paths.forEach((path, index) => {
                 const currentFill = path.getAttribute('fill');
+                const currentStroke = path.getAttribute('stroke');
+                
                 if (currentFill && currentFill.toLowerCase() !== 'none') {
                     const newColor = this.getNewColor(currentFill, mainColor, tone);
                     path.setAttribute('fill', newColor);
+                }
+                
+                if (currentStroke && currentStroke.toLowerCase() !== 'none') {
+                    const newColor = this.getNewColor(currentStroke, mainColor, tone);
+                    path.setAttribute('stroke', newColor);
                 }
             });
         }
@@ -160,8 +171,12 @@ class AvatarDisplay {
         const colors = new Set();
         paths.forEach(path => {
             const fill = path.getAttribute('fill');
+            const stroke = path.getAttribute('stroke');
             if (fill && fill.toLowerCase() !== 'none') {
                 colors.add(fill.toLowerCase());
+            }
+            if (stroke && stroke.toLowerCase() !== 'none') {
+                colors.add(stroke.toLowerCase());
             }
         });
         return Array.from(colors);
@@ -179,7 +194,7 @@ class AvatarDisplay {
         if (Math.abs(luminanceDiff) < 0.1) {
             return tone.main;
         } else if (luminanceDiff < 0) {
-            return tone.shadow;
+            return this.darkenColor(tone.main, Math.abs(luminanceDiff));
         } else {
             return this.lightenColor(tone.main, luminanceDiff);
         }
@@ -207,13 +222,18 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
+    darkenColor(color, amount) {
+        const rgb = this.hexToRgb(color);
+        const newRgb = rgb.map(c => Math.max(0, c - Math.round(amount * 255)));
+        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
+    }
+
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         // Initialize the objects if they don't exist
         if (!this.triedOnItems) this.triedOnItems = {};
         if (!this.currentItems) this.currentItems = {};
-
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
             // If the same item is clicked again, remove it
             this.removeItem(item.type);
@@ -222,17 +242,16 @@ class AvatarDisplay {
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
-
         this.reorderLayers();
     }
 
-     removeItem(type) {
+    removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-     updateAvatarDisplay(type, src) {
+    updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
@@ -280,6 +299,21 @@ class AvatarDisplay {
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
         });
+    }
+
+    reapplySkinTone() {
+        this.baseParts.forEach(type => {
+            if (this.layers[type]) {
+                this.applySkinTone(this.layers[type], type);
+            }
+        });
+    }
+
+    changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        this.reapplySkinTone();
+        // Save the new skin tone to localStorage
+        localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
 }
 
