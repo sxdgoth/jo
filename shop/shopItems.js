@@ -11,6 +11,7 @@ const shopItems = [
     { id: 'svgexport-34.svg', name: 'Charcoal Melody Pants', type: 'Pants', price: 180, path: 'home/assets/pants/' },
     { id: 'svgexport-30.svg', name: 'Casual Creations Jeans', type: 'Pants', price: 180, path: 'home/assets/pants/' },
     { id: 'ScarEye.svg', name: 'Scar Eyes', type: 'Eyes', price: 180, path: 'home/assets/eyes/' },
+    { id: 'zestyeyes.svg', name: 'Zesty Eyes', type: 'Eyes', price: 180, path: 'home/assets/eyes/' },
     { id: 'AngryBrows.svg', name: 'Angry Brows', type: 'Eyebrows', price: 180, path: 'home/assets/brows/' },
     // Add more items as needed
 ];
