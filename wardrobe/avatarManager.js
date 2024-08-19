@@ -18,22 +18,10 @@ class AvatarBody {
         this.layers = {};
         this.skinTone = 'light';
         this.skinTones = {
-            light: {
-                main: '#FEE2CA',
-                shadow: '#EFC1B7'
-            },
-            medium: {
-                main: '#FFE0BD',
-                shadow: '#EFD0B1'
-            },
-            tan: {
-                main: '#F1C27D',
-                shadow: '#E0B170'
-            },
-            dark: {
-                main: '#8D5524',
-                shadow: '#7C4A1E'
-            }
+            light: { main: '#FEE2CA', shadow: '#EFC1B7' },
+            medium: { main: '#FFE0BD', shadow: '#EFD0B1' },
+            tan: { main: '#F1C27D', shadow: '#E0B170' },
+            dark: { main: '#8D5524', shadow: '#7C4A1E' }
         };
     }
 
@@ -97,38 +85,23 @@ class AvatarBody {
         });
     }
 
-    initializeAvatar() {
-        this.loadAvatar();
-        if (window.avatarManager) {
-            window.avatarManager.updateAvatarDisplay();
-        }
-    }
-
-    clearAllLayers() {
-        Object.entries(this.layers).forEach(([type, layer]) => {
-            const bodyPart = this.bodyParts.find(part => part.type === type);
-            if (!bodyPart.isBase) {
-                layer.style.display = 'none';
-                layer.src = '';
-            }
-        });
-        this.reorderLayers();
-    }
-
     changeSkinTone(newTone) {
-        if (this.skinTones[newTone]) {
-            this.skinTone = newTone;
-            this.applyCurrentSkinTone();
-        } else {
-            console.error(`Invalid skin tone: ${newTone}`);
-        }
+        console.log(`Changing skin tone to: ${newTone}`);
+        this.skinTone = newTone;
+        this.applyCurrentSkinTone();
     }
 
     applyCurrentSkinTone() {
         const tone = this.skinTones[this.skinTone];
-        Object.values(this.layers).forEach(layer => {
-            if (layer.dataset.type === 'Head' || layer.dataset.type === 'Arms' || layer.dataset.type === 'Legs') {
-                this.applySkinToneToSVG(layer, tone);
+        if (!tone) {
+            console.error(`Invalid skin tone: ${this.skinTone}`);
+            return;
+        }
+
+        ['Head', 'Arms', 'Legs'].forEach(partName => {
+            const part = this.layers[partName];
+            if (part) {
+                this.applySkinToneToSVG(part, tone);
             }
         });
     }
@@ -144,7 +117,7 @@ class AvatarBody {
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        path.setAttribute('fill', this.getNewColor(currentFill, tone));
+                        path.setAttribute('fill', tone.main);
                     }
                 });
 
@@ -157,14 +130,19 @@ class AvatarBody {
             .catch(error => console.error(`Error applying skin tone:`, error));
     }
 
-    getNewColor(currentColor, tone) {
-        // This is a simple implementation. You might need to adjust this logic
-        // to better match your specific skin tone application needs.
-        return tone.main;
+    clearAllLayers() {
+        Object.entries(this.layers).forEach(([type, layer]) => {
+            const bodyPart = this.bodyParts.find(part => part.type === type);
+            if (!bodyPart.isBase) {
+                layer.style.display = 'none';
+                layer.src = '';
+            }
+        });
+        this.reorderLayers();
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     window.avatarBody = new AvatarBody('avatar-display');
-    window.avatarBody.initializeAvatar();
+    window.avatarBody.loadAvatar();
 });
