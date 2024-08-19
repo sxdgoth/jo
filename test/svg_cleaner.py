@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 import urllib.request
+import json
 
 def clean_svg(input_url, output_file):
     print(f"Processing file from URL: {input_url}")
@@ -17,8 +18,10 @@ def clean_svg(input_url, output_file):
     
     # Remove known body parts (adjust these selectors as needed)
     body_parts = [
-        ".//svg:path[@fill='#FFFFFF']",  # Assuming the body is white
-        ".//svg:path[@fill='#999999']",  # Assuming some parts might be grey
+        ".//svg:path[@fill='#FFFFFF']",
+        ".//svg:path[@fill='#999999']",
+        ".//svg:path[@fill='#F4D5BF']",
+        ".//svg:path[@fill='#E6BBA8']",
     ]
     
     elements_removed = 0
@@ -34,16 +37,24 @@ def clean_svg(input_url, output_file):
     print(f"Saved processed file: {output_file}")
     print(f"Elements removed: {elements_removed}")
 
-# Set up input URL and output path
-input_url = "https://sxdgoth.github.io/jo/test/trollface.svg"
+# Set up base URL and output directory
+base_url = "https://sxdgoth.github.io/jo/test/"
 output_dir = "output"
-output_file = os.path.join(output_dir, "cleaned_trollface.svg")
 
 # Ensure output directory exists
 os.makedirs(output_dir, exist_ok=True)
 
-# Process the SVG file
-clean_svg(input_url, output_file)
+# Fetch list of files in the directory
+index_url = base_url + "index.json"
+with urllib.request.urlopen(index_url) as response:
+    file_list = json.loads(response.read())
+
+# Process each SVG file
+for file in file_list:
+    if file.endswith('.svg'):
+        input_url = base_url + file
+        output_file = os.path.join(output_dir, file)
+        clean_svg(input_url, output_file)
 
 print("SVG cleaning complete!")
-print("Output file:", output_file)
+print("Output directory:", output_dir)
