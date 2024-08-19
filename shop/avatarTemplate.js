@@ -2,17 +2,17 @@ class AvatarBody {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/body/';
-        this.bodyParts = [
-            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
-            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
-            { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
-            { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
-            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
-            { name: 'Pants', file: '', type: 'Pants', isBase: false },
-            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
-            { name: 'Shoes', file: '', type: 'Shoes', isBase: false }
-        ];
+       this.bodyParts = [
+    { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+    { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
+    { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
+    { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
+    { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+    { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+    { name: 'Pants', file: '', type: 'Pants', isBase: false },
+    { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+    { name: 'Shoes', file: '', type: 'Shoes', isBase: false }
+];
         this.layers = {};
     }
 
