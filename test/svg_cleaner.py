@@ -3,6 +3,8 @@ import xml.etree.ElementTree as ET
 
 def clean_svg(input_file, output_file):
     print(f"Processing file: {input_file}")
+    
+    # Parse the SVG file
     ET.register_namespace('', "http://www.w3.org/2000/svg")
     tree = ET.parse(input_file)
     root = tree.getroot()
@@ -26,7 +28,22 @@ def clean_svg(input_file, output_file):
                     break
     
     # Write the modified SVG to the output file
-    tree.write(output_file, encoding='unicode', xml_declaration=True)
+    tree.write(output_file, encoding='utf-8', xml_declaration=True)
+    
+    # Read the file content
+    with open(output_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Remove namespace prefixes
+    content = content.replace('ns0:', '')
+    content = content.replace(':ns0', '')
+    
+    # Write the corrected content back to the file
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+        f.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
+        f.write(content)
+    
     print(f"Saved processed file: {output_file}")
     print(f"Elements removed: {elements_removed}")
 
