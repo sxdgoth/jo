@@ -66,15 +66,14 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-    reorderLayers() {
-        const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes'];
-        console.log('Reordering layers:', order);
-        order.forEach((type, index) => {
-            if (this.layers[type]) {
-                this.layers[type].style.zIndex = index + 1;
-            }
-        });
-    }
+   reorderLayers() {
+    const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes'];
+    order.forEach((type, index) => {
+        if (this.layers[type]) {
+            this.layers[type].style.zIndex = index + 1;
+        }
+    });
+}
 
     initializeAvatar() {
         this.loadAvatar();
