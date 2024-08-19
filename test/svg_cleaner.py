@@ -24,18 +24,37 @@ def clean_svg(input_file, output_file):
     # Save the modified SVG
     tree.write(output_file, encoding='unicode', xml_declaration=True)
 
-# Process files
-input_dir = 'input'
-output_dir = 'output'
+# Get the current directory (which should be the 'test' folder)
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
+# Set input and output directories relative to the current directory
+input_dir = current_dir
+output_dir = os.path.join(os.path.dirname(current_dir), 'output')
+
+# Create output directory if it doesn't exist
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
+# Process files
 for filename in os.listdir(input_dir):
-    if filename.endswith('.svg'):
+    if filename.endswith('.svg') and filename != 'svg_cleaner.py':
         input_path = os.path.join(input_dir, filename)
         output_path = os.path.join(output_dir, filename)
         clean_svg(input_path, output_path)
         print(f"Processed: {filename}")
 
 print("SVG cleaning complete!")
+
+
+
+This script is designed to work when placed inside the test folder. It will:
+
+Process all SVG files in the same folder it's in (the test folder).
+Create an output folder one level up from the test folder.
+Save the processed SVG
+Avatar for supwezton-hjwkg
+
+
+
+
+
