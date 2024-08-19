@@ -92,7 +92,7 @@ main {
 }
 
 .shop-item {
-    border: 2px solid #cccccc; /* Add grey line around each shop item */
+    border: 2px solid #cccccc; /* Grey line around each shop item */
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -101,7 +101,7 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 220px;
+    height: 280px; /* Increased overall height */
 }
 
 .shop-item:hover {
