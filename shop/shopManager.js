@@ -203,15 +203,35 @@ function filterItemsByCategory(category) {
     renderShopItems();
 }
 
+let currentCategory = 'All';
+
+function filterItemsByCategory(category) {
+    currentCategory = category;
+    renderShopItems();
+}
+
 function renderShopItems() {
     const shopItemsContainer = document.querySelector('.shop-items');
+    if (!shopItemsContainer) {
+        console.error('Shop items container not found');
+        return;
+    }
+    
     shopItemsContainer.innerHTML = ''; // Clear existing items
     const filteredItems = currentCategory === 'All' 
         ? shopItems 
         : shopItems.filter(item => item.type === currentCategory);
 
     filteredItems.forEach(item => {
-        // ... (your existing item rendering code)
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('shop-item');
+        itemElement.innerHTML = `
+            <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}">
+            <h3>${item.name}</h3>
+            <p>${item.price} coins</p>
+            <button class="buy-btn" data-id="${item.id}">Buy</button>
+        `;
+        shopItemsContainer.appendChild(itemElement);
     });
 
     // Update category buttons
@@ -220,14 +240,15 @@ function renderShopItems() {
     });
 }
 
-// Add this to your existing DOMContentLoaded event listener
+// Add this to ensure the shop items are rendered when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // ... (your existing code)
-
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', () => filterItemsByCategory(btn.dataset.category));
-    });
-
-    // Initial render
     renderShopItems();
+
+    // Set up category button click listeners
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const category = e.target.dataset.category;
+            filterItemsByCategory(category);
+        });
+    });
 });
