@@ -17,7 +17,6 @@ class AvatarBody {
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
-            { name: 'Dress', file: '', type: 'Dress', isBase: false },
         ];
         this.layers = {};
     }
@@ -71,7 +70,7 @@ class AvatarBody {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Head', 'Eyes', 'Mouth', 'Nose', 'Eyebrows', 'Accessories', 'Hair'];
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Head', 'Eyes', 'Mouth', 'Nose', 'Eyebrows', 'Accessories'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -97,6 +96,7 @@ class AvatarBody {
         this.reorderLayers();
     }
 
+    // New method to handle item selection
     selectItem(item) {
         console.log("Selecting item:", item);
         if (this.layers[item.type]) {
@@ -112,17 +112,4 @@ class AvatarBody {
 document.addEventListener('DOMContentLoaded', function() {
     window.avatarBody = new AvatarBody('avatar-display');
     window.avatarBody.initializeAvatar();
-
-    // Add event listener for item selection
-    document.body.addEventListener('click', function(event) {
-        const itemElement = event.target.closest('[data-item-id]');
-        if (itemElement) {
-            const itemId = itemElement.dataset.itemId;
-            const selectedItem = shopItems.find(item => item.id === itemId);
-            if (selectedItem) {
-                console.log("Item clicked:", selectedItem);
-                window.avatarBody.selectItem(selectedItem);
-            }
-        }
-    });
 });
