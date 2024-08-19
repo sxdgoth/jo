@@ -33,14 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateItemImages();
     }
 
-    function applySkinToneToShopItem(imgElement, item) {
-        if (window.skinToneManager && window.skinToneManager.currentSkinTone) {
-            imgElement.addEventListener('load', () => {
-                const tone = window.skinToneManager.currentSkinTone;
-                window.skinToneManager.applySkinToneToSVG(imgElement, tone, imgElement.src, item.type);
-            });
-        }
+   function applySkinToneToShopItem(imgElement, item) {
+    if (window.avatarDisplay) {
+        imgElement.addEventListener('load', () => {
+            const svgDoc = imgElement.contentDocument;
+            if (svgDoc) {
+                const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                elements.forEach(element => {
+                    window.avatarDisplay.applySkinToneToElement(element, item.type);
+                });
+            }
+        });
     }
+}
 
     function updateBuyButtonState(button, itemId) {
         if (window.userInventory && window.userInventory.hasItem(itemId)) {
