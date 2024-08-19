@@ -18,21 +18,16 @@ def clean_svg(input_file, output_file):
     tree.write(output_file, encoding='unicode', xml_declaration=True)
     print(f"Saved processed file: {output_file}")
 
-# Get the absolute path of the script
+# Set up directories
 script_dir = os.path.dirname(os.path.abspath(__file__))
 repo_root = os.path.dirname(script_dir)
 input_dir = script_dir
 output_dir = os.path.join(repo_root, 'output')
 
-print(f"Script directory: {script_dir}")
-print(f"Repository root: {repo_root}")
 print(f"Input directory: {input_dir}")
 print(f"Output directory: {output_dir}")
 
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
-    print(f"Created output directory: {output_dir}")
-
+# Process SVG files
 svg_files = [f for f in os.listdir(input_dir) if f.endswith('.svg') and f != 'svg_cleaner.py']
 print(f"SVG files found: {svg_files}")
 
@@ -44,3 +39,6 @@ for filename in svg_files:
 print("SVG cleaning complete!")
 print("Contents of output directory:")
 print(os.listdir(output_dir))
+
+
+
