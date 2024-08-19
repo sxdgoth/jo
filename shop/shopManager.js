@@ -29,17 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
-
-            // Add click event listener to the item image
-            const itemImage = itemElement.querySelector('.item-image');
-            itemImage.addEventListener('click', () => toggleTryOn(item.id));
         });
 
-        document.querySelectorAll('.buy-btn').forEach(button => {
-            button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
-        });
-
-        initializeInventoryState();
         updateCategoryButtons();
         updateItemImages();
     }
@@ -76,7 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             
-            if (window.avatarDisplay && window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === item.id) {
+            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
+                window.avatarDisplay.currentItems[item.type] && 
+                window.avatarDisplay.currentItems[item.type].id === item.id) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
@@ -100,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.userInventory) {
                 window.userInventory.addItem(item);
             }
-            updateUserCoinsAfterPurchase(newCoins);
+            updateUserCoinsDisplay(newCoins);
             const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
             if (buyButton) {
                 updateBuyButtonState(buyButton, itemId);
@@ -134,13 +127,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initializeInventoryState() {
-        // Implement this function if needed
+    function updateUserCoinsDisplay(newCoins) {
+        const coinsDisplay = document.getElementById('user-coins');
+        if (coinsDisplay) {
+            coinsDisplay.textContent = newCoins;
+        }
     }
 
-    function updateUserCoinsAfterPurchase(newCoins) {
-        // Implement this function to update the UI with the new coin amount
-    }
+    // Event delegation for item clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.item-image')) {
+            const itemId = e.target.closest('.item-image').dataset.id;
+            console.log('Item clicked:', itemId);
+            toggleTryOn(itemId);
+        } else if (e.target.classList.contains('buy-btn')) {
+            const itemId = e.target.dataset.id;
+            buyItem(itemId);
+        } else if (e.target.classList.contains('category-btn')) {
+            const category = e.target.dataset.category;
+            filterItemsByCategory(category);
+        }
+    });
 
     window.shopManager = {
         toggleTryOn,
@@ -152,12 +159,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the shop
     renderShopItems();
-
-    // Add event listeners to category buttons
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const category = e.target.dataset.category;
-            filterItemsByCategory(category);
-        });
-    });
 });
