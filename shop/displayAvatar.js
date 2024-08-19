@@ -120,7 +120,6 @@ class AvatarDisplay {
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
-                console.log(`Setting z-index for ${type}: ${index + 1}`);
             }
         });
     }
@@ -176,7 +175,6 @@ class AvatarDisplay {
         } else if (luminanceDiff < 0) {
             return tone.shadow;
         } else {
-            // For colors lighter than the main color, we'll create a lighter version of the main tone
             return this.lightenColor(tone.main, luminanceDiff);
         }
     }
@@ -300,6 +298,13 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
+
+    resetTriedOnItems() {
+        Object.keys(this.triedOnItems).forEach(type => {
+            this.removeTriedOnItem(type);
+        });
+        this.triedOnItems = {};
+    }
 }
 
 // Initialize the avatar display when the DOM is loaded
@@ -314,3 +319,4 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No logged in user found');
     }
 });
+
