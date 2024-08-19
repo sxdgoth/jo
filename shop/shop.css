@@ -87,12 +87,12 @@ main {
 
 .shop-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
 }
 
 .shop-item {
-    border: 1px solid #000000; /* Black line around item container */
+    border: 1px solid #000000;
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -100,11 +100,23 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 280px; /* Increased height to accommodate larger preview */
+    aspect-ratio: 1 / 1;
+    transition: all 0.3s ease;
+}
+
+.shop-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.shop-item.highlighted {
+    border-color: #4CAF50;
+    border-width: 2px;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
 .item-image {
-    height: 200px; /* Increased height for larger preview */
+    flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -198,14 +210,6 @@ main {
     }
 
     .shop-items {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
-
-    .shop-item {
-        height: 250px;
-    }
-
-    .item-image {
-        height: 170px;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
