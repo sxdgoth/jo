@@ -1,4 +1,5 @@
 class AvatarDisplay {
+
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
         window.avatarManager = window.avatarDisplay; // For compatibility with existing code
-    } else {
+      } else {
         console.error('No logged in user found');
     }
 });
