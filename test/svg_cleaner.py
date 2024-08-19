@@ -1,5 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
+import re
 
 def clean_svg(input_file, output_file):
     print(f"Processing file: {input_file}")
@@ -28,7 +29,7 @@ def clean_svg(input_file, output_file):
                     break
     
     # Write the modified SVG to the output file
-    tree.write(output_file, encoding='utf-8', xml_declaration=True)
+    tree.write(output_file, encoding='utf-8', xml_declaration=False)
     
     # Read the file content
     with open(output_file, 'r', encoding='utf-8') as f:
@@ -38,13 +39,13 @@ def clean_svg(input_file, output_file):
     content = content.replace('ns0:', '')
     content = content.replace(':ns0', '')
     
-    # Ensure only one XML declaration is present
-    content = content.replace('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n', '')
+    # Remove all existing XML declarations
+    content = re.sub(r'<\?xml[^>]+\?>\s*', '', content)
     
     # Write the corrected content back to the file
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('<?xml version=\'1.0\' encoding=\'utf-8\'?>\n')
-        f.write(content)
+        f.write(content.strip())
     
     print(f"Saved processed file: {output_file}")
     print(f"Elements removed: {elements_removed}")
