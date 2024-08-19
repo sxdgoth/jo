@@ -29,24 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
+
+            // Add click event listener to the item image
+            const itemImage = itemElement.querySelector('.item-image');
+            itemImage.addEventListener('click', () => toggleTryOn(item.id));
         });
 
-      document.querySelectorAll('.item-image').forEach(image => {
-            image.addEventListener('click', (e) => {
-                console.log('Item clicked:', e.currentTarget.dataset.id);
-                toggleTryOn(e.currentTarget.dataset.id);
-            });
-        });
-        
         document.querySelectorAll('.buy-btn').forEach(button => {
             button.addEventListener('click', (e) => buyItem(e.target.dataset.id));
         });
 
         initializeInventoryState();
-
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.category === currentCategory);
-        });
+        updateCategoryButtons();
+        updateItemImages();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -58,30 +53,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleTryOn(itemId) {
-    console.log('toggleTryOn called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        if (window.avatarDisplay) {
-            window.avatarDisplay.tryOnItem(item);
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            if (window.avatarDisplay) {
+                window.avatarDisplay.tryOnItem(item);
+            } else {
+                console.error('window.avatarDisplay is not defined');
+            }
+            
+            updateItemImages();
         } else {
-            console.error('window.avatarDisplay is not defined');
+            console.error('Item not found for id:', itemId);
         }
-        
-        updateItemImages();
-    } else {
-        console.error('Item not found for id:', itemId);
     }
-}
 
-  function updateItemImages() {
+    function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             
-            if (window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === item.id) {
+            if (window.avatarDisplay && window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === item.id) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
@@ -122,13 +117,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetAvatarDisplay() {
-        window.avatarDisplay.resetTriedOnItems();
-        updateItemImages();
+        if (window.avatarDisplay) {
+            window.avatarDisplay.resetTriedOnItems();
+            updateItemImages();
+        }
     }
 
     function filterItemsByCategory(category) {
         currentCategory = category;
         renderShopItems();
+    }
+
+    function updateCategoryButtons() {
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.category === currentCategory);
+        });
+    }
+
+    function initializeInventoryState() {
+        // Implement this function if needed
+    }
+
+    function updateUserCoinsAfterPurchase(newCoins) {
+        // Implement this function to update the UI with the new coin amount
     }
 
     window.shopManager = {
@@ -139,15 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
         filterItemsByCategory
     };
 
+    // Initialize the shop
     renderShopItems();
 
-     document.querySelectorAll('.item-image').forEach(image => {
-        image.addEventListener('click', (e) => {
-            console.log('Item clicked:', e.currentTarget.dataset.id);
-            if (e.currentTarget.dataset.id) {
-                toggleTryOn(e.currentTarget.dataset.id);
-            } else {
-                console.error('No data-id found on clicked element');
-            }
+    // Add event listeners to category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const category = e.target.dataset.category;
+            filterItemsByCategory(category);
         });
     });
+});
