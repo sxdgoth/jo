@@ -1,127 +1,170 @@
-class AvatarManager {
-    constructor(username) {
-        this.username = username;
-        this.equippedItems = {};
-        this.tempEquippedItems = {};
+class AvatarBody {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/body/';
+        this.bodyParts = [
+            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
+            { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
+            { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+            { name: 'Pants', file: '', type: 'Pants', isBase: false },
+            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+            { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
+            { name: 'Face', file: '', type: 'Face', isBase: false },
+            { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
+        ];
+        this.layers = {};
         this.skinTone = 'light';
-        this.loadEquippedItems();
+        this.skinTones = {
+            light: {
+                main: '#FEE2CA',
+                shadow: '#EFC1B7'
+            },
+            medium: {
+                main: '#FFE0BD',
+                shadow: '#EFD0B1'
+            },
+            tan: {
+                main: '#F1C27D',
+                shadow: '#E0B170'
+            },
+            dark: {
+                main: '#8D5524',
+                shadow: '#7C4A1E'
+            }
+        };
     }
 
-    initialize() {
-        this.setupApplyAvatarButton();
-        this.setupClearAvatarButton();
-        this.updateAvatarDisplay();
+    loadAvatar() {
+        console.log("Loading avatar body parts...");
+        this.container.innerHTML = '';
+        this.container.style.position = 'relative';
+        this.container.style.width = '100%';
+        this.container.style.height = '100%';
+
+        this.bodyParts.forEach(part => {
+            console.log('Creating layer for:', part.type);
+            const img = document.createElement('img');
+            img.src = part.file ? this.baseUrl + part.file : '';
+            img.alt = part.name;
+            img.dataset.type = part.type;
+            img.style.position = 'absolute';
+            img.style.top = '0';
+            img.style.left = '0';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.display = part.isBase ? 'block' : 'none';
+            img.onload = () => console.log(`Loaded ${part.name}`);
+            img.onerror = () => console.error(`Failed to load ${part.name}: ${img.src}`);
+            this.container.appendChild(img);
+            this.layers[part.type] = img;
+        });
+
+        this.reorderLayers();
+        this.applyCurrentSkinTone();
     }
 
-    setupApplyAvatarButton() {
-        const applyAvatarBtn = document.getElementById('apply-avatar-btn');
-        if (applyAvatarBtn) {
-            applyAvatarBtn.addEventListener('click', () => this.applyAvatar());
-        } else {
-            console.error('Apply Avatar button not found');
-        }
-    }
-
-    setupClearAvatarButton() {
-        const clearAvatarBtn = document.getElementById('clear-avatar-btn');
-        if (clearAvatarBtn) {
-            clearAvatarBtn.addEventListener('click', () => this.clearAvatar());
-        } else {
-            console.error('Clear Avatar button not found');
-        }
-    }
-
-    loadEquippedItems() {
-        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
-            this.tempEquippedItems = {...this.equippedItems};
-        }
-        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
-            this.skinTone = savedSkinTone;
-        }
-    }
-
-    applyAvatar() {
-        this.equippedItems = {...this.tempEquippedItems};
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        this.updateAvatarDisplay();
-        alert('Avatar saved successfully!');
-    }
-
-    clearAvatar() {
-        this.tempEquippedItems = {};
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
-    }
-
-    updateAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.loadAvatar();
-        }
-    }
-
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-        }
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
-    }
-
-    updateItemVisuals() {
-        document.querySelectorAll('.item-image').forEach(itemImage => {
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
+    updateLayer(type, src) {
+        console.log('Updating layer:', type, src);
+        if (this.layers[type]) {
+            const bodyPart = this.bodyParts.find(part => part.type === type);
+            if (src) {
+                this.layers[type].src = src;
+                this.layers[type].style.display = 'block';
+                console.log(`Updated ${type} layer with ${src}`);
+            } else if (!bodyPart.isBase) {
+                this.layers[type].style.display = 'none';
+                console.log(`Removed ${type} layer`);
             } else {
-                itemImage.classList.remove('equipped');
+                this.layers[type].src = this.baseUrl + bodyPart.file;
+                this.layers[type].style.display = 'block';
+                console.log(`Reverted ${type} to base layer`);
+            }
+        } else {
+            console.warn(`Layer ${type} not found`);
+        }
+        this.reorderLayers();
+    }
+
+    reorderLayers() {
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+        order.forEach((type, index) => {
+            if (this.layers[type]) {
+                this.layers[type].style.zIndex = index + 1;
             }
         });
     }
 
-    updateTempAvatarDisplay() {
-        if (window.avatarDisplay) {
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        window.avatarDisplay.tryOnItem(item);
-                    }
-                }
-            });
+    initializeAvatar() {
+        this.loadAvatar();
+        if (window.avatarManager) {
+            window.avatarManager.updateAvatarDisplay();
         }
+    }
+
+    clearAllLayers() {
+        Object.entries(this.layers).forEach(([type, layer]) => {
+            const bodyPart = this.bodyParts.find(part => part.type === type);
+            if (!bodyPart.isBase) {
+                layer.style.display = 'none';
+                layer.src = '';
+            }
+        });
+        this.reorderLayers();
     }
 
     changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        if (window.avatarDisplay) {
-            window.avatarDisplay.changeSkinTone(newTone);
+        if (this.skinTones[newTone]) {
+            this.skinTone = newTone;
+            this.applyCurrentSkinTone();
+        } else {
+            console.error(`Invalid skin tone: ${newTone}`);
         }
+    }
+
+    applyCurrentSkinTone() {
+        const tone = this.skinTones[this.skinTone];
+        Object.values(this.layers).forEach(layer => {
+            if (layer.dataset.type === 'Head' || layer.dataset.type === 'Arms' || layer.dataset.type === 'Legs') {
+                this.applySkinToneToSVG(layer, tone);
+            }
+        });
+    }
+
+    applySkinToneToSVG(img, tone) {
+        fetch(img.src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                paths.forEach(path => {
+                    const currentFill = path.getAttribute('fill');
+                    if (currentFill && currentFill.toLowerCase() !== 'none') {
+                        path.setAttribute('fill', this.getNewColor(currentFill, tone));
+                    }
+                });
+
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                img.src = url;
+            })
+            .catch(error => console.error(`Error applying skin tone:`, error));
+    }
+
+    getNewColor(currentColor, tone) {
+        // This is a simple implementation. You might need to adjust this logic
+        // to better match your specific skin tone application needs.
+        return tone.main;
     }
 }
 
-// Initialize the AvatarManager when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
-
-        // Set up skin tone buttons
-        const skinToneButtons = document.querySelectorAll('.skin-tone-button');
-        skinToneButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tone = button.dataset.tone;
-                window.avatarManager.changeSkinTone(tone);
-            });
-        });
-    } else {
-        console.error('No logged in user found');
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    window.avatarBody = new AvatarBody('avatar-display');
+    window.avatarBody.initializeAvatar();
 });
