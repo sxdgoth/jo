@@ -15,8 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
             </div>
             <h3>${item.name}</h3>
-            <p>Type: ${item.type}</p>
-            <p>Price: ${item.price} coins</p>
+            <p>${item.price} coins</p>
             <button class="buy-btn" data-id="${item.id}">Buy</button>
         `;
         shopItemsContainer.appendChild(itemElement);
