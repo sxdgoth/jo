@@ -58,36 +58,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleTryOn(itemId) {
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
-                // If the clicked item is already tried on, remove it
-                window.avatarDisplay.removeTriedOnItem(item.type);
-                console.log(`Removed ${item.name}`);
-            } else {
-                // If it's a different item or no item was tried on, try it on
-                window.avatarDisplay.tryOnItem(item);
-                console.log(`Tried on ${item.name}`);
-            }
-            
-            updateItemImages();
-        }
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        window.avatarDisplay.tryOnItem(item);
+        
+        updateItemImages();
     }
+}
 
     function updateItemImages() {
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
-                shopItem.classList.add('highlighted');
-            } else {
-                shopItem.classList.remove('highlighted');
-            }
-        });
-    }
+    document.querySelectorAll('.shop-item').forEach(shopItem => {
+        const image = shopItem.querySelector('.item-image');
+        const itemId = image.dataset.id;
+        const item = shopItems.find(i => i.id === itemId);
+        if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
+            shopItem.classList.add('highlighted');
+        } else {
+            shopItem.classList.remove('highlighted');
+        }
+    });
+}
 
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
