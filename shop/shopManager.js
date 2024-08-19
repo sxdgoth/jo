@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
-    let triedOnItems = {};
     let currentCategory = 'All';
 
     function renderShopItems() {
@@ -63,10 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item) {
             console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             
-            if (window.avatarDisplay.triedOnItems[item.type] === item) {
+            if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
+                // If the clicked item is already tried on, remove it
                 window.avatarDisplay.removeTriedOnItem(item.type);
+                console.log(`Removed ${item.name}`);
             } else {
+                // If it's a different item or no item was tried on, try it on
                 window.avatarDisplay.tryOnItem(item);
+                console.log(`Tried on ${item.name}`);
             }
             
             updateItemImages();
@@ -78,38 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
-            if (window.avatarDisplay.triedOnItems[item.type] === item) {
-                shopItem.classList.add('highlighted');
-            } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
+            if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
             }
         });
-    }
-
-    function updateAvatarDisplay(type, src) {
-        const layerElement = document.querySelector(`#avatar-display [data-type="${type}"]`);
-        if (layerElement) {
-            if (src) {
-                layerElement.data = src;
-                layerElement.style.display = 'block';
-            } else {
-                const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-                const equippedItem = equippedItems[type];
-                if (equippedItem) {
-                    const item = shopItems.find(item => item.id === equippedItem);
-                    if (item) {
-                        layerElement.data = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-                        layerElement.style.display = 'block';
-                    } else {
-                        layerElement.style.display = 'none';
-                    }
-                } else {
-                    layerElement.style.display = 'none';
-                }
-            }
-        }
     }
 
     function buyItem(itemId) {
@@ -145,11 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetAvatarDisplay() {
-        triedOnItems = {};
-        const equippedItems = JSON.parse(localStorage.getItem('equippedItems') || '{}');
-        Object.keys(equippedItems).forEach(type => {
-            updateAvatarDisplay(type, null);
-        });
+        window.avatarDisplay.resetTriedOnItems();
         updateItemImages();
     }
 
