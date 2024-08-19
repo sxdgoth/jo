@@ -47,14 +47,6 @@ print("SVG cleaning complete!")
 
 
 
-This script is designed to work when placed inside the test folder. It will:
-
-Process all SVG files in the same folder it's in (the test folder).
-Create an output folder one level up from the test folder.
-Save the processed SVG
-Avatar for supwezton-hjwkg
-
-
 
 
 
