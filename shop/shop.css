@@ -110,7 +110,7 @@ main {
 }
 
 .item-image {
-    height: 120px; /* Increased height for larger preview */
+    height: 180px; /* Increased height for larger preview */
     display: flex;
     align-items: center;
     justify-content: center;
