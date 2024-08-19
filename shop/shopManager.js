@@ -58,28 +58,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleTryOn(itemId) {
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        window.avatarDisplay.tryOnItem(item);
-        
-        updateItemImages();
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            window.avatarDisplay.tryOnItem(item);
+            
+            updateItemImages();
+        }
     }
-}
 
     function updateItemImages() {
-    document.querySelectorAll('.shop-item').forEach(shopItem => {
-        const image = shopItem.querySelector('.item-image');
-        const itemId = image.dataset.id;
-        const item = shopItems.find(i => i.id === itemId);
-        if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
-            shopItem.classList.add('highlighted');
-        } else {
-            shopItem.classList.remove('highlighted');
-        }
-    });
-}
+        document.querySelectorAll('.shop-item').forEach(shopItem => {
+            const image = shopItem.querySelector('.item-image');
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            if (window.avatarDisplay.triedOnItems[item.type] && window.avatarDisplay.triedOnItems[item.type].id === item.id) {
+                shopItem.classList.add('highlighted');
+            } else if (window.avatarDisplay.equippedItems[item.type] === item.id && !window.avatarDisplay.triedOnItems[item.type]) {
+                shopItem.classList.add('highlighted');
+            } else {
+                shopItem.classList.remove('highlighted');
+            }
+        });
+    }
 
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
