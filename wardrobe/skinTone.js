@@ -31,29 +31,29 @@ class SkinToneManager {
 
     initialize() {
         console.log("SkinToneManager initializing...");
-        this.createSkinToneButtons();
+        this.setupSkinToneButtons();
         this.saveOriginalColors();
     }
 
-   createSkinToneButtons() {
-    console.log("Creating skin tone buttons...");
-    const container = document.getElementById('skin-tone-buttons');
-    if (!container) {
-        console.error("Skin tone buttons container not found");
-        return;
+    setupSkinToneButtons() {
+        const container = document.getElementById('skin-tone-buttons');
+        if (!container) {
+            console.error("Skin tone buttons container not found");
+            return;
+        }
+
+        const buttons = container.querySelectorAll('.skin-tone-button');
+        buttons.forEach(button => {
+            const toneName = button.dataset.tone;
+            const tone = this.skinTones[toneName];
+            if (tone) {
+                button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
+                button.onclick = () => this.selectSkinTone(tone);
+            }
+        });
+
+        console.log("Skin tone buttons set up");
     }
-
-    Object.values(this.skinTones).forEach(tone => {
-        const button = document.createElement('button');
-        button.className = 'skin-tone-button';
-        button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
-        button.title = tone.name;
-        button.onclick = () => this.selectSkinTone(tone);
-        container.appendChild(button);
-    });
-
-    console.log("Skin tone buttons created and added to container");
-}
 
     selectSkinTone(tone) {
         this.currentSkinTone = tone;
@@ -62,25 +62,22 @@ class SkinToneManager {
         // Update button styles
         const buttons = document.querySelectorAll('.skin-tone-button');
         buttons.forEach(button => {
-            if (button.title === tone.name) {
-                button.style.borderColor = '#ff4500';
-                button.style.boxShadow = '0 0 5px #ff4500';
+            if (button.dataset.tone === this.getSkinToneKey(tone)) {
+                button.classList.add('selected');
             } else {
-                button.style.borderColor = '#000';
-                button.style.boxShadow = 'none';
+                button.classList.remove('selected');
             }
         });
 
         // Apply skin tone to avatar
         this.applySkinTone(tone);
 
-        // New: Update AvatarManager if it exists
+        // Update AvatarManager if it exists
         if (window.avatarManager) {
             window.avatarManager.changeSkinTone(this.getSkinToneKey(tone));
         }
     }
 
-    // New method to get the key of a skin tone
     getSkinToneKey(tone) {
         return Object.keys(this.skinTones).find(key => this.skinTones[key] === tone);
     }
@@ -156,7 +153,6 @@ class SkinToneManager {
     }
 
     findMainSkinColor(colors) {
-        // This is a simple heuristic. You might need to adjust this based on your specific SVGs.
         return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
     }
 
@@ -170,7 +166,6 @@ class SkinToneManager {
         } else if (luminanceDiff < 0) {
             return tone.shadow;
         } else {
-            // For colors lighter than the main color, we'll create a lighter version of the main tone
             return this.lightenColor(tone.main, luminanceDiff);
         }
     }
@@ -203,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.skinToneManager = new SkinToneManager();
     window.skinToneManager.initialize();
 
-    // New: Set initial skin tone based on AvatarManager if it exists
+    // Set initial skin tone based on AvatarManager if it exists
     if (window.avatarManager && window.avatarManager.skinTone) {
         const initialTone = window.skinToneManager.skinTones[window.avatarManager.skinTone];
         if (initialTone) {
@@ -211,5 +206,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
-
-
