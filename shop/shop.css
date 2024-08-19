@@ -91,6 +91,16 @@ main {
     gap: 20px;
 }
 
+.shop-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    border: 1px solid #cccccc; /* Added grey line around container */
+}
+
 .shop-item {
     border: 1px solid #ccc;
     border-radius: 5px;
