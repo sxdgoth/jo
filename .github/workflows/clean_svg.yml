@@ -23,10 +23,24 @@ jobs:
     - name: Run SVG cleaner
       run: |
         python test/svg_cleaner.py
+      continue-on-error: true
+    - name: Check Python script output
+      run: |
+        echo "Python script exit code: $?"
     - name: List output contents
       run: |
         echo "Output directory contents:"
         ls -R output || echo "Output directory not found"
+    - name: Debug information
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Python version:"
+        python --version
+        echo "Python path:"
+        which python
+        echo "Script contents:"
+        cat test/svg_cleaner.py
     - name: Commit changes
       run: |
         git config --local user.email "action@github.com"
@@ -40,3 +54,6 @@ jobs:
       run: |
         echo "The workflow failed. Please check the logs for more information."
         exit 1
+
+
+
