@@ -1,42 +1,96 @@
-class Inventory {
-    constructor(username) {
-        this.username = username;
-        this.items = [];
-        this.loadInventory();
+class SkinToneManager {
+    constructor(avatarBody) {
+        this.avatarBody = avatarBody;
+        this.skinTones = {
+            light: {
+                name: 'Light',
+                main: '#FEE2CA',
+                shadow: '#EFC1B7'
+            },
+            medium: {
+                name: 'Medium',
+                main: '#FFE0BD',
+                shadow: '#EFD0B1'
+            },
+            tan: {
+                name: 'Tan',
+                main: '#F1C27D',
+                shadow: '#E0B170'
+            },
+            dark: {
+                name: 'Dark',
+                main: '#8D5524',
+                shadow: '#7C4A1E'
+            }
+        };
+        this.currentSkinTone = this.skinTones.light;
     }
 
-    loadInventory() {
-        const savedInventory = localStorage.getItem(`inventory_${this.username}`);
-        if (savedInventory) {
-            this.items = JSON.parse(savedInventory);
+    initialize() {
+        console.log("SkinToneManager initializing...");
+        this.setupSkinToneButtons();
+    }
+
+    setupSkinToneButtons() {
+        const container = document.getElementById('skin-tone-buttons');
+        if (!container) {
+            console.error("Skin tone buttons container not found");
+            return;
         }
+
+        Object.keys(this.skinTones).forEach(toneName => {
+            const tone = this.skinTones[toneName];
+            const button = document.createElement('button');
+            button.classList.add('skin-tone-button');
+            button.dataset.tone = toneName;
+            button.style.background = `linear-gradient(135deg, ${tone.main} 50%, ${tone.shadow} 50%)`;
+            button.onclick = () => {
+                console.log(`Skin tone button clicked: ${toneName}`);
+                this.selectSkinTone(toneName);
+            };
+            container.appendChild(button);
+        });
+
+        console.log("Skin tone buttons set up");
     }
 
-    saveInventory() {
-        localStorage.setItem(`inventory_${this.username}`, JSON.stringify(this.items));
-    }
+    selectSkinTone(toneName) {
+        console.log(`Selecting skin tone: ${toneName}`);
+        const tone = this.skinTones[toneName];
+        if (!tone) {
+            console.error(`Invalid skin tone: ${toneName}`);
+            return;
+        }
 
-    addItem(item) {
-        this.items.push(item);
-        this.saveInventory();
-    }
+        this.currentSkinTone = tone;
+        console.log(`Selected skin tone: ${tone.name}`);
 
-    removeItem(itemId) {
-        this.items = this.items.filter(item => item.id !== itemId);
-        this.saveInventory();
-    }
+        // Update button styles
+        const buttons = document.querySelectorAll('.skin-tone-button');
+        buttons.forEach(button => {
+            if (button.dataset.tone === toneName) {
+                button.classList.add('selected');
+            } else {
+                button.classList.remove('selected');
+            }
+        });
 
-    getItems() {
-        return this.items;
+        // Apply skin tone to avatar
+        if (this.avatarBody && typeof this.avatarBody.changeSkinTone === 'function') {
+            this.avatarBody.changeSkinTone(toneName);
+        } else {
+            console.error('AvatarBody not found or changeSkinTone method not available');
+        }
     }
 }
 
-// Initialize the inventory when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, initializing SkinToneManager");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.userInventory = new Inventory(loggedInUser.username);
+    if (loggedInUser && window.avatarBody) {
+        window.skinToneManager = new SkinToneManager(window.avatarBody);
+        window.skinToneManager.initialize();
     } else {
-        console.error('No logged in user found');
+        console.error('No logged in user found or AvatarBody not initialized');
     }
 });
