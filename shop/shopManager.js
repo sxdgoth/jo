@@ -179,3 +179,31 @@ function updateItemImages() {
     // Initialize the shop
     renderShopItems();
 });
+
+let currentCategory = 'All';
+
+function filterItemsByCategory(category) {
+    currentCategory = category;
+    renderShopItems();
+}
+
+function renderShopItems() {
+    shopItemsContainer.innerHTML = ''; // Clear existing items
+    const filteredItems = currentCategory === 'All' 
+        ? shopItems 
+        : shopItems.filter(item => item.type === currentCategory);
+
+    filteredItems.forEach(item => {
+        // ... (rest of your existing renderShopItems code)
+    });
+
+    // Update category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === currentCategory);
+    });
+}
+
+// Add this to your existing DOMContentLoaded event listener
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => filterItemsByCategory(btn.dataset.category));
+});
