@@ -61,5 +61,16 @@
     <script src="https://sxdgoth.github.io/jo/shop/shopManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shop.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/welcome.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+        window.avatarDisplay.loadAvatar();
+    } else {
+        console.error('No logged in user found');
+    }
+});
+</script>
 </body>
 </html>
