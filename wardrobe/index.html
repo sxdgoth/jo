@@ -7,18 +7,14 @@
     <link rel="stylesheet" href="https://sxdgoth.github.io/jo/wardrobe/wardrobe.css">
 </head>
 <body>
-    <header>
-        <h1>Your Avatar Wardrobe</h1>
-        <div id="user-info">
-            <span>Welcome, <span id="user-name"></span>!</span>
-            <span>Coins: <span id="user-coins"></span></span>
-        </div>
-        <a href="https://sxdgoth.github.io/jo/shop/index.html">Go to Shop</a>
-        <button onclick="logout()">Logout</button>
-    </header>
     <main>
         <div class="avatar-container">
             <div id="avatar-display"></div>
+            <div id="skin-tone-buttons"></div>
+            <div class="avatar-buttons">
+                <button id="apply-avatar-btn">Apply</button>
+                <button id="clear-avatar-btn">Clear</button>
+            </div>
         </div>
         <div class="wardrobe-section">
             <h2>Your Items</h2>
@@ -26,17 +22,15 @@
                 <!-- Owned items will be dynamically added here -->
             </div>
         </div>
-      <button id="apply-avatar-btn">Apply Avatar</button>
-<button id="clear-avatar-btn">Clear Avatar</button>
-        <div id="skin-tone-buttons"></div>
     </main>
+
     <!-- Scripts -->
-   <script src="https://sxdgoth.github.io/jo/shop/inventory.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
-<script src="https://sxdgoth.github.io/jo/wardrobe/avatarManager.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/inventory.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
+    <script src="https://sxdgoth.github.io/jo/wardrobe/avatarManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/wardrobe/skinTone.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/layerManager.js"></script>
-<script src="https://sxdgoth.github.io/jo/wardrobe/wardrobe.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/layerManager.js"></script>
+    <script src="https://sxdgoth.github.io/jo/wardrobe/wardrobe.js"></script>
 </body>
 </html>
