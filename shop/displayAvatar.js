@@ -71,7 +71,10 @@ class AvatarDisplay {
             { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
             { name: 'Pants', file: '', type: 'Pants', isBase: false },
             { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
-            { name: 'Shoes', file: '', type: 'Shoes', isBase: false }
+            { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
+            { name: 'Nose', file: '', type: 'Nose', isBase: false },
+            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
+            { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false }
         ];
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
@@ -116,7 +119,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes'];
+        const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes', 'Nose', 'Mouth', 'Eyebrows'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -204,15 +207,18 @@ class AvatarDisplay {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        // Remove all previously tried on items
-        Object.keys(this.triedOnItems).forEach(type => {
-            if (type !== item.type) {
-                this.removeTriedOnItem(type);
-            }
-        });
+        // Remove previously tried on items of the same type, except for Shirt and Jacket
+        if (item.type !== 'Shirt' && item.type !== 'Jacket') {
+            Object.keys(this.triedOnItems).forEach(type => {
+                if (type === item.type) {
+                    this.removeTriedOnItem(type);
+                }
+            });
+        }
 
-        // If the clicked item is already tried on, remove it
-        if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
+        // If the clicked item is already tried on or equipped, remove it
+        if ((this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) ||
+            (this.equippedItems[item.type] === item.id && !this.triedOnItems[item.type])) {
             this.removeTriedOnItem(item.type);
         } else {
             // Update the tried on items
@@ -224,12 +230,9 @@ class AvatarDisplay {
             this.lastAction[item.type] = 'triedOn';
         }
 
-        // Special handling for shirt and jacket
+        // Ensure proper layering for Shirt and Jacket
         if (item.type === 'Shirt' || item.type === 'Jacket') {
-            const otherType = item.type === 'Shirt' ? 'Jacket' : 'Shirt';
-            if (!this.triedOnItems[otherType] && !this.equippedItems[otherType]) {
-                this.updateAvatarDisplay(otherType, null);
-            }
+            this.reorderLayers();
         }
     }
 
@@ -250,15 +253,9 @@ class AvatarDisplay {
             this.updateAvatarDisplay(type, null);
         }
 
-        // Special handling for shirt and jacket
-        if (type === 'Jacket' || type === 'Shirt') {
-            const otherType = type === 'Shirt' ? 'Jacket' : 'Shirt';
-            if (this.equippedItems[otherType] && !this.hiddenEquippedItems.has(otherType)) {
-                const equippedItem = shopItems.find(item => item.id === this.equippedItems[otherType]);
-                if (equippedItem) {
-                    this.updateAvatarDisplay(otherType, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-                }
-            }
+        // Ensure proper layering for Shirt and Jacket
+        if (type === 'Shirt' || type === 'Jacket') {
+            this.reorderLayers();
         }
     }
 
