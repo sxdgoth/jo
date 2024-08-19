@@ -115,14 +115,14 @@ class AvatarDisplay {
         this.reorderLayers();
     }
 
-    reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
-        order.forEach((type, index) => {
-            if (this.layers[type]) {
-                this.layers[type].style.zIndex = index + 1;
-            }
-        });
-    }
+   reorderLayers() {
+    const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+    order.forEach((type, index) => {
+        if (this.layers[type]) {
+            this.layers[type].style.zIndex = index + 1;
+        }
+    });
+}
 
     saveOriginalColors(obj, type) {
         const svgDoc = obj.contentDocument;
@@ -202,18 +202,21 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-    tryOnItem(item) {
-        if (this.layers[item.type]) {
-            console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
-            this.layers[item.type].style.display = 'block';
-            this.triedOnItems[item.type] = item;
-            this.lastAction[item.type] = 'triedOn';
-            // Hide conflicting items
-            if (item.type === 'Shirt') this.layers['Jacket'].style.display = 'none';
-            if (item.type === 'Jacket') this.layers['Shirt'].style.display = 'none';
+   tryOnItem(item) {
+    if (this.layers[item.type]) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
+        this.layers[item.type].style.display = 'block';
+        this.triedOnItems[item.type] = item;
+        this.lastAction[item.type] = 'triedOn';
+
+        // Ensure both Shirt and Jacket can be displayed simultaneously
+        if (item.type === 'Shirt' || item.type === 'Jacket') {
+            this.layers['Shirt'].style.display = 'block';
+            this.layers['Jacket'].style.display = 'block';
         }
     }
+}
     
     removeTriedOnItem(type) {
         if (this.layers[type]) {
