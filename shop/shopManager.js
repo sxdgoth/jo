@@ -57,16 +57,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-     function toggleTryOn(itemId) {
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
+    function toggleTryOn(itemId) {
+    console.log('toggleTryOn called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        if (window.avatarDisplay) {
             window.avatarDisplay.tryOnItem(item);
-            
-            updateItemImages();
+        } else {
+            console.error('window.avatarDisplay is not defined');
         }
+        
+        updateItemImages();
+    } else {
+        console.error('Item not found for id:', itemId);
     }
+}
 
   function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -134,10 +141,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderShopItems();
 
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const category = e.target.dataset.category;
-            filterItemsByCategory(category);
+     document.querySelectorAll('.item-image').forEach(image => {
+        image.addEventListener('click', (e) => {
+            console.log('Item clicked:', e.currentTarget.dataset.id);
+            if (e.currentTarget.dataset.id) {
+                toggleTryOn(e.currentTarget.dataset.id);
+            } else {
+                console.error('No data-id found on clicked element');
+            }
         });
     });
-});
