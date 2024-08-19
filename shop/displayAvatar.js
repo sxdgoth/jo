@@ -123,7 +123,7 @@ class AvatarDisplay {
     }
 
    reorderLayers() {
-    const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+    const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes'];
     order.forEach((type, index) => {
         if (this.layers[type]) {
             this.layers[type].style.zIndex = index + 1;
@@ -209,7 +209,7 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-  tryOnItem(item) {
+ tryOnItem(item) {
     if (this.layers[item.type]) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
@@ -217,7 +217,7 @@ class AvatarDisplay {
         this.triedOnItems[item.type] = item;
         this.lastAction[item.type] = 'triedOn';
 
-        // If trying on a shirt or jacket, hide the other layer if it's not being tried on
+        // Special handling for shirt and jacket
         if (item.type === 'Shirt' || item.type === 'Jacket') {
             const otherType = item.type === 'Shirt' ? 'Jacket' : 'Shirt';
             if (!this.triedOnItems[otherType]) {
@@ -226,17 +226,16 @@ class AvatarDisplay {
         }
     }
 }
-    
-   removeTriedOnItem(type) {
+
+
+removeTriedOnItem(type) {
     if (this.layers[type]) {
         console.log(`Removing tried on item of type: ${type}`);
         delete this.triedOnItems[type];
-
-        // Always hide the layer when removing a tried-on item
         this.layers[type].style.display = 'none';
         this.lastAction[type] = 'removed';
 
-        // If it's a jacket or shirt, ensure both layers are visible if they have items
+        // Special handling for shirt and jacket
         if (type === 'Jacket' || type === 'Shirt') {
             ['Jacket', 'Shirt'].forEach(itemType => {
                 if (this.equippedItems[itemType] && !this.hiddenEquippedItems.has(itemType)) {
@@ -248,6 +247,18 @@ class AvatarDisplay {
                 }
             });
         }
+    }
+}
+
+    updateAvatarDisplay(type, src) {
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+        } else {
+            this.layers[type].style.display = 'none';
+        }
+        this.reorderLayers();
     }
 }
 
@@ -281,13 +292,13 @@ class AvatarDisplay {
     }
 }
 
-// Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
+        window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
         console.error('No logged in user found');
     }
