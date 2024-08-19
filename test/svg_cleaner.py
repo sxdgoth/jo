@@ -41,7 +41,6 @@ def clean_svg(input_file, output_file):
     # Write the corrected content back to the file
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-        f.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
         f.write(content)
     
     print(f"Saved processed file: {output_file}")
