@@ -48,7 +48,7 @@ nav {
 }
 
 main {
-    max-width: 1100px; /* Increased to accommodate wider avatar */
+    max-width: 1000px; /* Adjusted back to accommodate smaller avatar */
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -59,7 +59,7 @@ main {
 }
 
 .avatar-container {
-    width: 300px; /* Increased width */
+    width: 250px; /* Adjusted to a smaller size */
 }
 
 #avatar-display {
@@ -67,8 +67,8 @@ main {
     border-radius: 10px;
     overflow: hidden;
     background-color: #f9f9f9;
-    width: 300px; /* Increased width */
-    height: 300px; /* Reduced height */
+    width: 250px; /* Width and height are the same for square aspect ratio */
+    height: 250px;
 }
 
 .shop-section {
@@ -187,7 +187,7 @@ main {
 }
 
 @media (max-width: 768px) {
-   main {
+    main {
         flex-direction: column;
     }
 
@@ -197,8 +197,9 @@ main {
     }
 
     #avatar-display {
-        width: 100%; /* Full width on mobile */
-        height: 250px; /* Adjusted height for mobile */
+        width: 250px; /* Keep it square on mobile */
+        height: 250px;
+        margin: 0 auto; /* Center the avatar on mobile */
     }
 
     .shop-items-container {
