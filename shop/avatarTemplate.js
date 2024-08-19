@@ -24,6 +24,7 @@ class AvatarBody {
         this.container.style.height = '100%';
 
         this.bodyParts.forEach(part => {
+            console.log('Creating layer for:', part.type);
             const img = document.createElement('img');
             img.src = part.file ? this.baseUrl + part.file : '';
             img.alt = part.name;
@@ -44,6 +45,7 @@ class AvatarBody {
     }
 
     updateLayer(type, src) {
+        console.log('Updating layer:', type, src);
         if (this.layers[type]) {
             const bodyPart = this.bodyParts.find(part => part.type === type);
             if (src) {
@@ -65,7 +67,8 @@ class AvatarBody {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Shoes', 'Arms', 'Body', 'Pants', 'Shirt', 'Jacket', 'Head', 'Eyes'];
+        const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes'];
+        console.log('Reordering layers:', order);
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -92,7 +95,6 @@ class AvatarBody {
     }
 }
 
-// Create and load the avatar body when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
     window.avatarBody = new AvatarBody('avatar-display');
     window.avatarBody.initializeAvatar();
