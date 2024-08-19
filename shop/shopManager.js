@@ -27,9 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
+            applySkinToneToShopItem(imgElement, item);
         });
         updateCategoryButtons();
         updateItemImages();
+    }
+
+    function applySkinToneToShopItem(imgElement, item) {
+        if (window.skinToneManager && window.skinToneManager.currentSkinTone) {
+            imgElement.addEventListener('load', () => {
+                const tone = window.skinToneManager.currentSkinTone;
+                window.skinToneManager.applySkinToneToSVG(imgElement, tone, imgElement.src, item.type);
+            });
+        }
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -132,11 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // New function to update shop display
     function updateShopDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.reapplySkinTone();
-        }
         renderShopItems();
     }
 
@@ -161,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderShopItems,
         resetAvatarDisplay,
         filterItemsByCategory,
-        updateShopDisplay // Add this new method
+        updateShopDisplay
     };
 
     // Initialize the shop
