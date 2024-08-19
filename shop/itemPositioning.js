@@ -1,5 +1,5 @@
 const itemPositions = {
-    face: {
+    eyes: {
        objectPosition: '0px 10%',
         transform: 'scale(2.5)'
     },
@@ -8,6 +8,10 @@ const itemPositions = {
         transform: 'scale(2.0)'
     },
       jacket: {
+        objectPosition: '0px 25%',
+        transform: 'scale(2.0)'
+    },
+     pants: {
         objectPosition: '0px 25%',
         transform: 'scale(2.0)'
     },
