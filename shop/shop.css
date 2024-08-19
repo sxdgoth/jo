@@ -48,7 +48,7 @@ nav {
 }
 
 main {
-    max-width: 1000px; /* Adjusted back to accommodate smaller avatar */
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -83,28 +83,35 @@ main {
 
 .shop-section {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .shop-section h2 {
     margin-top: 0;
-    font-size: 20px;
+    margin-bottom: 15px;
+    font-size: 22px;
     color: #4CAF50;
 }
 
 .shop-items-container {
-    height: 600px;
+    flex: 1;
     overflow-y: auto;
     padding-right: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
 }
 
 .shop-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 15px;
 }
 
 .shop-item {
-    border: 2px solid #cccccc;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 10px;
     text-align: center;
@@ -113,16 +120,17 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 280px;
+    height: 220px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .shop-item:hover {
     transform: translateY(-3px);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .item-image {
-    height: 180px;
+    height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -206,14 +214,7 @@ main {
         margin-bottom: 20px;
     }
 
-    #avatar-display {
-        width: 250px; /* Keep it square on mobile */
-        height: 250px;
-        margin: 0 auto; /* Center the avatar on mobile */
-    }
-
     .shop-items-container {
-        height: auto;
         max-height: 600px;
     }
 
@@ -226,7 +227,7 @@ main {
     }
 
     .item-image {
-        height: 80px;
+        height: 100px;
     }
 }
 
