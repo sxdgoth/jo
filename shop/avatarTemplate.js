@@ -67,7 +67,7 @@ class AvatarBody {
     }
 
    reorderLayers() {
-    const order = ['Legs', 'Shoes', 'Pants', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head', 'Eyes'];
+    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Eyebrows', 'Accessories', 'Hair'];
     order.forEach((type, index) => {
         if (this.layers[type]) {
             this.layers[type].style.zIndex = index + 1;
