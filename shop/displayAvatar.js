@@ -60,14 +60,21 @@ class AvatarDisplay {
         this.container.style.width = '100%';
         this.container.style.height = '100%';
 
-        const bodyParts = [
-            { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
-            { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
-            { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
-            { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
-            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
-        ];
+       const bodyParts = [
+    { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+    { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
+    { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
+    { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
+    { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+    { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+    { name: 'Pants', file: '', type: 'Pants', isBase: false },
+    { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+    { name: 'Shoes', file: '', type: 'Shoes', isBase: false }
+];
+
+
+
+
 
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
