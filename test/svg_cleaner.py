@@ -38,9 +38,12 @@ def clean_svg(input_file, output_file):
     content = content.replace('ns0:', '')
     content = content.replace(':ns0', '')
     
+    # Ensure only one XML declaration is present
+    content = content.replace('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n', '')
+    
     # Write the corrected content back to the file
     with open(output_file, 'w', encoding='utf-8') as f:
-        f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+        f.write('<?xml version=\'1.0\' encoding=\'utf-8\'?>\n')
         f.write(content)
     
     print(f"Saved processed file: {output_file}")
