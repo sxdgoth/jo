@@ -13,7 +13,9 @@ jobs:
       with:
         python-version: '3.x'
     - name: Run SVG cleaner
-      run: python svg_cleaner.py
+      run: |
+        cd test
+        python svg_cleaner.py
     - name: Commit changes
       run: |
         git config --local user.email "action@github.com"
