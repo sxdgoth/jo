@@ -202,7 +202,7 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
- tryOnItem(item) {
+  tryOnItem(item) {
     if (this.layers[item.type]) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
@@ -217,18 +217,15 @@ class AvatarDisplay {
                 this.layers[otherType].style.display = 'none';
             }
         }
-
-        // Update highlighting
-        this.updateItemHighlight(item.type);
     }
 }
     
-  removeTriedOnItem(type) {
+   removeTriedOnItem(type) {
     if (this.layers[type]) {
         console.log(`Removing tried on item of type: ${type}`);
         delete this.triedOnItems[type];
 
-        // Hide the layer when removing a tried-on item
+        // Always hide the layer when removing a tried-on item
         this.layers[type].style.display = 'none';
         this.lastAction[type] = 'removed';
 
@@ -244,54 +241,36 @@ class AvatarDisplay {
                 }
             });
         }
-
-        // Update highlighting
-        this.updateItemHighlight(type);
     }
 }
 
-    updateItemHighlight(type) {
-    const shopItems = document.querySelectorAll('.shop-item');
-    shopItems.forEach(item => {
-        const itemImage = item.querySelector('.item-image');
-        if (itemImage && itemImage.dataset.id) {
-            const itemId = itemImage.dataset.id;
-            const isEquipped = this.equippedItems[type] === itemId;
-            const isTriedOn = this.triedOnItems[type] && this.triedOnItems[type].id === itemId;
-            const isVisible = this.layers[type].style.display !== 'none';
-
-            if ((isEquipped || isTriedOn) && isVisible) {
-                item.classList.add('highlighted');
+    toggleEquippedItem(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            if (this.layers[type].style.display === 'none') {
+                // Show the equipped item
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                    this.lastAction[type] = 'shown';
+                    this.hiddenEquippedItems.delete(type); // Remove from hidden set
+                }
             } else {
-                item.classList.remove('highlighted');
+                // Hide the equipped item
+                this.layers[type].style.display = 'none';
+                this.lastAction[type] = 'hidden';
+                this.hiddenEquippedItems.add(type); // Add to hidden set
             }
         }
-    });
-}
+    }
 
+    isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
+    }
 
-
-
-   toggleEquippedItem(type) {
-    if (this.layers[type] && this.equippedItems[type]) {
-        if (this.layers[type].style.display === 'none') {
-            // Show the equipped item
-            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-            if (equippedItem) {
-                this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
-                this.layers[type].style.display = 'block';
-                this.lastAction[type] = 'shown';
-                this.hiddenEquippedItems.delete(type); // Remove from hidden set
-            }
-        } else {
-            // Hide the equipped item
-            this.layers[type].style.display = 'none';
-            this.lastAction[type] = 'hidden';
-            this.hiddenEquippedItems.add(type); // Add to hidden set
-        }
-        
-        // Update highlighting
-        this.updateItemHighlight(type);
+    updateEquippedItems() {
+        const savedItems = localStorage.getItem('equippedItems');
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 }
 
