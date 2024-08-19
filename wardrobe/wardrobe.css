@@ -91,12 +91,6 @@ main {
     position: relative;
 }
 
-#skin-tone-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    width: 100%;
-}
 
 .avatar-buttons {
     display: flex;
