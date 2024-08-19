@@ -67,12 +67,11 @@ function toggleTryOn(itemId) {
             console.log(`Removed ${item.name}`);
             // Remove highlight when item is removed
             clickedItem.classList.remove('highlighted');
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            // Item is equipped, toggle its visibility
-            window.avatarDisplay.toggleEquippedItem(item.type);
-            console.log(`Toggled equipped item ${item.name}`);
-            clickedItem.classList.add('highlighted');
         } else {
+            // Remove any previously tried on item of the same type
+            if (window.avatarDisplay.triedOnItems[item.type]) {
+                window.avatarDisplay.removeTriedOnItem(item.type);
+            }
             // Try on the new item
             window.avatarDisplay.tryOnItem(item);
             console.log(`Tried on ${item.name}`);
@@ -89,22 +88,10 @@ function updateItemImages() {
         const itemId = image.dataset.id;
         const item = shopItems.find(i => i.id === itemId);
         if (window.avatarDisplay.triedOnItems[item.type] === item) {
-            image.classList.add('selected');
-            image.classList.remove('equipped');
             shopItem.classList.add('highlighted');
-        } else if (window.avatarDisplay.isItemEquipped(item)) {
-            if (!window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
-                image.classList.add('equipped');
-                image.classList.remove('selected');
-                shopItem.classList.add('highlighted');
-            } else {
-                image.classList.remove('equipped');
-                image.classList.remove('selected');
-                shopItem.classList.remove('highlighted');
-            }
+        } else if (window.avatarDisplay.isItemEquipped(item) && !window.avatarDisplay.hiddenEquippedItems.has(item.type)) {
+            shopItem.classList.add('highlighted');
         } else {
-            image.classList.remove('selected');
-            image.classList.remove('equipped');
             shopItem.classList.remove('highlighted');
         }
     });
