@@ -1,148 +1,142 @@
-class AvatarBody {
-    constructor(containerId) {
-        this.container = document.getElementById(containerId);
-        this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/body/';
-        this.bodyParts = [
-            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
-            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
-            { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
-            { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
-            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
-            { name: 'Pants', file: '', type: 'Pants', isBase: false },
-            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
-            { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
-            { name: 'Face', file: '', type: 'Face', isBase: false },
-            { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
-        ];
-        this.layers = {};
-        this.skinTone = 'light';
-        this.skinTones = {
-            light: { main: '#FEE2CA', shadow: '#EFC1B7' },
-            medium: { main: '#FFE0BD', shadow: '#EFD0B1' },
-            tan: { main: '#F1C27D', shadow: '#E0B170' },
-            dark: { main: '#8D5524', shadow: '#7C4A1E' }
-        };
+class AvatarManager {
+    constructor(username) {
+        this.username = username;
+        this.equippedItems = {};
+        this.tempEquippedItems = {};
+        this.skinTone = 'light'; // New line
+        this.loadEquippedItems();
     }
 
-    loadAvatar() {
-        console.log("Loading avatar body parts...");
-        this.container.innerHTML = '';
-        this.container.style.position = 'relative';
-        this.container.style.width = '100%';
-        this.container.style.height = '100%';
-
-        this.bodyParts.forEach(part => {
-            console.log('Creating layer for:', part.type);
-            const img = document.createElement('img');
-            img.src = part.file ? this.baseUrl + part.file : '';
-            img.alt = part.name;
-            img.dataset.type = part.type;
-            img.style.position = 'absolute';
-            img.style.top = '0';
-            img.style.left = '0';
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.display = part.isBase ? 'block' : 'none';
-            img.onload = () => console.log(`Loaded ${part.name}`);
-            img.onerror = () => console.error(`Failed to load ${part.name}: ${img.src}`);
-            this.container.appendChild(img);
-            this.layers[part.type] = img;
-        });
-
-        this.reorderLayers();
-        this.applyCurrentSkinTone();
+    initialize() {
+        this.setupApplyAvatarButton();
+        this.setupClearAvatarButton();
+        this.updateAvatarDisplay();
     }
 
-    updateLayer(type, src) {
-        console.log('Updating layer:', type, src);
-        if (this.layers[type]) {
-            const bodyPart = this.bodyParts.find(part => part.type === type);
-            if (src) {
-                this.layers[type].src = src;
-                this.layers[type].style.display = 'block';
-                console.log(`Updated ${type} layer with ${src}`);
-            } else if (!bodyPart.isBase) {
-                this.layers[type].style.display = 'none';
-                console.log(`Removed ${type} layer`);
-            } else {
-                this.layers[type].src = this.baseUrl + bodyPart.file;
-                this.layers[type].style.display = 'block';
-                console.log(`Reverted ${type} to base layer`);
-            }
+    setupApplyAvatarButton() {
+        const applyAvatarBtn = document.getElementById('apply-avatar-btn');
+        if (applyAvatarBtn) {
+            applyAvatarBtn.addEventListener('click', () => this.applyAvatar());
         } else {
-            console.warn(`Layer ${type} not found`);
+            console.error('Apply Avatar button not found');
         }
-        this.reorderLayers();
     }
 
-    reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
-        order.forEach((type, index) => {
-            if (this.layers[type]) {
-                this.layers[type].style.zIndex = index + 1;
-            }
-        });
-    }
-
-    changeSkinTone(newTone) {
-        console.log(`Changing skin tone to: ${newTone}`);
-        this.skinTone = newTone;
-        this.applyCurrentSkinTone();
-    }
-
-    applyCurrentSkinTone() {
-        const tone = this.skinTones[this.skinTone];
-        if (!tone) {
-            console.error(`Invalid skin tone: ${this.skinTone}`);
-            return;
+    setupClearAvatarButton() {
+        const clearAvatarBtn = document.getElementById('clear-avatar-btn');
+        if (clearAvatarBtn) {
+            clearAvatarBtn.addEventListener('click', () => this.clearAvatar());
+        } else {
+            console.error('Clear Avatar button not found');
         }
-
-        ['Head', 'Arms', 'Legs'].forEach(partName => {
-            const part = this.layers[partName];
-            if (part) {
-                this.applySkinToneToSVG(part, tone);
-            }
-        });
     }
 
-    applySkinToneToSVG(img, tone) {
-        fetch(img.src)
-            .then(response => response.text())
-            .then(svgText => {
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                
-                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-                paths.forEach(path => {
-                    const currentFill = path.getAttribute('fill');
-                    if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        path.setAttribute('fill', tone.main);
+    loadEquippedItems() {
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+            this.tempEquippedItems = {...this.equippedItems};
+        }
+        // New: Load skin tone
+        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+        if (savedSkinTone) {
+            this.skinTone = savedSkinTone;
+        }
+    }
+
+    applyAvatar() {
+        this.equippedItems = {...this.tempEquippedItems};
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        // New: Save skin tone
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        this.updateAvatarDisplay();
+        alert('Avatar saved successfully!');
+    }
+
+    clearAvatar() {
+        this.tempEquippedItems = {};
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
+    }
+
+    updateAvatarDisplay() {
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            // New: Apply skin tone
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinTone(window.skinToneManager.skinTones[this.skinTone]);
+            }
+
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                     }
-                });
-
-                const serializer = new XMLSerializer();
-                const modifiedSvgString = serializer.serializeToString(svgDoc);
-                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                img.src = url;
-            })
-            .catch(error => console.error(`Error applying skin tone:`, error));
+                }
+            });
+        }
     }
 
-    clearAllLayers() {
-        Object.entries(this.layers).forEach(([type, layer]) => {
-            const bodyPart = this.bodyParts.find(part => part.type === type);
-            if (!bodyPart.isBase) {
-                layer.style.display = 'none';
-                layer.src = '';
+    toggleItem(item) {
+        if (this.tempEquippedItems[item.type] === item.id) {
+            // Unequip the item
+            delete this.tempEquippedItems[item.type];
+        } else {
+            // Equip the item
+            this.tempEquippedItems[item.type] = item.id;
+        }
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
+    }
+
+    updateItemVisuals() {
+        document.querySelectorAll('.item-image').forEach(itemImage => {
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+            } else {
+                itemImage.classList.remove('equipped');
             }
         });
-        this.reorderLayers();
+    }
+
+    updateTempAvatarDisplay() {
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            // New: Apply skin tone
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinTone(window.skinToneManager.skinTones[this.skinTone]);
+            }
+
+            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        window.avatarBody.updateLayer(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                }
+            });
+        }
+    }
+
+    // New method
+    changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        this.updateTempAvatarDisplay();
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    window.avatarBody = new AvatarBody('avatar-display');
-    window.avatarBody.loadAvatar();
+// Initialize the AvatarManager when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
+    } else {
+        console.error('No logged in user found');
+    }
 });
