@@ -1,6 +1,6 @@
 class SkinToneManager {
-    constructor(avatarDisplay) {
-        this.avatarDisplay = avatarDisplay;
+    constructor(avatarBody) {
+        this.avatarBody = avatarBody;
         this.skinTones = {
             light: {
                 name: 'Light',
@@ -72,10 +72,10 @@ class SkinToneManager {
         });
 
         // Apply skin tone to avatar
-        if (this.avatarDisplay) {
-            this.avatarDisplay.changeSkinTone(toneName);
+        if (this.avatarBody) {
+            this.avatarBody.changeSkinTone(toneName);
         } else {
-            console.error('AvatarDisplay not found');
+            console.error('AvatarBody not found');
         }
     }
 }
@@ -84,15 +84,14 @@ class SkinToneManager {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing SkinToneManager");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser && window.avatarDisplay) {
-        window.skinToneManager = new SkinToneManager(window.avatarDisplay);
+    if (loggedInUser && window.avatarBody) {
+        window.skinToneManager = new SkinToneManager(window.avatarBody);
         window.skinToneManager.initialize();
-
-        // Set initial skin tone based on AvatarDisplay
-        if (window.avatarDisplay.skinTone) {
-            window.skinToneManager.selectSkinTone(window.avatarDisplay.skinTone);
+        // Set initial skin tone based on AvatarBody
+        if (window.avatarBody.skinTone) {
+            window.skinToneManager.selectSkinTone(window.avatarBody.skinTone);
         }
     } else {
-        console.error('No logged in user found or AvatarDisplay not initialized');
+        console.error('No logged in user found or AvatarBody not initialized');
     }
 });
