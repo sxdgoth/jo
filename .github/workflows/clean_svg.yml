@@ -6,6 +6,8 @@ on:
 jobs:
   clean-svg:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
@@ -26,6 +28,3 @@ jobs:
         git add output/
         git commit -m "Clean SVG files" || echo "No changes to commit"
         git push
-
-
-
