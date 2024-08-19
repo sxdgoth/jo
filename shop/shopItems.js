@@ -15,6 +15,5 @@ const shopItems = [
     { id: 'AngryBrows.svg', name: 'Angry Brows', type: 'Eyebrows', price: 180, path: 'home/assets/brows/' },
     { id: 'chipmunkcheeks.svg', name: 'Chipmunk Cheeks', type: 'Face', price: 180, path: 'output/' },
     { id: 'chipmunksx.svg', name: 'Chipmunk Cheeks', type: 'Face', price: 180, path: 'home/assets/face/' },
-    { id: 'chipmunksx.svg', name: 'Chipmunk Cheeks', type: 'Eyes', price: 180, path: 'home/assets/face/' },
     // Add more items as needed
 ];
