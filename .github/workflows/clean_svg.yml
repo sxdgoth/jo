@@ -22,12 +22,11 @@ jobs:
         ls -R
     - name: Run SVG cleaner
       run: |
-        cd test
-        python svg_cleaner.py
+        python test/svg_cleaner.py
     - name: List output contents
       run: |
         echo "Output directory contents:"
-        ls -R ../output || echo "Output directory not found"
+        ls -R output || echo "Output directory not found"
     - name: Commit changes
       run: |
         git config --local user.email "action@github.com"
