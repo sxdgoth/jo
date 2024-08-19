@@ -7,4 +7,5 @@ const shopItems = [
     { id: 'avatar-head.svg', name: 'Head', type: 'Head', price: 150, path: 'home/assets/shirts/' },
     { id: 'mostvaluableshirt.svg', name: 'Most Valuable Shirt', type: 'Shirt', price: 200, path: 'home/assets/shirts/' },
     { id: 'najabloomtop.svg', name: 'Naja Bloom Top', type: 'Shirt', price: 180, path: 'home/assets/shirts/' },
+    // Add more items as needed
 ];
