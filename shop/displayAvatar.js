@@ -2,6 +2,8 @@ class AvatarDisplay {
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
+        this.triedOnItems = {}; // Initialize this
+        this.currentItems = {}; // Initialize this
         if (!this.container) {
             console.error(`Container with id "${containerId}" not found`);
             return;
@@ -207,6 +209,10 @@ class AvatarDisplay {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
+        // Initialize the objects if they don't exist
+        if (!this.triedOnItems) this.triedOnItems = {};
+        if (!this.currentItems) this.currentItems = {};
+
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
             // If the same item is clicked again, remove it
             this.removeItem(item.type);
@@ -219,13 +225,13 @@ class AvatarDisplay {
         this.reorderLayers();
     }
 
-    removeItem(type) {
+     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-    updateAvatarDisplay(type, src) {
+     updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
@@ -269,10 +275,10 @@ class AvatarDisplay {
     }
 
     resetTriedOnItems() {
-        Object.keys(this.triedOnItems).forEach(type => {
-            this.removeTriedOnItem(type);
+        this.currentItems = {};
+        Object.keys(this.layers).forEach(type => {
+            this.updateAvatarDisplay(type, null);
         });
-        this.triedOnItems = {};
     }
 }
 
