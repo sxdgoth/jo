@@ -202,7 +202,7 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-   tryOnItem(item) {
+  tryOnItem(item) {
     if (this.layers[item.type]) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
@@ -210,10 +210,12 @@ class AvatarDisplay {
         this.triedOnItems[item.type] = item;
         this.lastAction[item.type] = 'triedOn';
 
-        // Ensure both Shirt and Jacket can be displayed simultaneously
+        // If trying on a shirt or jacket, hide the other layer if it's not being tried on
         if (item.type === 'Shirt' || item.type === 'Jacket') {
-            this.layers['Shirt'].style.display = 'block';
-            this.layers['Jacket'].style.display = 'block';
+            const otherType = item.type === 'Shirt' ? 'Jacket' : 'Shirt';
+            if (!this.triedOnItems[otherType]) {
+                this.layers[otherType].style.display = 'none';
+            }
         }
     }
 }
