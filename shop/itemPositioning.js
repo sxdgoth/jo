@@ -1,15 +1,15 @@
 const itemPositions = {
     face: {
-       objectPosition: '-20px 10%',
-        transform: 'scale(1.2)'
+       objectPosition: '0px 10%',
+        transform: 'scale(2.5)'
     },
     shirt: {
         objectPosition: '0px 25%',
         transform: 'scale(2.0)'
     },
       jacket: {
-        objectPosition: '20px 25%',
-        transform: 'scale(1.7)'
+        objectPosition: '0px 25%',
+        transform: 'scale(2.0)'
     },
     // Add more item types as needed
 };
