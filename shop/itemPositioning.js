@@ -5,11 +5,11 @@ const itemPositions = {
     },
     shirt: {
         objectPosition: '20px 25%',
-        transform: 'scale(1.5)'
+        transform: 'scale(1.7)'
     },
       jacket: {
         objectPosition: '20px 25%',
-        transform: 'scale(1.5)'
+        transform: 'scale(1.7)'
     },
     // Add more item types as needed
 };
