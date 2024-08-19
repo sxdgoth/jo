@@ -48,7 +48,7 @@ nav {
 }
 
 main {
-    max-width: 1000px;
+    max-width: 1100px; /* Increased to accommodate wider avatar */
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -59,7 +59,7 @@ main {
 }
 
 .avatar-container {
-    width: 200px;
+    width: 300px; /* Increased width */
 }
 
 #avatar-display {
@@ -67,8 +67,8 @@ main {
     border-radius: 10px;
     overflow: hidden;
     background-color: #f9f9f9;
-    width: 200px;
-    height: 400px;
+    width: 300px; /* Increased width */
+    height: 300px; /* Reduced height */
 }
 
 .shop-section {
@@ -187,7 +187,7 @@ main {
 }
 
 @media (max-width: 768px) {
-    main {
+   main {
         flex-direction: column;
     }
 
@@ -197,7 +197,8 @@ main {
     }
 
     #avatar-display {
-        height: 200px;
+        width: 100%; /* Full width on mobile */
+        height: 250px; /* Adjusted height for mobile */
     }
 
     .shop-items-container {
