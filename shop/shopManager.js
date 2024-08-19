@@ -132,6 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // New function to update shop display
+    function updateShopDisplay() {
+        if (window.avatarDisplay) {
+            window.avatarDisplay.reapplySkinTone();
+        }
+        renderShopItems();
+    }
+
     // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
@@ -152,7 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
-        filterItemsByCategory
+        filterItemsByCategory,
+        updateShopDisplay // Add this new method
     };
 
     // Initialize the shop
