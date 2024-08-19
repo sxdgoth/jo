@@ -3,40 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avatar Wardrobe</title>
-    <link rel="stylesheet" href="https://sxdgoth.github.io/jo/wardrobe/wardrobe.css">
+    <title>Register and Login</title>
 </head>
 <body>
-    <header>
-        <h1>Your Avatar Wardrobe</h1>
-        <div id="user-info">
-            <span>Welcome, <span id="user-name"></span>!</span>
-            <span>Coins: <span id="user-coins"></span></span>
-        </div>
-        <a href="https://sxdgoth.github.io/jo/shop/index.html">Go to Shop</a>
+    <div id="register-form">
+        <h2>Register</h2>
+        <input type="text" id="reg-username" placeholder="Username">
+        <input type="password" id="reg-password" placeholder="Password">
+        <button onclick="register()">Register</button>
+    </div>
+
+    <div id="login-form">
+        <h2>Login</h2>
+        <input type="text" id="login-username" placeholder="Username">
+        <input type="password" id="login-password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="welcome-message" style="display: none;">
+        <h2>Welcome, <span id="user-name"></span>!</h2>
         <button onclick="logout()">Logout</button>
-    </header>
-    <main>
-        <div class="avatar-container">
-            <div id="avatar-display"></div>
-        </div>
-        <div class="wardrobe-section">
-            <h2>Your Items</h2>
-            <div class="wardrobe-items">
-                <!-- Owned items will be dynamically added here -->
-            </div>
-        </div>
-      <button id="apply-avatar-btn">Apply Avatar</button>
-<button id="clear-avatar-btn">Clear Avatar</button>
-        <div id="skin-tone-buttons"></div>
-    </main>
-    <!-- Scripts -->
-   <script src="https://sxdgoth.github.io/jo/shop/inventory.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
-<script src="https://sxdgoth.github.io/jo/wardrobe/avatarManager.js"></script>
-    <script src="https://sxdgoth.github.io/jo/wardrobe/skinTone.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/layerManager.js"></script>
-<script src="https://sxdgoth.github.io/jo/wardrobe/wardrobe.js"></script>
+    </div>
+
+    <script src="register.js"></script>
+    <script src="login.js"></script>
+    <script src="welcome.js"></script>
 </body>
 </html>
