@@ -1,5 +1,3 @@
-// displayAvatar.js
-
 class AvatarDisplay {
     constructor(containerId, username) {
         this.username = username;
@@ -113,16 +111,17 @@ class AvatarDisplay {
         });
 
         this.reorderLayers();
+        this.updateShopHighlights();
     }
 
-   reorderLayers() {
-    const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
-    order.forEach((type, index) => {
-        if (this.layers[type]) {
-            this.layers[type].style.zIndex = index + 1;
-        }
-    });
-}
+    reorderLayers() {
+        const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+        order.forEach((type, index) => {
+            if (this.layers[type]) {
+                this.layers[type].style.zIndex = index + 1;
+            }
+        });
+    }
 
     saveOriginalColors(obj, type) {
         const svgDoc = obj.contentDocument;
@@ -202,7 +201,7 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-   tryOnItem(item) {
+    tryOnItem(item) {
         if (this.layers[item.type]) {
             console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             this.layers[item.type].data = `${this.baseUrl}${item.path}${item.id}`;
@@ -217,19 +216,13 @@ class AvatarDisplay {
                     this.layers[otherType].style.display = 'none';
                 }
             }
-
-            // Highlight the item in the shop
-            const shopItem = document.querySelector(`.shop-item .item-image[data-id="${item.id}"]`).closest('.shop-item');
-            if (shopItem) {
-                shopItem.classList.add('highlighted');
-            }
+            this.updateShopHighlights();
         }
     }
-
+    
     removeTriedOnItem(type) {
         if (this.layers[type]) {
             console.log(`Removing tried on item of type: ${type}`);
-            const removedItem = this.triedOnItems[type];
             delete this.triedOnItems[type];
 
             // Always hide the layer when removing a tried-on item
@@ -248,14 +241,7 @@ class AvatarDisplay {
                     }
                 });
             }
-
-            // Remove highlight from the item in the shop
-            if (removedItem) {
-                const shopItem = document.querySelector(`.shop-item .item-image[data-id="${removedItem.id}"]`).closest('.shop-item');
-                if (shopItem) {
-                    shopItem.classList.remove('highlighted');
-                }
-            }
+            this.updateShopHighlights();
         }
     }
 
@@ -276,6 +262,7 @@ class AvatarDisplay {
                 this.lastAction[type] = 'hidden';
                 this.hiddenEquippedItems.add(type); // Add to hidden set
             }
+            this.updateShopHighlights();
         }
     }
 
@@ -286,6 +273,30 @@ class AvatarDisplay {
     updateEquippedItems() {
         const savedItems = localStorage.getItem('equippedItems');
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
+        this.updateShopHighlights();
+    }
+
+    updateShopHighlights() {
+        // Remove all highlights
+        document.querySelectorAll('.shop-item').forEach(item => item.classList.remove('highlighted'));
+
+        // Add highlights for tried-on items
+        Object.values(this.triedOnItems).forEach(item => {
+            const shopItem = document.querySelector(`.shop-item .item-image[data-id="${item.id}"]`).closest('.shop-item');
+            if (shopItem) {
+                shopItem.classList.add('highlighted');
+            }
+        });
+
+        // Add highlights for equipped items that are not hidden
+        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+            if (!this.hiddenEquippedItems.has(type)) {
+                const shopItem = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
+                if (shopItem) {
+                    shopItem.classList.add('highlighted');
+                }
+            }
+        });
     }
 }
 
