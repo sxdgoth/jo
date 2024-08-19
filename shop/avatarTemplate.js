@@ -1,5 +1,3 @@
-// avatarTemplate.js
-
 class AvatarBody {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
@@ -10,7 +8,10 @@ class AvatarBody {
             { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
             { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false }
+            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+            { name: 'Pants', file: '', type: 'Pants', isBase: false },
+            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+            { name: 'Shoes', file: '', type: 'Shoes', isBase: false }
         ];
         this.layers = {};
     }
@@ -21,6 +22,7 @@ class AvatarBody {
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
         this.container.style.height = '100%';
+
         this.bodyParts.forEach(part => {
             const img = document.createElement('img');
             img.src = part.file ? this.baseUrl + part.file : '';
@@ -37,6 +39,7 @@ class AvatarBody {
             this.container.appendChild(img);
             this.layers[part.type] = img;
         });
+
         this.reorderLayers();
     }
 
@@ -51,7 +54,6 @@ class AvatarBody {
                 this.layers[type].style.display = 'none';
                 console.log(`Removed ${type} layer`);
             } else {
-                // If it's a base part, revert to the original image
                 this.layers[type].src = this.baseUrl + bodyPart.file;
                 this.layers[type].style.display = 'block';
                 console.log(`Reverted ${type} to base layer`);
@@ -63,7 +65,7 @@ class AvatarBody {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shirt', 'Jacket', 'Head'];
+        const order = ['Legs', 'Shoes', 'Arms', 'Body', 'Pants', 'Shirt', 'Jacket', 'Head', 'Eyes'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -78,7 +80,6 @@ class AvatarBody {
         }
     }
 
-    // New method for clearing all non-base layers
     clearAllLayers() {
         Object.entries(this.layers).forEach(([type, layer]) => {
             const bodyPart = this.bodyParts.find(part => part.type === type);
