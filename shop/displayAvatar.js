@@ -76,7 +76,8 @@ class AvatarDisplay {
             { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
-            { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false }
+            { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
+            { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
@@ -121,7 +122,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-         const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Head', 'Eyes', 'Mouth', 'Nose', 'Eyebrows', 'Accessories', 'Hair'];
+    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
