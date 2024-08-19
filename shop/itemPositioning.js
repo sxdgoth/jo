@@ -1,6 +1,6 @@
 const itemPositions = {
     eyes: {
-       objectPosition: '0px 10%',
+       objectPosition: '0px -20%',
         transform: 'scale(2.5)'
     },
     shirt: {
