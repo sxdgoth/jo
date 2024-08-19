@@ -1,6 +1,15 @@
 import os
 import xml.etree.ElementTree as ET
 import re
+import hashlib
+
+def get_file_hash(file_path):
+    """Calculate the MD5 hash of a file."""
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 def clean_svg(input_file, output_file):
     print(f"Processing file: {input_file}")
@@ -69,6 +78,16 @@ print(f"SVG files found: {svg_files}")
 for filename in svg_files:
     input_path = os.path.join(input_dir, filename)
     output_path = os.path.join(output_dir, filename)
+    
+    # Check if the file needs processing
+    if os.path.exists(output_path):
+        input_hash = get_file_hash(input_path)
+        output_hash = get_file_hash(output_path)
+        
+        if input_hash == output_hash:
+            print(f"Skipping {filename} - already processed")
+            continue
+    
     clean_svg(input_path, output_path)
 
 print("SVG cleaning complete!")
