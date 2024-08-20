@@ -148,61 +148,58 @@ class AvatarDisplay {
         });
     }
 
-    applySkinToneToSVG(svgDoc) {
-    const tone = window.skinToneManager.skinTones[this.skinTone];
-    const defaultColors = {
-        light: ['#FEE2CA', '#EFC1B7'],
-        medium: ['#FFE0BD', '#EFD0B1'],
-        tan: ['#F1C27D', '#E0B170'],
-        dark: ['#8D5524', '#7C4A1E']
-    };
-    const eyeColors = {
-        main: '#F4D5BF',
-        shadow: '#E6BBA8'
-    };
-    const preserveColors = [
+    applySkinTone(obj, type) {
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc || !this.skinTones[this.skinTone]) return;
+
+        const tone = this.skinTones[this.skinTone];
+        const defaultColors = {
+            light: ['#FEE2CA', '#EFC1B7'],
+            medium: ['#FFE0BD', '#EFD0B1'],
+            tan: ['#F1C27D', '#E0B170'],
+            dark: ['#8D5524', '#7C4A1E']
+        };
+        const eyeColors = {
+            main: '#F4D5BF',
+            shadow: '#E6BBA8'
+        };
+        
+        // Colors to preserve (including the scar color)
+        const preserveColors = [
         '#E6958A',
         '#dea296', '#d19083', '#ebc7bf', '#a76e64', 
         '#f8d2cc', '#ebc7bf', '#f3ddd8', '#fdedea'
     ];
-    const replaceColor = (element) => {
-        ['fill', 'stroke'].forEach(attr => {
-            let color = element.getAttribute(attr);
-            if (color) {
-                color = color.toUpperCase();
-                if (preserveColors.includes(color.toLowerCase())) return;
-                
-                if (defaultColors.light.includes(color)) {
-                    element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
-                } else if (color === eyeColors.main) {
-                    element.setAttribute(attr, tone.main);
-                } else if (color === eyeColors.shadow) {
-                    element.setAttribute(attr, tone.shadow);
-                } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color.toLowerCase())) {
-                    element.setAttribute(attr, tone.main);
+        
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color) {
+                    color = color.toUpperCase();
+                    // Skip preserved colors
+                    if (preserveColors.includes(color)) return;
+                    
+                    // Replace default skin colors
+                    if (defaultColors.light.includes(color)) {
+                        element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
+                    }
+                    // Replace eye colors
+                    else if (color === eyeColors.main) {
+                        element.setAttribute(attr, tone.main);
+                    }
+                    else if (color === eyeColors.shadow) {
+                        element.setAttribute(attr, tone.shadow);
+                    }
+                    // Replace other potential skin tone colors
+                    else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
+                        element.setAttribute(attr, tone.main);
+                    }
+                    // Apply eye color
+                    else if (color === '#3FA2FF') {
+                        element.setAttribute(attr, this.eyeColor);
+                    }
                 }
-            }
-        });
-        let style = element.getAttribute('style');
-        if (style) {
-            defaultColors.light.forEach((defaultColor, index) => {
-                style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
             });
-            style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-            style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-            preserveColors.forEach(color => {
-                style = style.replace(new RegExp(color, 'gi'), color);
-            });
-            if (!preserveColors.some(color => style.toLowerCase().includes(color.toLowerCase()))) {
-                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
-            }
-            element.setAttribute('style', style);
-        }
-        Array.from(element.children).forEach(replaceColor);
-    };
-    replaceColor(svgDoc.documentElement);
-}
 
             // Replace colors in style attribute
             let style = element.getAttribute('style');
