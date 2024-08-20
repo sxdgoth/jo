@@ -3,76 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avatar Shop</title>
-    <link rel="stylesheet" href="https://sxdgoth.github.io/jo/shop/shop.css">
+    <title>Avatar Wardrobe</title>
+    <link rel="stylesheet" href="https://sxdgoth.github.io/jo/wardrobe/wardrobe.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Avatar Shop</h1>
+    <div class="top-bar">
         <div id="user-info">
             <span>Welcome, <span id="user-name"></span>!</span>
             <span>Coins: <span id="user-coins"></span></span>
         </div>
         <nav>
-            <a href="https://sxdgoth.github.io/jo/wardrobe/index.html" class="nav-button">Wardrobe</a>
+            <a href="https://sxdgoth.github.io/jo/shop/index.html" class="nav-button">Go to Shop</a>
             <button onclick="logout()" class="nav-button">Logout</button>
         </nav>
-    </header>
-
-    <!-- Category buttons container placed above the shop container -->
-   
-
-    <div class="shop-container">
-         <div class="category-buttons-container">
-        <button class="category-btn active" data-category="All">All</button>
-        <button class="category-btn" data-category="Eyes">Eyes</button>      
-        <button class="category-btn" data-category="Eyebrows">Eyebrows</button>
-        <button class="category-btn" data-category="Nose">Nose</button>
-        <button class="category-btn" data-category="Mouth">Lips</button>
-        <button class="category-btn" data-category="Shirt">Shirts</button>
-        <button class="category-btn" data-category="Jacket">Jackets</button>
-        <button class="category-btn" data-category="Pants">Pants</button>
-        <button class="category-btn" data-category="Dress">Dresses</button>
-        <button class="category-btn" data-category="Shoes">Shoes</button>
-        <button class="category-btn" data-category="Accessories">Accessories</button>
     </div>
-        <main>
-            <div class="avatar-container">
-                <div id="avatar-display" style="width: 200px; height: 400px;"></div>
-            </div>
-            <div class="shop-section">
-                <h2>Shop Items</h2>
-                <div class="shop-items-container">
-                    <div class="shop-items">
-                        <!-- Shop items will be dynamically added here -->
-                    </div>
-                </div>
-            </div>
-        </main>
+    <main>
+       <div class="avatar-section">
+    <div class="avatar-container">
+        <div id="avatar-display"></div>
     </div>
-
+    <div class="avatar-buttons">
+        <button id="apply-avatar-btn">Apply</button>
+        <button id="clear-avatar-btn">Clear</button>
+    </div>
+    <div id="skin-tone-buttons">
+        <button class="skin-tone-button" data-tone="light" title="Light"></button>
+        <button class="skin-tone-button" data-tone="medium" title="Medium"></button>
+        <button class="skin-tone-button" data-tone="tan" title="Tan"></button>
+        <button class="skin-tone-button" data-tone="dark" title="Dark"></button>
+    </div>
+</div>
+        <div class="wardrobe-section">
+            <h2>Your Items</h2>
+            <div class="wardrobe-items">
+                <!-- Owned items will be dynamically added here -->
+            </div>
+        </div>
+    </main>
     <!-- Scripts -->
-    <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/layerManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/inventory.js"></script>
-    <script src="https://sxdgoth.github.io/jo/userManager.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/itemPositioning.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/shopManager.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/shop.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/welcome.js"></script>
-    <script src="https://sxdgoth.github.io/jo/shop/skinToneApplier.js"></script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
-        window.avatarDisplay.loadAvatar();
-    } else {
-        console.error('No logged in user found');
-    }
-});
-</script>
+    <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
+    <script src="https://sxdgoth.github.io/jo/wardrobe/avatarManager.js"></script>
+    <script src="https://sxdgoth.github.io/jo/wardrobe/skinTone.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/layerManager.js"></script>
+    <script src="https://sxdgoth.github.io/jo/wardrobe/wardrobe.js"></script>
+    
 </body>
 </html>
