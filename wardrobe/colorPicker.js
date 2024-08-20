@@ -20,6 +20,12 @@ class ColorPicker {
                 const button = document.createElement('button');
                 button.className = 'color-button';
                 button.style.backgroundColor = color;
+                button.style.width = '30px';
+                button.style.height = '30px';
+                button.style.margin = '5px';
+                button.style.border = '1px solid #000';
+                button.style.borderRadius = '50%';
+                button.style.cursor = 'pointer';
                 button.onclick = () => this.changeColor('eyes', color);
                 eyeColorButtons.appendChild(button);
             });
@@ -41,7 +47,3 @@ class ColorPicker {
 document.addEventListener('DOMContentLoaded', () => {
     window.colorPicker = new ColorPicker();
 });
-
-
-
-These upda
