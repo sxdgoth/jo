@@ -42,19 +42,6 @@ class Inventory {
 window.createUserInventory = function(username) {
     window.userInventory = new Inventory(username);
     console.log(`Created user inventory for ${username}`);
-
-    // Add a test item if the inventory is empty (for debugging)
-    if (window.userInventory.getItems().length === 0) {
-        console.log("Adding test item to inventory");
-        window.userInventory.addItem({
-            id: 'test-item',
-            name: 'Test Item',
-            type: 'Shirt',
-            price: 100,
-            path: 'home/assets/shirts/'
-        });
-        window.userInventory.saveInventory();
-    }
 };
 
 // Function to update button state based on inventory
@@ -97,54 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createUserInventory(loggedInUser.username);
         initializeInventoryState();
         console.log("Inventory initialized for logged-in user");
-    } else {
-        console.log("No logged-in user found");
-    }
-});
-
-// Function to render owned items in the wardrobe
-function renderOwnedItems() {
-    console.log("Rendering owned items");
-    const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
-    if (!wardrobeItemsContainer) {
-        console.error("Wardrobe items container not found");
-        return;
-    }
-
-    const ownedItems = window.userInventory.getItems();
-    console.log("Owned items:", ownedItems);
-
-    wardrobeItemsContainer.innerHTML = ''; // Clear existing items
-
-    ownedItems.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.classList.add('wardrobe-item');
-        const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        itemElement.innerHTML = `
-            <div class="item-image" data-id="${item.id}">
-                <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
-            </div>
-            <h3>${item.name}</h3>
-            <p>Type: ${item.type}</p>
-        `;
-        wardrobeItemsContainer.appendChild(itemElement);
-        
-        // Add click event listener to the item image
-        const itemImage = itemElement.querySelector('.item-image');
-        itemImage.addEventListener('click', () => toggleItem(item));
-    });
-
-    console.log("Finished rendering owned items");
-}
-
-// Make sure to call renderOwnedItems after the inventory is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.createUserInventory(loggedInUser.username);
-        initializeInventoryState();
-        renderOwnedItems(); // Call this function to display the items
-        console.log("Inventory initialized and items rendered for logged-in user");
     } else {
         console.log("No logged-in user found");
     }
