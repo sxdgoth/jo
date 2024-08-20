@@ -11,6 +11,7 @@ class AvatarManager {
     initialize() {
         this.setupApplyAvatarButton();
         this.setupClearAvatarButton();
+        this.setupEyeColorPicker();
         this.updateAvatarDisplay();
     }
 
@@ -29,6 +30,18 @@ class AvatarManager {
             clearAvatarBtn.addEventListener('click', () => this.clearAvatar());
         } else {
             console.error('Clear Avatar button not found');
+        }
+    }
+
+    setupEyeColorPicker() {
+        const eyeColorPicker = document.getElementById('eye-color-picker');
+        if (eyeColorPicker) {
+            eyeColorPicker.value = this.eyeColor;
+            eyeColorPicker.addEventListener('input', (event) => {
+                this.changeEyeColor(event.target.value);
+            });
+        } else {
+            console.error('Eye color picker not found');
         }
     }
 
@@ -124,6 +137,10 @@ class AvatarManager {
 
     changeEyeColor(newColor) {
         this.eyeColor = newColor;
+        const eyeColorPicker = document.getElementById('eye-color-picker');
+        if (eyeColorPicker) {
+            eyeColorPicker.value = newColor;
+        }
         this.updateTempAvatarDisplay();
     }
 
