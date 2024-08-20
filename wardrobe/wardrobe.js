@@ -58,6 +58,9 @@ function renderOwnedItems() {
 function toggleItem(item) {
     if (window.avatarManager) {
         window.avatarManager.toggleItem(item);
+        if (window.colorCustomizer) {
+            window.colorCustomizer.setCurrentItem(item);
+        }
     } else {
         console.error('AvatarManager not initialized');
     }
