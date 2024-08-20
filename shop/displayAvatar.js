@@ -38,6 +38,7 @@ class AvatarDisplay {
                 shadow: '#7C4A1E'
             }
         };
+        this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
 
@@ -73,13 +74,13 @@ class AvatarDisplay {
             { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
             { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
             { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+            { name: 'Nose', file: '', type: 'Nose', isBase: false },
+            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
             { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
             { name: 'Pants', file: '', type: 'Pants', isBase: false },
-            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
             { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
-            { name: 'Nose', file: '', type: 'Nose', isBase: false },
-            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
@@ -115,15 +116,16 @@ class AvatarDisplay {
                 console.log(`No equipped item for: ${part.name}`);
             }
 
-            obj.onload = () => {
-                if (part.isBase || ['Eyes', 'Nose', 'Mouth', 'Face'].includes(part.type)) {
-                    this.applySkinTone(obj, part.type);
-                }
-            };
-
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
+
+            if (part.isBase || this.facialFeatures.includes(part.type)) {
+                obj.addEventListener('load', () => {
+                    this.saveOriginalColors(obj, part.type);
+                    this.applySkinTone(obj, part.type);
+                });
+            }
         });
 
         this.reorderLayers();
@@ -138,31 +140,86 @@ class AvatarDisplay {
         });
     }
 
+    saveOriginalColors(obj, type) {
+        const svgDoc = obj.contentDocument;
+        if (svgDoc) {
+            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+            this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
+        }
+    }
+
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
+            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
             const tone = this.skinTones[this.skinTone];
-            const defaultLight = '#FEE2CA';
-            const defaultShadow = '#EFC1B7';
-
-            const applyColorToElement = (element) => {
-                ['fill', 'stroke'].forEach(attr => {
-                    const color = element.getAttribute(attr);
-                    if (color) {
-                        if (color.toUpperCase() === defaultLight) {
-                            element.setAttribute(attr, tone.main);
-                        } else if (color.toUpperCase() === defaultShadow) {
-                            element.setAttribute(attr, tone.shadow);
-                        }
+            
+            paths.forEach((path) => {
+                const currentFill = path.getAttribute('fill');
+                if (currentFill && currentFill.toLowerCase() !== 'none') {
+                    if (this.isCloseTo(currentFill, '#FEE2CA') || this.isCloseTo(currentFill, '#EFC1B7')) {
+                        const newColor = this.getNewColor(currentFill, tone);
+                        path.setAttribute('fill', newColor);
                     }
-                });
-
-                // Apply to child elements
-                Array.from(element.children).forEach(applyColorToElement);
-            };
-
-            applyColorToElement(svgDoc.documentElement);
+                }
+            });
         }
+    }
+
+    isCloseTo(color1, color2) {
+        const rgb1 = this.hexToRgb(color1);
+        const rgb2 = this.hexToRgb(color2);
+        const threshold = 30; // Adjust this value to change the sensitivity
+
+        return Math.abs(rgb1[0] - rgb2[0]) < threshold &&
+               Math.abs(rgb1[1] - rgb2[1]) < threshold &&
+               Math.abs(rgb1[2] - rgb2[2]) < threshold;
+    }
+
+    getNewColor(currentColor, tone) {
+        const currentLuminance = this.getLuminance(currentColor);
+        const mainLuminance = this.getLuminance(tone.main);
+        const luminanceDiff = currentLuminance - mainLuminance;
+        
+        if (Math.abs(luminanceDiff) < 0.1) {
+            return tone.main;
+        } else if (luminanceDiff < 0) {
+            return tone.shadow;
+        } else {
+            return this.lightenColor(tone.main, luminanceDiff);
+        }
+    }
+
+    getLuminance(hex) {
+        const rgb = this.hexToRgb(hex);
+        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+    }
+
+    hexToRgb(hex) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
+    }
+
+    lightenColor(color, amount) {
+        const rgb = this.hexToRgb(color);
+        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
+        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
+    }
+
+    changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        this.baseParts.concat(this.facialFeatures).forEach(part => {
+            if (this.layers[part]) {
+                this.applySkinTone(this.layers[part], part);
+            }
+        });
+        localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
 
     tryOnItem(item) {
@@ -176,9 +233,6 @@ class AvatarDisplay {
         } else {
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-            
-            // Add this line to reapply skin tone
-            setTimeout(() => this.applySkinTone(this.layers[item.type], item.type), 100);
         }
 
         this.reorderLayers();
@@ -196,6 +250,12 @@ class AvatarDisplay {
             if (src) {
                 this.layers[type].data = src;
                 this.layers[type].style.display = 'block';
+                if (this.facialFeatures.includes(type)) {
+                    this.layers[type].addEventListener('load', () => {
+                        this.saveOriginalColors(this.layers[type], type);
+                        this.applySkinTone(this.layers[type], type);
+                    });
+                }
             } else {
                 this.layers[type].style.display = 'none';
             }
@@ -213,7 +273,12 @@ class AvatarDisplay {
                     this.layers[type].style.display = 'block';
                     this.lastAction[type] = 'shown';
                     this.hiddenEquippedItems.delete(type);
-                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                    if (this.facialFeatures.includes(type)) {
+                        this.layers[type].addEventListener('load', () => {
+                            this.saveOriginalColors(this.layers[type], type);
+                            this.applySkinTone(this.layers[type], type);
+                        });
+                    }
                 }
             } else {
                 this.layers[type].style.display = 'none';
@@ -231,21 +296,12 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
+    
 
     resetTriedOnItems() {
         this.currentItems = {};
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
-        });
-    }
-
-    changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        localStorage.setItem(`skinTone_${this.username}`, newTone);
-        Object.values(this.layers).forEach(obj => {
-            if (obj.contentDocument) {
-                this.applySkinTone(obj, obj.dataset.type);
-            }
         });
     }
 }
