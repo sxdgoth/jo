@@ -148,22 +148,24 @@ class AvatarDisplay {
         }
     }
 
-    applySkinTone(obj, type) {
+  applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (svgDoc && this.skinTones[this.skinTone]) {
-        const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        const elements = svgDoc.querySelectorAll('*');
         const tone = this.skinTones[this.skinTone];
         
-        paths.forEach((path) => {
-            const currentFill = path.getAttribute('fill');
-            if (currentFill) {
-                const upperCaseFill = currentFill.toUpperCase();
-                if (upperCaseFill === '#FEE2CA') {
-                    path.setAttribute('fill', tone.main);
-                } else if (upperCaseFill === '#EFC1B7') {
-                    path.setAttribute('fill', tone.shadow);
+        elements.forEach((element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                const currentColor = element.getAttribute(attr);
+                if (currentColor) {
+                    const upperCaseColor = currentColor.toUpperCase();
+                    if (upperCaseColor === '#FEE2CA') {
+                        element.setAttribute(attr, tone.main);
+                    } else if (upperCaseColor === '#EFC1B7') {
+                        element.setAttribute(attr, tone.shadow);
+                    }
                 }
-            }
+            });
         });
     }
 }
@@ -214,7 +216,7 @@ class AvatarDisplay {
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
 
-    changeSkinTone(newTone) {
+   changeSkinTone(newTone) {
     this.skinTone = newTone;
     Object.values(this.layers).forEach(obj => {
         if (obj.contentDocument) {
@@ -224,21 +226,21 @@ class AvatarDisplay {
     localStorage.setItem(`skinTone_${this.username}`, newTone);
 }
 
-    tryOnItem(item) {
-        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        if (!this.triedOnItems) this.triedOnItems = {};
-        if (!this.currentItems) this.currentItems = {};
+  tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    if (!this.triedOnItems) this.triedOnItems = {};
+    if (!this.currentItems) this.currentItems = {};
 
-        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-            this.removeItem(item.type);
-        } else {
-            this.currentItems[item.type] = item;
-            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-        }
-
-        this.reorderLayers();
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        this.removeItem(item.type);
+    } else {
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
+
+    this.reorderLayers();
+}
 
     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
@@ -246,49 +248,48 @@ class AvatarDisplay {
         this.updateAvatarDisplay(type, null);
     }
 
-    updateAvatarDisplay(type, src) {
-        console.log(`Updating avatar display for ${type} with src: ${src}`);
-        if (this.layers[type]) {
-            if (src) {
-                this.layers[type].data = src;
-                this.layers[type].style.display = 'block';
-                if (this.facialFeatures.includes(type)) {
-                    this.layers[type].addEventListener('load', () => {
-                        this.saveOriginalColors(this.layers[type], type);
-                        this.applySkinTone(this.layers[type], type);
-                    });
+  updateAvatarDisplay(type, src) {
+    console.log(`Updating avatar display for ${type} with src: ${src}`);
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                if (this.baseParts.includes(type) || this.facialFeatures.includes(type)) {
+                    this.applySkinTone(this.layers[type], type);
                 }
-            } else {
-                this.layers[type].style.display = 'none';
+            };
+        } else {
+            this.layers[type].style.display = 'none';
+        }
+    } else {
+        console.warn(`Layer not found for type: ${type}`);
+    }
+}
+
+
+  toggleEquippedItem(type) {
+    if (this.layers[type] && this.equippedItems[type]) {
+        if (this.layers[type].style.display === 'none') {
+            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+            if (equippedItem) {
+                this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                this.layers[type].style.display = 'block';
+                this.lastAction[type] = 'shown';
+                this.hiddenEquippedItems.delete(type);
+                this.layers[type].onload = () => {
+                    if (this.baseParts.includes(type) || this.facialFeatures.includes(type)) {
+                        this.applySkinTone(this.layers[type], type);
+                    }
+                };
             }
         } else {
-            console.warn(`Layer not found for type: ${type}`);
+            this.layers[type].style.display = 'none';
+            this.lastAction[type] = 'hidden';
+            this.hiddenEquippedItems.add(type);
         }
     }
-
-    toggleEquippedItem(type) {
-        if (this.layers[type] && this.equippedItems[type]) {
-            if (this.layers[type].style.display === 'none') {
-                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-                if (equippedItem) {
-                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
-                    this.layers[type].style.display = 'block';
-                    this.lastAction[type] = 'shown';
-                    this.hiddenEquippedItems.delete(type);
-                    if (this.facialFeatures.includes(type)) {
-                        this.layers[type].addEventListener('load', () => {
-                            this.saveOriginalColors(this.layers[type], type);
-                            this.applySkinTone(this.layers[type], type);
-                        });
-                    }
-                }
-            } else {
-                this.layers[type].style.display = 'none';
-                this.lastAction[type] = 'hidden';
-                this.hiddenEquippedItems.add(type);
-            }
-        }
-    }
+}
 
     isItemEquipped(item) {
         return this.equippedItems[item.type] === item.id;
