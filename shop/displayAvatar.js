@@ -61,10 +61,9 @@ class AvatarDisplay {
     loadAvatar() {
         console.log("Loading avatar...");
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-    console.log("Saved items:", savedItems);
-    const equippedItems = savedItems ? JSON.parse(savedItems) : {};
-        
-        this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
+        console.log("Saved items:", savedItems);
+        const equippedItems = savedItems ? JSON.parse(savedItems) : {};
+
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
@@ -138,60 +137,44 @@ class AvatarDisplay {
         });
     }
 
- applySkinTone(obj, type) {
+    applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
     const tone = this.skinTones[this.skinTone];
-    const defaultColors = {
-        light: ['#E6BBA8', '#E6958A', '#F4D5BF', '#FEE2CA', '#EFC1B7'],
-        medium: ['#FFE0BD', '#EFD0B1'],
-        tan: ['#F1C27D', '#E0B170'],
-        dark: ['#8D5524', '#7C4A1E']
-    };
+    const defaultColors = ['#E6BBA8', '#E6958A', '#F4D5BF'];
 
-    const currentDefaultColors = defaultColors[this.skinTone];
-    
     function replaceColor(element) {
         ['fill', 'stroke'].forEach(attr => {
             let color = element.getAttribute(attr);
             if (color) {
                 color = color.toUpperCase();
-                if (currentDefaultColors.includes(color) || 
-                    (this.skinTone === 'light' && (color.startsWith('#E6') || color.startsWith('#F4')))) {
+                if (defaultColors.includes(color) || color.startsWith('#E6') || color.startsWith('#F4')) {
                     element.setAttribute(attr, tone.main);
-                } else if (color === '#EFC1B7' || 
-                           (this.skinTone !== 'light' && color === defaultColors.light[4])) {
-                    element.setAttribute(attr, tone.shadow);
                 }
             }
         });
 
         
+           
         // Replace colors in style attribute
         let style = element.getAttribute('style');
         if (style) {
-            currentDefaultColors.forEach(defaultColor => {
+            defaultColors.forEach(defaultColor => {
                 style = style.replace(new RegExp(defaultColor, 'gi'), tone.main);
             });
-            if (this.skinTone === 'light') {
-                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
-            }
-            style = style.replace(/#EFC1B7/gi, tone.shadow);
+            style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+            style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
             element.setAttribute('style', style);
         }
 
         // Recursively apply to child elements
-        Array.from(element.children).forEach(child => replaceColor(child));
+        Array.from(element.children).forEach(replaceColor);
     }
 
     replaceColor(svgDoc.documentElement);
     console.log(`Applied skin tone ${this.skinTone} to ${type}`);
 }
-
-
-
 
 
 
