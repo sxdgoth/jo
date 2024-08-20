@@ -18,5 +18,7 @@ const shopItems = [
     { id: 'chipmunkcheeks.svg', name: 'Chipmunk Cheeks', type: 'Face', price: 180, path: 'output/' },
     { id: 'chipmunksx.svg', name: 'Chipmunk Cheeks', type: 'Face', price: 180, path: 'home/assets/face/' },
     { id: 'babyfangs.svg', name: 'Baby Fangs', type: 'Mouth', price: 180, path: 'home/assets/mouth/' },
+    { id: 'svgexport-5.svg', name: 'Coy Mouth', type: 'Mouth', price: 50, path: 'home/assets/mouth/' },
+    
     // Add more items as needed
 ];
