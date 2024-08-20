@@ -145,20 +145,28 @@ class AvatarDisplay {
 
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
-        if (svgDoc && this.skinTones[this.skinTone]) {
+        if (svgDoc && this.skinTones[this.skinTone] && this.baseParts.includes(type)) {
             const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
             const tone = this.skinTones[this.skinTone];
             
             elements.forEach((element) => {
                 ['fill', 'stroke'].forEach((attr) => {
                     const color = element.getAttribute(attr);
-                    if (color && color.toLowerCase() !== 'none') {
+                    if (color && color.toLowerCase() !== 'none' && this.isSkinTone(color)) {
                         const newColor = this.getNewSkinColor(color, tone);
                         element.setAttribute(attr, newColor);
                     }
                 });
             });
         }
+    }
+
+    isSkinTone(color) {
+        const rgb = this.hexToRgb(color);
+        if (!rgb) return false;
+        
+        const [r, g, b] = rgb;
+        return r > g && g > b && r - b > 20 && r > 180;
     }
 
     getNewSkinColor(currentColor, tone) {
