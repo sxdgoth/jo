@@ -1,4 +1,4 @@
-cclass ItemColorManager {
+class ItemColorManager {
     constructor() {
         this.colorableColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
         this.colorOptions = {
