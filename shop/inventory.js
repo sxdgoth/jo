@@ -1,31 +1,24 @@
-// inventory.js
-
 class Inventory {
     constructor(username) {
         this.username = username;
         this.items = this.loadInventory();
-        console.log(`Inventory created for ${username}:`, this.items);
     }
 
     loadInventory() {
         const savedInventory = localStorage.getItem(`userInventory_${this.username}`);
-        console.log(`Loading inventory for ${this.username}:`, savedInventory);
         return savedInventory ? JSON.parse(savedInventory) : [];
     }
 
     saveInventory() {
         localStorage.setItem(`userInventory_${this.username}`, JSON.stringify(this.items));
-        console.log(`Saved inventory for ${this.username}:`, this.items);
     }
 
     addItem(item) {
         if (!this.hasItem(item.id)) {
             this.items.push(item);
             this.saveInventory();
-            console.log(`Added item to inventory:`, item);
             return true;
         }
-        console.log(`Item already in inventory:`, item);
         return false;
     }
 
@@ -41,7 +34,6 @@ class Inventory {
 // Create a global inventory instance
 window.createUserInventory = function(username) {
     window.userInventory = new Inventory(username);
-    console.log(`Created user inventory for ${username}`);
 };
 
 // Function to update button state based on inventory
@@ -83,8 +75,5 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         window.createUserInventory(loggedInUser.username);
         initializeInventoryState();
-        console.log("Inventory initialized for logged-in user");
-    } else {
-        console.log("No logged-in user found");
     }
 });
