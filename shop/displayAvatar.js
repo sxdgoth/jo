@@ -42,9 +42,6 @@ class AvatarDisplay {
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
 
-        this.defaultEyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
-        this.currentEyeColor = '#000000'; // Default to black
-
         this.loadSkinTone();
         this.loadEquippedItems();
     }
@@ -122,9 +119,6 @@ class AvatarDisplay {
 
             obj.onload = () => {
                 this.applySkinTone(obj, part.type);
-                if (part.type === 'Eyes') {
-                    this.applyEyeColor(obj);
-                }
             };
 
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
@@ -144,71 +138,82 @@ class AvatarDisplay {
         });
     }
 
-    applySkinTone(obj, type) {
-        const svgDoc = obj.contentDocument;
-        if (!svgDoc || !this.skinTones[this.skinTone]) return;
+applySkinTone(obj, type) {
+    const svgDoc = obj.contentDocument;
+    if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
-        const tone = this.skinTones[this.skinTone];
-        const defaultColors = {
-            light: ['#FEE2CA', '#EFC1B7'],
-            medium: ['#FFE0BD', '#EFD0B1'],
-            tan: ['#F1C27D', '#E0B170'],
-            dark: ['#8D5524', '#7C4A1E']
-        };
-        const eyeColors = {
-            main: '#F4D5BF',
-            shadow: '#E6BBA8'
-        };
-        
-        const preserveColors = ['#E6958A']; // Add more colors here if needed
-        
-        function replaceColor(element) {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    if (preserveColors.includes(color)) return;
-                    
-                    if (defaultColors.light.includes(color)) {
-                        element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
-                    }
-                    else if (color === eyeColors.main) {
-                        element.setAttribute(attr, tone.main);
-                    }
-                    else if (color === eyeColors.shadow) {
-                        element.setAttribute(attr, tone.shadow);
-                    }
-                    else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
-                        element.setAttribute(attr, tone.main);
-                    }
+    const tone = this.skinTones[this.skinTone];
+    const defaultColors = {
+        light: ['#FEE2CA', '#EFC1B7'],
+        medium: ['#FFE0BD', '#EFD0B1'],
+        tan: ['#F1C27D', '#E0B170'],
+        dark: ['#8D5524', '#7C4A1E']
+    };
+    const eyeColors = {
+        main: '#F4D5BF',
+        shadow: '#E6BBA8'
+    };
+    
+    // Colors to preserve (including the scar color)
+    const preserveColors = ['#E6958A']; // Add more colors here if needed
+    
+function replaceColor(element) {
+        ['fill', 'stroke'].forEach(attr => {
+            let color = element.getAttribute(attr);
+            if (color) {
+                color = color.toUpperCase();
+                // Skip preserved colors
+                if (preserveColors.includes(color)) return;
+                
+                // Replace default skin colors
+                if (defaultColors.light.includes(color)) {
+                    element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
                 }
-            });
-
-            let style = element.getAttribute('style');
-            if (style) {
-                defaultColors.light.forEach((defaultColor, index) => {
-                    style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
-                });
-                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-                preserveColors.forEach(color => {
-                    style = style.replace(new RegExp(color, 'gi'), color);
-                });
-                if (!preserveColors.some(color => style.includes(color))) {
-                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+                // Replace eye colors
+                else if (color === eyeColors.main) {
+                    element.setAttribute(attr, tone.main);
                 }
-                element.setAttribute('style', style);
+                else if (color === eyeColors.shadow) {
+                    element.setAttribute(attr, tone.shadow);
+                }
+                // Replace other potential skin tone colors
+                else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
+                    element.setAttribute(attr, tone.main);
+                }
             }
+        });
 
-            Array.from(element.children).forEach(replaceColor);
+  // Replace colors in style attribute
+        let style = element.getAttribute('style');
+        if (style) {
+            // Replace default skin colors
+            defaultColors.light.forEach((defaultColor, index) => {
+                style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
+            });
+            // Replace eye colors
+            style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+            style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
+            // Preserve specific colors
+            preserveColors.forEach(color => {
+                style = style.replace(new RegExp(color, 'gi'), color);
+            });
+            // Replace other potential skin tone colors
+            if (!preserveColors.some(color => style.includes(color))) {
+                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            }
+            element.setAttribute('style', style);
         }
 
-        replaceColor(svgDoc.documentElement);
-        console.log(`Applied skin tone ${this.skinTone} to ${type}`);
+        // Recursively apply to child elements
+        Array.from(element.children).forEach(replaceColor);
     }
 
-  changeSkinTone(newTone) {
+    replaceColor(svgDoc.documentElement);
+    console.log(`Applied skin tone ${this.skinTone} to ${type}`);
+}
+
+    changeSkinTone(newTone) {
         this.skinTone = newTone;
         Object.values(this.layers).forEach(obj => {
             if (obj.contentDocument) {
@@ -241,26 +246,27 @@ class AvatarDisplay {
     }
 
     updateAvatarDisplay(type, src) {
-        console.log(`Updating avatar display for ${type} with src: ${src}`);
-        if (this.layers[type]) {
-            if (src) {
-                this.layers[type].data = src;
-                this.layers[type].style.display = 'block';
-                this.layers[type].onload = () => {
-                    this.applySkinTone(this.layers[type], type);
-                    if (type === 'Eyes') {
-                        this.applyEyeColor(this.layers[type]);
-                    }
-                };
-            } else {
-                this.layers[type].style.display = 'none';
-            }
+    console.log(`Updating avatar display for ${type} with src: ${src}`);
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Eyes') {
+                    // Apply skin tone again after a short delay to ensure all elements are loaded
+                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                }
+            };
         } else {
-            console.warn(`Layer not found for type: ${type}`);
+            this.layers[type].style.display = 'none';
         }
+    } else {
+        console.warn(`Layer not found for type: ${type}`);
     }
+}
 
- toggleEquippedItem(type) {
+    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -271,14 +277,11 @@ class AvatarDisplay {
                     this.hiddenEquippedItems.delete(type);
                     this.layers[type].onload = () => {
                         this.applySkinTone(this.layers[type], type);
-                        if (type === 'Eyes') {
-                            this.applyEyeColor(this.layers[type]);
-                        }
                     };
                 }
             } else {
                 this.layers[type].style.display = 'none';
-                    this.lastAction[type] = 'hidden';
+                this.lastAction[type] = 'hidden';
                 this.hiddenEquippedItems.add(type);
             }
         }
@@ -299,39 +302,7 @@ class AvatarDisplay {
             this.updateAvatarDisplay(type, null);
         });
     }
-
-    updateEyeColor(newColor) {
-        this.currentEyeColor = newColor;
-        const eyesLayer = this.layers['Eyes'];
-        if (eyesLayer && eyesLayer.contentDocument) {
-            this.applyEyeColor(eyesLayer);
-        }
-    }
-
-    applyEyeColor(obj) {
-        const svgDoc = obj.contentDocument;
-        if (!svgDoc) return;
-
-        const eyeElements = svgDoc.querySelectorAll('path, circle, ellipse');
-        eyeElements.forEach(element => {
-            this.defaultEyeColors.forEach(oldColor => {
-                if (element.getAttribute('fill') === oldColor) {
-                    element.setAttribute('fill', this.currentEyeColor);
-                }
-                if (element.getAttribute('stroke') === oldColor) {
-                    element.setAttribute('stroke', this.currentEyeColor);
-                }
-                let style = element.getAttribute('style');
-                if (style) {
-                    style = style.replace(new RegExp(`fill:\\s*${oldColor}`, 'gi'), `fill: ${this.currentEyeColor}`);
-                    style = style.replace(new RegExp(`stroke:\\s*${oldColor}`, 'gi'), `stroke: ${this.currentEyeColor}`);
-                    element.setAttribute('style', style);
-                }
-            });
-        });
-    }
 }
-
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
@@ -344,8 +315,3 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No logged in user found');
     }
 });
-
-
-
-
-
