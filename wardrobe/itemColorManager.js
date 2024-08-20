@@ -57,17 +57,16 @@ class ItemColorManager {
         colorPicker.style.display = 'none';
     }
 
-    changeItemColor(newColor) {
-        const colorPicker = document.getElementById('color-picker');
-        const itemId = colorPicker.getAttribute('data-item-id');
-        this.currentItemColors[itemId] = newColor;
-        this.hideColorPicker();
-        if (window.avatarManager) {
-            console.log('Updating item color:', itemId, newColor); // Add this log
-            window.avatarManager.updateItemColor(itemId, newColor);
-        } else {
-            console.error('AvatarManager not found');
-        }
+   changeItemColor(newColor) {
+    const colorPicker = document.getElementById('color-picker');
+    const itemId = colorPicker.getAttribute('data-item-id');
+    this.currentItemColors[itemId] = newColor;
+    this.hideColorPicker();
+    if (window.avatarManager) {
+        console.log('Updating item color:', itemId, newColor);
+        window.avatarManager.updateItemColor(itemId, newColor);
+    } else {
+        console.error('AvatarManager not found');
     }
 }
 
