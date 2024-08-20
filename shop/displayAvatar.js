@@ -200,31 +200,48 @@ class AvatarDisplay {
         ] : null;
     }
 
-    tryOnItem(item) {
-        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+  tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    if (!this.triedOnItems) this.triedOnItems = {};
+    if (!this.currentItems) this.currentItems = {};
+    
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        this.removeItem(item.type);
+    } else {
+        this.currentItems[item.type] = item;
+        const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
+        this.updateAvatarDisplay(item.type, itemSrc);
         
-        if (!this.triedOnItems) this.triedOnItems = {};
-        if (!this.currentItems) this.currentItems = {};
-        
-        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-            this.removeItem(item.type);
-        } else {
-            this.currentItems[item.type] = item;
-            const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
-            this.updateAvatarDisplay(item.type, itemSrc);
-            
-            const itemLayer = this.layers[item.type];
-            if (itemLayer) {
-                itemLayer.addEventListener('load', () => {
-                    if (['Eyes', 'Face', 'Accessories', 'Mouth', 'Nose'].includes(item.type)) {
-                        this.applySkinTone(itemLayer, item.type);
-                    }
-                }, { once: true });
-            }
+        const itemLayer = this.layers[item.type];
+        if (itemLayer) {
+            itemLayer.addEventListener('load', () => {
+                this.applySkinToneWithShadows(itemLayer, item.type);
+            }, { once: true });
         }
-        this.reorderLayers();
     }
+    this.reorderLayers();
+}
 
+applySkinToneWithShadows(obj, type) {
+    const svgDoc = obj.contentDocument;
+    if (svgDoc && this.skinTones[this.skinTone]) {
+        const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        const tone = this.skinTones[this.skinTone];
+        
+        elements.forEach((element) => {
+            this.applySkinToneToElement(element, tone);
+        });
+        
+        // Reapply shadows
+        const shadowElements = svgDoc.querySelectorAll('[id*="shadow"], [class*="shadow"]');
+        shadowElements.forEach((element) => {
+            element.setAttribute('fill', tone.shadow);
+            element.setAttribute('stroke', tone.shadow);
+        });
+    }
+}
+    
     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
