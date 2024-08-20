@@ -57,12 +57,11 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-     updateAvatarDisplay() {
+    updateAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
-
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -96,12 +95,11 @@ class AvatarManager {
         });
     }
 
-   updateTempAvatarDisplay() {
+    updateTempAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
-
             Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -113,12 +111,12 @@ class AvatarManager {
         }
     }
 
-     changeSkinTone(newTone) {
+    changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
     }
 
-  applySkinTone() {
+    applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
             window.skinToneManager.applySkinTone(tone);
@@ -133,7 +131,6 @@ class AvatarManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 this.applySkinToneToSVG(svgDoc);
-
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -157,7 +154,6 @@ class AvatarManager {
             shadow: '#E6BBA8'
         };
         const preserveColors = ['#E6958A'];
-
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -176,7 +172,6 @@ class AvatarManager {
                     }
                 }
             });
-
             let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
@@ -193,11 +188,41 @@ class AvatarManager {
                 }
                 element.setAttribute('style', style);
             }
-
             Array.from(element.children).forEach(replaceColor);
         };
-
         replaceColor(svgDoc.documentElement);
+    }
+
+    // New methods for color changing
+    updateItemColors(colors) {
+        Object.entries(colors).forEach(([itemType, color]) => {
+            const svgElement = this.getSVGElement(itemType);
+            if (svgElement) {
+                this.updateSVGColor(svgElement, color, itemType);
+            }
+        });
+        this.updateTempAvatarDisplay();
+    }
+
+    getSVGElement(itemType) {
+        const itemId = this.tempEquippedItems[itemType];
+        if (itemId) {
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item) {
+                return document.querySelector(`[data-id="${item.id}"] svg`);
+            }
+        }
+        return null;
+    }
+
+    updateSVGColor(svgElement, color, itemType) {
+        if (itemType === 'eyes') {
+            const eyeElement = svgElement.querySelector('path[fill="#3FA2FF"]');
+            if (eyeElement) {
+                eyeElement.setAttribute('fill', color);
+            }
+        }
+        // Add more conditions for other item types as needed
     }
 }
 
