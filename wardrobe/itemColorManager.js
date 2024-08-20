@@ -84,3 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// At the end of itemColorManager.js
+window.ItemColorManager = ItemColorManager;
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing ItemColorManager');
+    window.itemColorManager = new ItemColorManager();
+    window.itemColorManager.initialize();
+
+    // Close color picker when clicking outside
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('#color-picker')) {
+            window.itemColorManager.hideColorPicker();
+        }
+    });
+});
