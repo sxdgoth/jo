@@ -198,9 +198,14 @@ class AvatarManager {
             const svgElement = this.getSVGElement(itemType);
             if (svgElement) {
                 this.updateSVGColor(svgElement, color, itemType);
+                // Update the layer in avatarBody
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(svgElement);
+                const blob = new Blob([svgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                window.avatarBody.updateLayer(itemType, url);
             }
         });
-        this.updateTempAvatarDisplay();
     }
 
     getSVGElement(itemType) {
@@ -208,7 +213,8 @@ class AvatarManager {
         if (itemId) {
             const item = window.userInventory.getItems().find(i => i.id === itemId);
             if (item) {
-                return document.querySelector(`[data-id="${item.id}"] svg`);
+                const itemElement = document.querySelector(`[data-id="${item.id}"]`);
+                return itemElement ? itemElement.querySelector('svg') : null;
             }
         }
         return null;
@@ -218,7 +224,7 @@ class AvatarManager {
         if (itemType === 'eyes') {
             const eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
             eyeColors.forEach(eyeColor => {
-                const eyeElements = svgElement.querySelectorAll(`path[fill="${eyeColor}"], path[style*="fill: ${eyeColor}"]`);
+                const eyeElements = svgElement.querySelectorAll(`*[fill="${eyeColor}"], *[style*="fill: ${eyeColor}"]`);
                 eyeElements.forEach(element => {
                     if (element.hasAttribute('fill')) {
                         element.setAttribute('fill', color);
@@ -230,6 +236,12 @@ class AvatarManager {
                     }
                 });
             });
+            
+            // Force a redraw of the SVG
+            const parent = svgElement.parentNode;
+            const nextSibling = svgElement.nextSibling;
+            parent.removeChild(svgElement);
+            parent.insertBefore(svgElement, nextSibling);
         }
         // Add more conditions for other item types as needed
     }
