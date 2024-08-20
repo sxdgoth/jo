@@ -1,3 +1,5 @@
+// wardrobe.js
+
 document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
@@ -24,35 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Render owned items
         renderOwnedItems();
-
-        // Setup eye color picker
-        const eyeColorInput = document.getElementById('eye-color-input');
-        if (eyeColorInput) {
-            // Set initial value from localStorage or default
-            const savedEyeColor = localStorage.getItem(`eyeColor_${loggedInUser.username}`);
-            eyeColorInput.value = savedEyeColor || '#3FA2FF';
-
-            eyeColorInput.addEventListener('change', function(e) {
-                const newColor = e.target.value;
-                if (window.avatarManager) {
-                    window.avatarManager.changeEyeColor(newColor);
-                }
-            });
-        }
-
-        // Setup lip color picker
-        const lipColorInput = document.getElementById('lip-color-input');
-        if (lipColorInput) {
-            const savedLipColor = localStorage.getItem(`lipColor_${loggedInUser.username}`);
-            lipColorInput.value = savedLipColor || '#dea296';
-
-            lipColorInput.addEventListener('change', function(e) {
-                const newColor = e.target.value;
-                if (window.avatarManager) {
-                    window.avatarManager.changeLipColor(newColor);
-                }
-            });
-        }
     } else {
         window.location.href = '../index.html';
     }
