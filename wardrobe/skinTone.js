@@ -1,3 +1,5 @@
+// skinTone.js
+
 class SkinToneManager {
     constructor() {
         this.skinTones = {
@@ -123,17 +125,8 @@ class SkinToneManager {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-                const colors = this.getUniqueColors(paths);
-                const mainColor = this.findMainSkinColor(colors);
-                
-                paths.forEach(path => {
-                    const currentFill = path.getAttribute('fill');
-                    if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        const newColor = this.getNewColor(currentFill, mainColor, tone);
-                        path.setAttribute('fill', newColor);
-                    }
-                });
+                this.applySkinToneToSVGElements(svgDoc, tone);
+
                 console.log(`Skin tone applied to ${partName}`);
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -144,19 +137,34 @@ class SkinToneManager {
             .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
     }
 
-    getUniqueColors(paths) {
-        const colors = new Set();
-        paths.forEach(path => {
-            const fill = path.getAttribute('fill');
-            if (fill && fill.toLowerCase() !== 'none') {
-                colors.add(fill.toLowerCase());
-            }
+    applySkinToneToSVGElements(svgDoc, tone) {
+        const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        elements.forEach((element) => {
+            ['fill', 'stroke'].forEach((attr) => {
+                const color = element.getAttribute(attr);
+                if (color && color.toLowerCase() !== 'none' && this.isSkinTone(color)) {
+                    const newColor = this.getNewColor(color, tone.main, tone);
+                    element.setAttribute(attr, newColor);
+                }
+            });
         });
-        return Array.from(colors);
     }
 
-    findMainSkinColor(colors) {
-        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
+    applySkinToneToShopItem(imgElement, item) {
+        if (['Eyes', 'Face', 'Accessories', 'Mouth', 'Nose'].includes(item.type)) {
+            imgElement.addEventListener('load', () => {
+                const svgDoc = imgElement.contentDocument;
+                if (svgDoc) {
+                    const tone = this.skinTones[this.getSkinToneKey(this.currentSkinTone)];
+                    this.applySkinToneToSVGElements(svgDoc, tone);
+                }
+            });
+        }
+    }
+
+    isSkinTone(color) {
+        const rgb = this.hexToRgb(color);
+        return (rgb[0] > rgb[1] && rgb[1] > rgb[2] && rgb[0] - rgb[2] > 20);
     }
 
     getNewColor(currentColor, mainColor, tone) {
@@ -212,3 +220,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.skinToneManager = new SkinToneManager();
     window.skinToneManager.initialize();
 });
+
+// avatarManager.js and displayAvatar.js remain unchanged
