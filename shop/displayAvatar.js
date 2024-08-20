@@ -39,7 +39,7 @@ class AvatarDisplay {
                 shadow: '#7C4A1E'
             }
         };
-        this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
+        this.facialFeatures = ['Eyes', 'Nose'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
 
