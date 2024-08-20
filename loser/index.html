@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Eye Color Changer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+        .color-buttons {
+            margin-top: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547" preserveAspectRatio="xMidYMid meet" width="300"  height="400">
+            <!-- Your SVG content here -->
+            <!-- ... -->
+        </svg>
+        <div class="color-buttons">
+            <button onclick="changeEyeColor('#346799')">Default</button>
+            <button onclick="changeEyeColor('#ff0000')">Red</button>
+            <button onclick="changeEyeColor('#00ff00')">Green</button>
+            <button onclick="changeEyeColor('#0000ff')">Blue</button>
+            <button onclick="changeEyeColor('#ffff00')">Yellow</button>
+        </div>
+    </div>
+
+    <script>
+        function changeEyeColor(color) {
+            const eyeElements = document.querySelectorAll('path[fill="#3FA2FF"]');
+            eyeElements.forEach(element => {
+                element.setAttribute('fill', color);
+            });
+        }
+    </script>
+</body>
+</html>
