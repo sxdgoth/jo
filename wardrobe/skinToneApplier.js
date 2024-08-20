@@ -1,25 +1,24 @@
 // skinToneApplier.js
 
 class SkinToneApplier {
-    constructor(avatarDisplay) {
-        this.avatarDisplay = avatarDisplay;
+    constructor() {
         this.skinToneItems = ['Eyes', 'Nose', 'Mouth', 'Face'];
     }
 
-    applySkinToneToItems() {
+    applySkinToneToItems(currentSkinTone) {
         this.skinToneItems.forEach(itemType => {
-            const layer = this.avatarDisplay.layers[itemType];
+            const layer = document.querySelector(`[data-type="${itemType}"]`);
             if (layer && layer.style.display !== 'none') {
-                this.applySkinToneToSVG(layer, itemType);
+                this.applySkinToneToSVG(layer, currentSkinTone);
             }
         });
     }
 
-    applySkinToneToSVG(obj, itemType) {
+    applySkinToneToSVG(obj, currentSkinTone) {
         const svgDoc = obj.contentDocument;
-        if (svgDoc && this.avatarDisplay.skinTones[this.avatarDisplay.skinTone]) {
+        if (svgDoc && window.avatarDisplay.skinTones[currentSkinTone]) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            const tone = this.avatarDisplay.skinTones[this.avatarDisplay.skinTone];
+            const tone = window.avatarDisplay.skinTones[currentSkinTone];
 
             paths.forEach(path => {
                 const currentFill = path.getAttribute('fill');
@@ -68,9 +67,5 @@ class SkinToneApplier {
     }
 }
 
-// Initialize the SkinToneApplier when the AvatarDisplay is created
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.avatarDisplay) {
-        window.skinToneApplier = new SkinToneApplier(window.avatarDisplay);
-    }
-});
+// Initialize the SkinToneApplier
+window.skinToneApplier = new SkinToneApplier();
