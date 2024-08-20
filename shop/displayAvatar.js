@@ -1,9 +1,11 @@
+// displayAvatar.js
+
 class AvatarDisplay {
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
-        this.triedOnItems = {}; // Initialize this
-        this.currentItems = {}; // Initialize this
+        this.triedOnItems = {};
+        this.currentItems = {};
         if (!this.container) {
             console.error(`Container with id "${containerId}" not found`);
             return;
@@ -12,9 +14,9 @@ class AvatarDisplay {
         this.layers = {};
         this.triedOnItems = {};
         this.equippedItems = {};
-        this.lastAction = {}; // Track the last action for each item type
+        this.lastAction = {};
         this.hiddenEquippedItems = new Set();
-        this.skinTone = 'light'; // Default skin tone
+        this.skinTone = 'light';
         this.skinTones = {
             light: {
                 name: 'Light',
@@ -64,6 +66,7 @@ class AvatarDisplay {
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
         this.container.style.height = '100%';
+
         const bodyParts = [
             { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
             { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
@@ -79,6 +82,7 @@ class AvatarDisplay {
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
+
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
@@ -90,6 +94,7 @@ class AvatarDisplay {
             obj.style.left = '0';
             obj.style.width = '100%';
             obj.style.height = '100%';
+
             if (part.isBase) {
                 obj.data = this.baseUrl + part.file;
                 obj.style.display = 'block';
@@ -108,9 +113,11 @@ class AvatarDisplay {
                 obj.style.display = 'none';
                 console.log(`No equipped item for: ${part.name}`);
             }
+
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
+
             if (part.isBase) {
                 obj.addEventListener('load', () => {
                     this.saveOriginalColors(obj, part.type);
@@ -118,11 +125,13 @@ class AvatarDisplay {
                 });
             }
         });
+
         this.reorderLayers();
+        this.applySkinToneToItems();
     }
 
     reorderLayers() {
-    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -188,9 +197,7 @@ class AvatarDisplay {
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
         return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    }
-
-    hexToRgb(hex) {
+        hexToRgb(hex) {
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
         hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -210,29 +217,27 @@ class AvatarDisplay {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        // Initialize the objects if they don't exist
         if (!this.triedOnItems) this.triedOnItems = {};
         if (!this.currentItems) this.currentItems = {};
 
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-            // If the same item is clicked again, remove it
             this.removeItem(item.type);
         } else {
-            // Otherwise, update with the new item
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
 
         this.reorderLayers();
+        this.applySkinToneToItems();
     }
 
-     removeItem(type) {
+    removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-     updateAvatarDisplay(type, src) {
+    updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
@@ -245,23 +250,21 @@ class AvatarDisplay {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
-    
+
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
-                // Show the equipped item
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
                 if (equippedItem) {
                     this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
                     this.layers[type].style.display = 'block';
                     this.lastAction[type] = 'shown';
-                    this.hiddenEquippedItems.delete(type); // Remove from hidden set
+                    this.hiddenEquippedItems.delete(type);
                 }
             } else {
-                // Hide the equipped item
                 this.layers[type].style.display = 'none';
                 this.lastAction[type] = 'hidden';
-                this.hiddenEquippedItems.add(type); // Add to hidden set
+                this.hiddenEquippedItems.add(type);
             }
         }
     }
@@ -280,6 +283,18 @@ class AvatarDisplay {
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
         });
+    }
+
+    applySkinToneToItems() {
+        if (window.skinToneApplier) {
+            window.skinToneApplier.applySkinToneToItems(this.skinTone);
+        }
+    }
+
+    changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        localStorage.setItem(`skinTone_${this.username}`, newTone);
+        this.loadAvatar();
     }
 }
 
