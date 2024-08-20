@@ -1,4 +1,5 @@
 function renderOwnedItems() {
+    console.log('Rendering owned items');
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
     
@@ -26,10 +27,11 @@ function renderOwnedItems() {
         const changeColorBtn = itemElement.querySelector('.change-color-btn');
         changeColorBtn.addEventListener('click', (event) => {
             event.stopPropagation();
+            console.log('Change color button clicked for item:', item);
             if (window.itemColorManager) {
                 window.itemColorManager.showColorPicker(item, event);
             } else {
-                console.error('ItemColorManager not found');
+                console.error('ItemColorManager not found. window.itemColorManager:', window.itemColorManager);
             }
         });
     });
@@ -49,6 +51,7 @@ function logout() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded in wardrobe.js');
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
@@ -66,14 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('AvatarManager class not found');
         }
         
-        // Render the avatar
-        if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
-            window.avatarBody.initializeAvatar(loggedInUser.username);
-        }
-
-      // Initialize SkinToneManager after avatar is rendered
-        if (window.skinToneManager) {
-            window.skinToneManager.initialize();
+        // Check if ItemColorManager is available
+        if (window.ItemColorManager) {
+            console.log('ItemColorManager is available');
+        } else {
+            console.error('ItemColorManager is not available');
         }
         
         // Render owned items
@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             logoutButton.addEventListener('click', logout);
         }
     } else {
+        console.error('No logged in user found');
         window.location.href = '../index.html';
     }
 });
