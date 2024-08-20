@@ -46,6 +46,17 @@ class AvatarDisplay {
         this.loadEquippedItems();
     }
 
+
+    isCloseTo(color1, color2) {
+    const rgb1 = this.hexToRgb(color1);
+    const rgb2 = this.hexToRgb(color2);
+    const threshold = 15; // Reduced threshold for more precise matching
+
+    return Math.abs(rgb1[0] - rgb2[0]) < threshold &&
+           Math.abs(rgb1[1] - rgb2[1]) < threshold &&
+           Math.abs(rgb1[2] - rgb2[2]) < threshold;
+}
+    
     loadSkinTone() {
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
