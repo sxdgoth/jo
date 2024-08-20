@@ -2,6 +2,7 @@ class ColorPicker {
     constructor() {
         this.defaultEyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
         this.currentEyeColor = '#000000'; // Default to black
+        this.eyeColors = ['#000000', '#800080', '#FF0000', '#808080', '#008000', '#0000FF', '#FFA500'];
         this.initialize();
     }
 
@@ -14,8 +15,7 @@ class ColorPicker {
         const eyeColorButtons = document.getElementById('eye-color-buttons');
         if (eyeColorButtons) {
             eyeColorButtons.innerHTML = ''; // Clear existing buttons
-            const colors = ['#000000', '#800080', '#FF0000', '#808080', '#008000', '#0000FF', '#FFA500'];
-            colors.forEach(color => {
+            this.eyeColors.forEach(color => {
                 const button = document.createElement('button');
                 button.className = 'color-button';
                 button.style.backgroundColor = color;
@@ -48,9 +48,38 @@ class ColorPicker {
     }
 
     applyEyeColor() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.updateEyeColor(this.currentEyeColor);
+        const eyesLayer = document.querySelector('object[data-type="Eyes"]');
+        if (eyesLayer && eyesLayer.contentDocument) {
+            this.updateEyeColorInSVG(eyesLayer.contentDocument);
+        } else {
+            console.error('Eyes layer not found or not loaded');
         }
+    }
+
+    updateEyeColorInSVG(svgDoc) {
+        const eyeElements = svgDoc.querySelectorAll('path, circle, ellipse');
+        eyeElements.forEach(element => {
+            this.defaultEyeColors.forEach(oldColor => {
+                if (element.getAttribute('fill') === oldColor) {
+                    element.setAttribute('fill', this.currentEyeColor);
+                }
+                if (element.getAttribute('stroke') === oldColor) {
+                    element.setAttribute('stroke', this.currentEyeColor);
+                }
+                let style = element.getAttribute('style');
+                if (style) {
+                    style = style.replace(new RegExp(`fill:\\s*${oldColor}`, 'gi'), `fill: ${this.currentEyeColor}`);
+                    style = style.replace(new RegExp(`stroke:\\s*${oldColor}`, 'gi'), `stroke: ${this.currentEyeColor}`);
+                    element.setAttribute('style', style);
+                }
+            });
+        });
+
+        // Force a redraw of the SVG
+        const parent = svgDoc.documentElement.parentNode;
+        const nextSibling = svgDoc.documentElement.nextSibling;
+        parent.removeChild(svgDoc.documentElement);
+        parent.insertBefore(svgDoc.documentElement, nextSibling);
     }
 }
 
