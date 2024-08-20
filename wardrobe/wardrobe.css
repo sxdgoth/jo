@@ -274,6 +274,7 @@ main {
     margin-top: 10px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 #eye-color-picker label {
@@ -284,8 +285,8 @@ main {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background-color: transparent;
     border: none;
     cursor: pointer;
