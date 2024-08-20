@@ -39,6 +39,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+
+        // Setup lip color picker
+        const lipColorInput = document.getElementById('lip-color-input');
+        if (lipColorInput) {
+            const savedLipColor = localStorage.getItem(`lipColor_${loggedInUser.username}`);
+            lipColorInput.value = savedLipColor || '#dea296';
+
+            lipColorInput.addEventListener('change', function(e) {
+                const newColor = e.target.value;
+                if (window.avatarManager) {
+                    window.avatarManager.changeLipColor(newColor);
+                }
+            });
+        }
     } else {
         window.location.href = '../index.html';
     }
