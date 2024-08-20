@@ -149,6 +149,10 @@ class AvatarManager {
 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
+                
+                // Log the final SVG for debugging
+                console.log('Final SVG:', modifiedSvgString);
+
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
                 const url = URL.createObjectURL(blob);
                 
@@ -182,7 +186,7 @@ class AvatarManager {
                 }
             });
 
-              let style = element.getAttribute('style');
+            let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
                     style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
@@ -210,15 +214,19 @@ class AvatarManager {
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
-                if (color && this.colorableColors.includes(color.toUpperCase())) {
-                    element.setAttribute(attr, newColor);
+                if (color) {
+                    color = color.toUpperCase();
+                    if (this.colorableColors.includes(color)) {
+                        element.setAttribute(attr, newColor);
+                    }
                 }
             });
 
             let style = element.getAttribute('style');
             if (style) {
                 this.colorableColors.forEach(colorableColor => {
-                    style = style.replace(new RegExp(colorableColor, 'gi'), newColor);
+                    const regex = new RegExp(colorableColor, 'gi');
+                    style = style.replace(regex, newColor);
                 });
                 element.setAttribute('style', style);
             }
@@ -227,10 +235,13 @@ class AvatarManager {
         };
 
         replaceColor(svgDoc.documentElement);
+
+        // Log the modified SVG for debugging
+        console.log('Modified SVG:', new XMLSerializer().serializeToString(svgDoc));
     }
 
-
     updateItemColor(itemId, newColor) {
+        console.log('Updating item color:', itemId, newColor); // Add this log
         this.itemColors[itemId] = newColor;
         this.updateTempAvatarDisplay();
     }
