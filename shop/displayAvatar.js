@@ -10,6 +10,7 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
+        this.triedOnItems = {};
         this.equippedItems = {};
         this.lastAction = {};
         this.hiddenEquippedItems = new Set();
@@ -44,10 +45,9 @@ class AvatarDisplay {
 
     loadSkinTone() {
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone && this.skinTones[savedSkinTone]) {
+        if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
-        console.log("Loaded skin tone:", this.skinTone, "Color:", this.skinTones[this.skinTone].main);
     }
 
     loadEquippedItems() {
@@ -77,9 +77,9 @@ class AvatarDisplay {
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
-            { name: 'Face', file: '', type: 'Face', isBase: false },
-            { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
+            { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
+
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
@@ -114,6 +114,7 @@ class AvatarDisplay {
             this.layers[part.type] = obj;
             if (part.isBase) {
                 obj.addEventListener('load', () => {
+                    this.saveOriginalColors(obj, part.type);
                     this.applySkinTone(obj, part.type);
                 });
             }
@@ -130,6 +131,17 @@ class AvatarDisplay {
         });
     }
 
+    saveOriginalColors(obj, type) {
+        const svgDoc = obj.contentDocument;
+        if (svgDoc) {
+            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+            this.originalColors[type] = Array.from(paths).map(path => ({
+                fill: path.getAttribute('fill'),
+                stroke: path.getAttribute('stroke')
+            }));
+        }
+    }
+
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
@@ -137,61 +149,66 @@ class AvatarDisplay {
             const tone = this.skinTones[this.skinTone];
             
             elements.forEach((element) => {
-                this.applySkinToneToElement(element, tone);
+                ['fill', 'stroke'].forEach((attr) => {
+                    const color = element.getAttribute(attr);
+                    if (color && color.toLowerCase() !== 'none') {
+                        if (this.isSkinTone(color)) {
+                            const newColor = this.getNewColor(color, tone.main, tone);
+                            element.setAttribute(attr, newColor);
+                        }
+                    }
+                });
             });
         }
     }
 
-    applySkinToneToElement(element, tone) {
-        ['fill', 'stroke'].forEach((attr) => {
-            const originalColor = element.getAttribute(attr);
-            if (originalColor && originalColor.toLowerCase() !== 'none') {
-                if (this.isSkinTone(originalColor)) {
-                    element.setAttribute(attr, tone.main);
-                    console.log(`Changed ${attr} from ${originalColor} to ${tone.main}`);
-                } else if (this.isShadowTone(originalColor)) {
-                    element.setAttribute(attr, tone.shadow);
-                    console.log(`Changed ${attr} from ${originalColor} to ${tone.shadow}`);
-                }
+    isSkinTone(color) {
+        const rgb = this.hexToRgb(color);
+        // This is a simple check and might need adjustment
+        return (rgb[0] > rgb[1] && rgb[1] > rgb[2] && rgb[0] - rgb[2] > 20);
+    }
+
+    getUniqueColors(paths) {
+        const colors = new Set();
+        paths.forEach(path => {
+            const fill = path.getAttribute('fill');
+            const stroke = path.getAttribute('stroke');
+            if (fill && fill.toLowerCase() !== 'none') {
+                colors.add(fill.toLowerCase());
+            }
+            if (stroke && stroke.toLowerCase() !== 'none') {
+                colors.add(stroke.toLowerCase());
             }
         });
+        return Array.from(colors);
     }
 
-    isSkinTone(color) {
-        const skinTones = Object.values(this.skinTones).map(t => t.main.toLowerCase());
-        return skinTones.includes(color.toLowerCase()) || this.isCloseToSkinTone(color);
+    findMainSkinColor(colors) {
+        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
     }
 
-    isShadowTone(color) {
-        const shadowTones = Object.values(this.skinTones).map(t => t.shadow.toLowerCase());
-        return shadowTones.includes(color.toLowerCase()) || this.isCloseToShadowTone(color);
+    getNewColor(currentColor, mainColor, tone) {
+        const currentLuminance = this.getLuminance(currentColor);
+        const mainLuminance = this.getLuminance(mainColor);
+        const luminanceDiff = currentLuminance - mainLuminance;
+        
+        if (Math.abs(luminanceDiff) < 0.1) {
+            return tone.main;
+        } else if (luminanceDiff < 0) {
+            return this.darkenColor(tone.main, Math.abs(luminanceDiff));
+        } else {
+            return this.lightenColor(tone.main, luminanceDiff);
+        }
     }
 
-    isCloseToSkinTone(color) {
-        const rgb = this.hexToRgb(color);
-        return Object.values(this.skinTones).some(tone => {
-            const toneRgb = this.hexToRgb(tone.main);
-            return this.colorDistance(rgb, toneRgb) < 30; // Adjust threshold as needed
-        });
-    }
-
-    isCloseToShadowTone(color) {
-        const rgb = this.hexToRgb(color);
-        return Object.values(this.skinTones).some(tone => {
-            const toneRgb = this.hexToRgb(tone.shadow);
-            return this.colorDistance(rgb, toneRgb) < 30; // Adjust threshold as needed
-        });
-    }
-
-    colorDistance(rgb1, rgb2) {
-        return Math.sqrt(
-            Math.pow(rgb1[0] - rgb2[0], 2) +
-            Math.pow(rgb1[1] - rgb2[1], 2) +
-            Math.pow(rgb1[2] - rgb2[2], 2)
-        );
+    getLuminance(hex) {
+        const rgb = this.hexToRgb(hex);
+        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
     }
 
     hexToRgb(hex) {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? [
             parseInt(result[1], 16),
@@ -200,48 +217,41 @@ class AvatarDisplay {
         ] : null;
     }
 
-  tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (!this.triedOnItems) this.triedOnItems = {};
-    if (!this.currentItems) this.currentItems = {};
-    
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        this.removeItem(item.type);
-    } else {
-        this.currentItems[item.type] = item;
-        const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
-        this.updateAvatarDisplay(item.type, itemSrc);
-        
-        const itemLayer = this.layers[item.type];
-        if (itemLayer) {
-            itemLayer.addEventListener('load', () => {
-                this.applySkinToneWithShadows(itemLayer, item.type);
-            }, { once: true });
-        }
+    lightenColor(color, amount) {
+        const rgb = this.hexToRgb(color);
+        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
+        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
-    this.reorderLayers();
-}
 
-applySkinToneWithShadows(obj, type) {
-    const svgDoc = obj.contentDocument;
-    if (svgDoc && this.skinTones[this.skinTone]) {
-        const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-        const tone = this.skinTones[this.skinTone];
-        
-        elements.forEach((element) => {
-            this.applySkinToneToElement(element, tone);
-        });
-        
-        // Reapply shadows
-        const shadowElements = svgDoc.querySelectorAll('[id*="shadow"], [class*="shadow"]');
-        shadowElements.forEach((element) => {
-            element.setAttribute('fill', tone.shadow);
-            element.setAttribute('stroke', tone.shadow);
-        });
+    darkenColor(color, amount) {
+        const rgb = this.hexToRgb(color);
+        const newRgb = rgb.map(c => Math.max(0, c - Math.round(amount * 255)));
+        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
     }
-}
-    
+
+    tryOnItem(item) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        if (!this.triedOnItems) this.triedOnItems = {};
+        if (!this.currentItems) this.currentItems = {};
+        
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            this.removeItem(item.type);
+        } else {
+            this.currentItems[item.type] = item;
+            const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
+            this.updateAvatarDisplay(item.type, itemSrc);
+            
+            const itemLayer = this.layers[item.type];
+            if (itemLayer) {
+                itemLayer.addEventListener('load', () => {
+                    this.applySkinTone(itemLayer, item.type);
+                }, { once: true });
+            }
+        }
+        this.reorderLayers();
+    }
+
     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
@@ -306,66 +316,9 @@ applySkinToneWithShadows(obj, type) {
     }
 
     changeSkinTone(newTone) {
-        if (this.skinTones[newTone]) {
-            this.skinTone = newTone;
-            this.reapplySkinTone();
-            localStorage.setItem(`skinTone_${this.username}`, newTone);
-            console.log("Skin tone changed to:", newTone);
-        } else {
-            console.error("Invalid skin tone:", newTone);
-        }
-    }
-
-    applySkinToneToShopItem(imgElement, item) {
-        if (['Eyes', 'Face', 'Accessories', 'Mouth', 'Nose'].includes(item.type)) {
-            imgElement.addEventListener('load', () => {
-                const svgDoc = imgElement.contentDocument;
-                if (svgDoc) {
-                    const tone = this.skinTones[this.skinTone];
-                    this.applySkinToneToSpecificParts(svgDoc, item.type, tone);
-                }
-            });
-        }
-    }
-
-    applySkinToneToSpecificParts(svgDoc, itemType, tone) {
-        const partsToColor = {
-            'Eyes': {
-                main: ['eyelid', 'under-eye'],
-                shadow: ['eyelid-crease', 'eye-socket']
-            },
-            'Face': {
-                main: ['cheek', 'forehead', 'chin'],
-                shadow: ['cheekbone', 'jaw-shadow']
-            },
-            'Accessories': {
-                main: ['skin-contact'],
-                shadow: ['skin-shadow']
-            },
-            'Mouth': {
-                main: ['lip', 'inner-mouth'],
-                shadow: ['lip-shadow']
-            },
-            'Nose': {
-                main: ['nose-bridge', 'nostril'],
-                shadow: ['nose-shadow']
-            }
-        };
-
-        const parts = partsToColor[itemType] || { main: [], shadow: [] };
-        parts.main.forEach(part => {
-            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
-            elements.forEach(element => {
-                this.applySkinToneToElement(element, tone.main);
-            });
-        });
-
-        parts.shadow.forEach(part => {
-            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
-            elements.forEach(element => {
-                this.applySkinToneToElement(element, tone.shadow);
-            });
-        });
+        this.skinTone = newTone;
+        this.reapplySkinTone();
+        localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
 }
 
