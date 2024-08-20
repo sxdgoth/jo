@@ -270,11 +270,20 @@ main {
     }
 }
 
-#color-picker {
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+#eye-color-buttons {
+    margin-top: 10px;
 }
 
-.color-option:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s;
+#eye-color-buttons button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#eye-color-buttons button:hover {
+    opacity: 0.8;
 }
