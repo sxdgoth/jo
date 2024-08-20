@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
 
@@ -8,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
+
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
@@ -21,16 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
+
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
+
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
-            if (window.avatarDisplay) {
-                window.avatarDisplay.applySkinToneToShopItem(imgElement, item);
-            }
         });
+
         updateCategoryButtons();
         updateItemImages();
     }
@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (window.avatarDisplay) {
                 window.avatarDisplay.tryOnItem(item);
-                window.avatarDisplay.reapplySkinTone(); // Add this line
             } else {
                 console.error('window.avatarDisplay is not defined');
             }
@@ -135,10 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateShopDisplay() {
-        renderShopItems();
-    }
-
     // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
@@ -159,8 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
-        filterItemsByCategory,
-        updateShopDisplay
+        filterItemsByCategory
     };
 
     // Initialize the shop
