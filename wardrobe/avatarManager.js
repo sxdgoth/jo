@@ -3,7 +3,7 @@ class AvatarManager {
         this.username = username;
         this.equippedItems = {};
         this.tempEquippedItems = {};
-        this.skinTone = 'light'; // New line
+        this.skinTone = 'light';
         this.loadEquippedItems();
     }
 
@@ -37,7 +37,6 @@ class AvatarManager {
             this.equippedItems = JSON.parse(savedItems);
             this.tempEquippedItems = {...this.equippedItems};
         }
-        // New: Load skin tone
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
@@ -47,7 +46,6 @@ class AvatarManager {
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        // New: Save skin tone
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
@@ -63,9 +61,9 @@ class AvatarManager {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
-            // New: Apply skin tone
             if (window.skinToneManager) {
-                window.skinToneManager.applySkinTone(window.skinToneManager.skinTones[this.skinTone]);
+                const tone = window.skinToneManager.skinTones[this.skinTone];
+                window.skinToneManager.applySkinTone(tone);
             }
 
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
@@ -81,10 +79,8 @@ class AvatarManager {
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
-            // Unequip the item
             delete this.tempEquippedItems[item.type];
         } else {
-            // Equip the item
             this.tempEquippedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
@@ -107,9 +103,9 @@ class AvatarManager {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
-            // New: Apply skin tone
             if (window.skinToneManager) {
-                window.skinToneManager.applySkinTone(window.skinToneManager.skinTones[this.skinTone]);
+                const tone = window.skinToneManager.skinTones[this.skinTone];
+                window.skinToneManager.applySkinTone(tone);
             }
 
             Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
@@ -123,7 +119,6 @@ class AvatarManager {
         }
     }
 
-    // New method
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
