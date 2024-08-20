@@ -1,75 +1,72 @@
 class ColorPicker {
     constructor() {
-        this.defaultEyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
-        this.currentEyeColor = '#000000'; // Default to black
-        this.eyeColors = ['#000000', '#800080', '#FF0000', '#808080', '#008000', '#0000FF', '#FFA500'];
+        this.defaultColors = {
+            eyes: ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'],
+            // Add other item types and their default colors here
+        };
+        this.currentColors = {};
         this.initialize();
     }
 
     initialize() {
-        this.setupColorButtons();
-        this.setupCustomColorInput();
+        this.setupColorPickers();
     }
 
-    setupColorButtons() {
-        const eyeColorButtons = document.getElementById('eye-color-buttons');
-        if (eyeColorButtons) {
-            eyeColorButtons.innerHTML = ''; // Clear existing buttons
-            this.eyeColors.forEach(color => {
-                const button = document.createElement('button');
-                button.className = 'color-button';
-                button.style.backgroundColor = color;
-                button.style.width = '30px';
-                button.style.height = '30px';
-                button.style.margin = '5px';
-                button.style.border = '1px solid #000';
-                button.style.borderRadius = '50%';
-                button.style.cursor = 'pointer';
-                button.onclick = () => this.changeEyeColor(color);
-                eyeColorButtons.appendChild(button);
-            });
-        } else {
-            console.error('Eye color buttons container not found');
+    setupColorPickers() {
+        const colorPickerContainer = document.getElementById('color-picker-container');
+        if (!colorPickerContainer) {
+            console.error('Color picker container not found');
+            return;
+        }
+
+        for (const [itemType, colors] of Object.entries(this.defaultColors)) {
+            const pickerDiv = document.createElement('div');
+            pickerDiv.innerHTML = `
+                <h3>${itemType.charAt(0).toUpperCase() + itemType.slice(1)} Color</h3>
+                <input type="color" id="${itemType}-color-picker" value="${colors[0]}">
+            `;
+            colorPickerContainer.appendChild(pickerDiv);
+
+            const colorPicker = document.getElementById(`${itemType}-color-picker`);
+            colorPicker.addEventListener('input', (e) => this.changeColor(itemType, e.target.value));
         }
     }
 
-    setupCustomColorInput() {
-        const customColorInput = document.getElementById('custom-eye-color');
-        if (customColorInput) {
-            customColorInput.oninput = (e) => this.changeEyeColor(e.target.value);
-        } else {
-            console.error('Custom color input not found');
-        }
+    changeColor(itemType, newColor) {
+        this.currentColors[itemType] = newColor;
+        this.applyColor(itemType);
     }
 
-    changeEyeColor(color) {
-        this.currentEyeColor = color;
-        this.applyEyeColor();
+    applyColor(itemType) {
+        const svgObjects = document.querySelectorAll(`object[data-type="${itemType}"]`);
+        svgObjects.forEach(obj => {
+            if (obj.contentDocument) {
+                this.updateColorInSVG(obj.contentDocument, itemType);
+            }
+        });
     }
 
-    applyEyeColor() {
-        const eyesLayer = document.querySelector('object[data-type="Eyes"]');
-        if (eyesLayer && eyesLayer.contentDocument) {
-            this.updateEyeColorInSVG(eyesLayer.contentDocument);
-        } else {
-            console.error('Eyes layer not found or not loaded');
-        }
-    }
+    updateColorInSVG(svgDoc, itemType) {
+        const newColor = this.currentColors[itemType];
+        const defaultColors = this.defaultColors[itemType];
 
-    updateEyeColorInSVG(svgDoc) {
-        const eyeElements = svgDoc.querySelectorAll('path, circle, ellipse');
-        eyeElements.forEach(element => {
-            this.defaultEyeColors.forEach(oldColor => {
+        defaultColors.forEach(oldColor => {
+            const elements = svgDoc.querySelectorAll(`[fill="${oldColor}"], [stroke="${oldColor}"]`);
+            elements.forEach(element => {
                 if (element.getAttribute('fill') === oldColor) {
-                    element.setAttribute('fill', this.currentEyeColor);
+                    element.setAttribute('fill', newColor);
                 }
                 if (element.getAttribute('stroke') === oldColor) {
-                    element.setAttribute('stroke', this.currentEyeColor);
+                    element.setAttribute('stroke', newColor);
                 }
+            });
+
+            const styledElements = svgDoc.querySelectorAll('*');
+            styledElements.forEach(element => {
                 let style = element.getAttribute('style');
                 if (style) {
-                    style = style.replace(new RegExp(`fill:\\s*${oldColor}`, 'gi'), `fill: ${this.currentEyeColor}`);
-                    style = style.replace(new RegExp(`stroke:\\s*${oldColor}`, 'gi'), `stroke: ${this.currentEyeColor}`);
+                    style = style.replace(new RegExp(`fill:\\s*${oldColor}`, 'gi'), `fill: ${newColor}`);
+                    style = style.replace(new RegExp(`stroke:\\s*${oldColor}`, 'gi'), `stroke: ${newColor}`);
                     element.setAttribute('style', style);
                 }
             });
