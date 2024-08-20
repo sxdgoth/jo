@@ -15,7 +15,6 @@ class AvatarDisplay {
         this.equippedItems = {};
         this.lastAction = {};
         this.hiddenEquippedItems = new Set();
-        this.skinTone = 'light';
         this.skinTones = {
             light: {
                 name: 'Light',
@@ -49,9 +48,8 @@ class AvatarDisplay {
 
     loadSkinTone() {
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
-            this.skinTone = savedSkinTone;
-        }
+        this.skinTone = savedSkinTone || 'light'; // Default to 'light' if no saved skin tone
+        console.log(`Loaded skin tone: ${this.skinTone}`);
     }
 
     loadEquippedItems() {
@@ -235,7 +233,8 @@ class AvatarDisplay {
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
-     updateAvatarDisplay(type, src) {
+
+    updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
