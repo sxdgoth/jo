@@ -163,13 +163,13 @@ class AvatarDisplay {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            const tone = this.skinTones[this.skinTone];
+            const currentTone = this.skinTones[this.skinTone];
             
             paths.forEach((path) => {
                 const currentFill = path.getAttribute('fill');
                 if (currentFill && currentFill.toLowerCase() !== 'none') {
-                    if (this.isCloseTo(currentFill, '#FEE2CA') || this.isCloseTo(currentFill, '#EFC1B7')) {
-                        const newColor = this.getNewColor(currentFill, tone);
+                    const newColor = this.getNewSkinColor(currentFill, currentTone);
+                    if (newColor) {
                         path.setAttribute('fill', newColor);
                     }
                 }
@@ -187,20 +187,22 @@ class AvatarDisplay {
                Math.abs(rgb1[2] - rgb2[2]) < threshold;
     }
 
-    getNewColor(currentColor, tone) {
-        const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(tone.main);
-        const luminanceDiff = currentLuminance - mainLuminance;
-        
-        if (Math.abs(luminanceDiff) < 0.1) {
-            return tone.main;
-        } else if (luminanceDiff < 0) {
-            return tone.shadow;
-        } else {
-            return this.lightenColor(tone.main, luminanceDiff);
+     getNewSkinColor(currentColor, newTone) {
+        const lightMain = '#FEE2CA';
+        const lightShadow = '#EFC1B7';
+
+        if (this.colorEquals(currentColor, lightMain)) {
+            return newTone.main;
+        } else if (this.colorEquals(currentColor, lightShadow)) {
+            return newTone.shadow;
         }
+        return null;
     }
 
+ colorEquals(color1, color2) {
+        return color1.toLowerCase() === color2.toLowerCase();
+    }
+    
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
         return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
