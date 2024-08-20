@@ -137,44 +137,60 @@ class AvatarDisplay {
         });
     }
 
-    applySkinTone(obj, type) {
+ applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
     const tone = this.skinTones[this.skinTone];
-    const defaultColors = ['#E6BBA8', '#E6958A'];
+    const defaultColors = {
+        light: ['#E6BBA8', '#E6958A', '#F4D5BF', '#FEE2CA', '#EFC1B7'],
+        medium: ['#FFE0BD', '#EFD0B1'],
+        tan: ['#F1C27D', '#E0B170'],
+        dark: ['#8D5524', '#7C4A1E']
+    };
 
+    const currentDefaultColors = defaultColors[this.skinTone];
+    
     function replaceColor(element) {
         ['fill', 'stroke'].forEach(attr => {
             let color = element.getAttribute(attr);
             if (color) {
                 color = color.toUpperCase();
-                if (defaultColors.includes(color) || color.startsWith('#E6') || color.startsWith('#F4')) {
+                if (currentDefaultColors.includes(color) || 
+                    (this.skinTone === 'light' && (color.startsWith('#E6') || color.startsWith('#F4')))) {
                     element.setAttribute(attr, tone.main);
+                } else if (color === '#EFC1B7' || 
+                           (this.skinTone !== 'light' && color === defaultColors.light[4])) {
+                    element.setAttribute(attr, tone.shadow);
                 }
             }
         });
 
         
-           
         // Replace colors in style attribute
         let style = element.getAttribute('style');
         if (style) {
-            defaultColors.forEach(defaultColor => {
+            currentDefaultColors.forEach(defaultColor => {
                 style = style.replace(new RegExp(defaultColor, 'gi'), tone.main);
             });
-            style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-            style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            if (this.skinTone === 'light') {
+                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            }
+            style = style.replace(/#EFC1B7/gi, tone.shadow);
             element.setAttribute('style', style);
         }
 
         // Recursively apply to child elements
-        Array.from(element.children).forEach(replaceColor);
+        Array.from(element.children).forEach(child => replaceColor(child));
     }
 
     replaceColor(svgDoc.documentElement);
     console.log(`Applied skin tone ${this.skinTone} to ${type}`);
 }
+
+
+
 
 
 
