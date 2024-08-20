@@ -43,7 +43,7 @@ class ItemColorManager {
         document.body.appendChild(colorPicker);
     }
 
-     showColorPicker(item, event) {
+    showColorPicker(item, event) {
         console.log('Showing color picker for item:', item);
         const colorPicker = document.getElementById('color-picker');
         colorPicker.style.display = 'block';
@@ -67,27 +67,12 @@ class ItemColorManager {
             console.log('Updating item color:', itemId, newColor);
             window.avatarManager.updateItemColor(itemId, newColor);
         } else {
-       console.error('AvatarManager not found');
+            console.error('AvatarManager not found');
         }
     }
 }
 
 // Initialize the ItemColorManager when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.itemColorManager = new ItemColorManager();
-    window.itemColorManager.initialize();
-
-    // Close color picker when clicking outside
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('#color-picker')) {
-            window.itemColorManager.hideColorPicker();
-        }
-    });
-});
-
-// At the end of itemColorManager.js
-window.ItemColorManager = ItemColorManager;
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Initializing ItemColorManager');
     window.itemColorManager = new ItemColorManager();
@@ -100,3 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Make ItemColorManager available globally
+window.ItemColorManager = ItemColorManager;
