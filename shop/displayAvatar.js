@@ -149,12 +149,12 @@ class AvatarDisplay {
         tan: ['#F1C27D', '#E0B170'],
         dark: ['#8D5524', '#7C4A1E']
     };
-  const eyeColors = ['#E6BBA8', '#F4D5BF'];
+    const eyeColors = ['#E6BBA8', '#F4D5BF'];
     
-    // Colors to preserve (add more as needed)
-    const preserveColors = ['#FF0000', '#800000']; // Example: preserve red and dark red
-
-    function replaceColor(element) {
+     // Colors to preserve (including the scar color)
+    const preserveColors = ['#E6958A']; // Add more colors here if needed
+     
+  function replaceColor(element) {
         ['fill', 'stroke'].forEach(attr => {
             let color = element.getAttribute(attr);
             if (color) {
@@ -175,7 +175,7 @@ class AvatarDisplay {
             }
         });
 
-        // Replace colors in style attribute
+      // Replace colors in style attribute
         let style = element.getAttribute('style');
         if (style) {
             // Replace default skin colors
@@ -187,6 +187,9 @@ class AvatarDisplay {
                 style = style.replace(new RegExp(defaultColor, 'gi'), tone.main);
             });
             // Only replace #E6 and #F4 colors if they're not in the preserve list
+            preserveColors.forEach(color => {
+                style = style.replace(new RegExp(color, 'gi'), color);
+            });
             if (!preserveColors.some(color => style.includes(color))) {
                 style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                 style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
