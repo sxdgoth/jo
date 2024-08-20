@@ -1,3 +1,5 @@
+// skinTone.js
+
 class SkinToneManager {
     constructor() {
         this.skinTones = {
@@ -31,7 +33,6 @@ class SkinToneManager {
         console.log("SkinToneManager initializing...");
         this.setupSkinToneButtons();
         this.saveOriginalColors();
-        this.loadSavedSkinTone();
     }
 
     setupSkinToneButtons() {
@@ -40,6 +41,7 @@ class SkinToneManager {
             console.error("Skin tone buttons container not found");
             return;
         }
+
         const buttons = container.querySelectorAll('.skin-tone-button');
         buttons.forEach(button => {
             const toneName = button.dataset.tone;
@@ -49,6 +51,7 @@ class SkinToneManager {
                 button.onclick = () => this.selectSkinTone(tone);
             }
         });
+
         console.log("Skin tone buttons set up");
     }
 
@@ -72,14 +75,6 @@ class SkinToneManager {
         // Update AvatarManager if it exists
         if (window.avatarManager) {
             window.avatarManager.changeSkinTone(this.getSkinToneKey(tone));
-        }
-
-        // Save the selected skin tone
-        this.saveSkinTone(this.getSkinToneKey(tone));
-
-        // Update shop display if it exists
-        if (window.shopManager && window.shopManager.updateShopDisplay) {
-            window.shopManager.updateShopDisplay();
         }
     }
 
@@ -134,7 +129,9 @@ class SkinToneManager {
                         path.setAttribute('fill', newColor);
                     }
                 });
+
                 console.log(`Skin tone applied to ${partName}`);
+
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -194,21 +191,18 @@ class SkinToneManager {
             parseInt(result[3], 16)
         ] : null;
     }
-
-    saveSkinTone(toneKey) {
-        localStorage.setItem('currentSkinTone', toneKey);
-    }
-
-    loadSavedSkinTone() {
-        const savedTone = localStorage.getItem('currentSkinTone');
-        if (savedTone && this.skinTones[savedTone]) {
-            this.selectSkinTone(this.skinTones[savedTone]);
-        }
-    }
 }
 
 // Create and initialize the SkinToneManager
 document.addEventListener('DOMContentLoaded', () => {
     window.skinToneManager = new SkinToneManager();
     window.skinToneManager.initialize();
+
+    // Set initial skin tone based on AvatarManager if it exists
+    if (window.avatarManager && window.avatarManager.skinTone) {
+        const initialTone = window.skinToneManager.skinTones[window.avatarManager.skinTone];
+        if (initialTone) {
+            window.skinToneManager.selectSkinTone(initialTone);
+        }
+    }
 });
