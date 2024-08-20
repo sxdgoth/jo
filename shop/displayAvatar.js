@@ -148,8 +148,7 @@ class AvatarDisplay {
             this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
         }
     }
-
-    applySkinTone(obj, type) {
+       applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
@@ -177,7 +176,18 @@ class AvatarDisplay {
                 paths.forEach(path => {
                     const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        const newColor = this.getNewColor(currentFill, tone);
+                        let newColor;
+                        if (type === 'Eyes') {
+                            // For eyes, we'll set the "white" part to pure white
+                            // and the colored part to the main skin tone
+                            if (this.getLuminance(currentFill) > 0.5) {
+                                newColor = '#FFFFFF'; // White for the "white" of the eye
+                            } else {
+                                newColor = tone.main; // Main skin tone for the colored part
+                            }
+                        } else {
+                            newColor = this.getNewColor(currentFill, tone.main, tone);
+                        }
                         path.setAttribute('fill', newColor);
                     }
                 });
@@ -246,6 +256,14 @@ class AvatarDisplay {
         } else {
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+            
+            // Apply skin tone immediately after updating the display
+            if (this.skinToneItems.includes(item.type)) {
+                const obj = this.layers[item.type];
+                obj.addEventListener('load', () => {
+                    this.applySkinToneToItem(obj, item.type);
+                }, { once: true }); // Ensure the listener is only called once
+            }
         }
 
         this.reorderLayers();
@@ -263,9 +281,6 @@ class AvatarDisplay {
             if (src) {
                 this.layers[type].data = src;
                 this.layers[type].style.display = 'block';
-                this.layers[type].addEventListener('load', () => {
-                    this.applySkinToneToItem(this.layers[type], type);
-                });
             } else {
                 this.layers[type].style.display = 'none';
             }
@@ -273,8 +288,7 @@ class AvatarDisplay {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
-
-    toggleEquippedItem(type) {
+  toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -322,8 +336,61 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
-        window.avatarManager = window.avatarDisplay; // For compatibility with existing code
+          window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
         console.error('No logged in user found');
     }
 });
+
+// Add these utility functions outside of the class
+function applyItemPosition(imgElement, itemType) {
+    const positions = {
+        hair: { top: '0%', left: '0%', width: '100%', height: '50%' },
+        eyes: { top: '20%', left: '0%', width: '100%', height: '15%' },
+        nose: { top: '30%', left: '40%', width: '20%', height: '15%' },
+        mouth: { top: '40%', left: '35%', width: '30%', height: '10%' },
+        shirt: { top: '45%', left: '0%', width: '100%', height: '30%' },
+        pants: { top: '70%', left: '0%', width: '100%', height: '30%' },
+        shoes: { top: '90%', left: '0%', width: '100%', height: '10%' },
+        // Add more item types and their positions as needed
+    };
+
+    const position = positions[itemType] || { top: '0%', left: '0%', width: '100%', height: '100%' };
+
+    Object.assign(imgElement.style, {
+        position: 'absolute',
+        top: position.top,
+        left: position.left,
+        width: position.width,
+        height: position.height,
+        objectFit: 'contain'
+    });
+}
+
+// Expose the applyItemPosition function globally
+window.applyItemPosition = applyItemPosition;
+
+// Add any additional utility functions or event listeners here
+
+// Example: Function to update the avatar display when the user changes equipment
+function updateAvatarEquipment(itemType, itemId) {
+    if (window.avatarDisplay) {
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            window.avatarDisplay.tryOnItem(item);
+        }
+    }
+}
+
+// Example: Function to handle skin tone changes
+function changeSkinTone(newTone) {
+    if (window.avatarDisplay) {
+        window.avatarDisplay.changeSkinTone(newTone);
+    }
+}
+
+// Expose these functions globally if needed
+window.updateAvatarEquipment = updateAvatarEquipment;
+window.changeSkinTone = changeSkinTone;
+
+// You can add more global functions or event listeners here as needed
