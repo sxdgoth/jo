@@ -61,9 +61,10 @@ class AvatarDisplay {
     loadAvatar() {
         console.log("Loading avatar...");
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        console.log("Saved items:", savedItems);
-        const equippedItems = savedItems ? JSON.parse(savedItems) : {};
-
+    console.log("Saved items:", savedItems);
+    const equippedItems = savedItems ? JSON.parse(savedItems) : {};
+        
+        this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
