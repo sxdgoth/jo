@@ -4,6 +4,7 @@ class AvatarManager {
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.skinTone = 'light';
+        this.itemColors = {};
         this.loadEquippedItems();
     }
 
@@ -41,23 +42,29 @@ class AvatarManager {
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
+        const savedItemColors = localStorage.getItem(`itemColors_${this.username}`);
+        if (savedItemColors) {
+            this.itemColors = JSON.parse(savedItemColors);
+        }
     }
 
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`itemColors_${this.username}`, JSON.stringify(this.itemColors));
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
 
     clearAvatar() {
         this.tempEquippedItems = {};
+        this.itemColors = {};
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
 
-     updateAvatarDisplay() {
+    updateAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
@@ -96,7 +103,7 @@ class AvatarManager {
         });
     }
 
-   updateTempAvatarDisplay() {
+    updateTempAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
@@ -113,42 +120,42 @@ class AvatarManager {
         }
     }
 
-     changeSkinTone(newTone) {
+    changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
     }
 
-  applySkinTone() {
+    applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
             window.skinToneManager.applySkinTone(tone);
         }
     }
 
-   updateLayerWithSkinTone(type, src) {
-    fetch(src)
-        .then(response => response.text())
-        .then(svgText => {
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-            
-            this.applySkinToneToSVG(svgDoc);
-            
-            // Apply item color if it's set
-            const item = Object.values(this.tempEquippedItems).find(id => window.userInventory.getItems().find(i => i.id === id && i.type === type));
-            if (item) {
-                window.itemColorManager.applyItemColor(svgDoc, item);
-            }
+    updateLayerWithSkinTone(type, src) {
+        fetch(src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                this.applySkinToneToSVG(svgDoc);
+                
+                // Apply item color if it's set
+                const itemId = this.tempEquippedItems[type];
+                if (itemId && this.itemColors && this.itemColors[itemId]) {
+                    window.itemColorManager.applyItemColor(svgDoc, itemId);
+                }
 
-            const serializer = new XMLSerializer();
-            const modifiedSvgString = serializer.serializeToString(svgDoc);
-            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            
-            window.avatarBody.updateLayer(type, url);
-        })
-        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
-}
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                
+                window.avatarBody.updateLayer(type, url);
+            })
+            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+    }
 
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -204,6 +211,21 @@ class AvatarManager {
         };
 
         replaceColor(svgDoc.documentElement);
+    }
+
+    updateItemColor(itemId, newColor) {
+        // Find the item in tempEquippedItems
+        const itemType = Object.keys(this.tempEquippedItems).find(
+            type => this.tempEquippedItems[type] === itemId
+        );
+
+        if (itemType) {
+            // Update the color for this item
+            this.itemColors[itemId] = newColor;
+
+            // Refresh the avatar display
+            this.updateTempAvatarDisplay();
+        }
     }
 }
 
