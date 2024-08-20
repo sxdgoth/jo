@@ -63,7 +63,10 @@ class ItemColorManager {
         this.currentItemColors[itemId] = newColor;
         this.hideColorPicker();
         if (window.avatarManager) {
+            console.log('Updating item color:', itemId, newColor); // Add this log
             window.avatarManager.updateItemColor(itemId, newColor);
+        } else {
+            console.error('AvatarManager not found');
         }
     }
 }
