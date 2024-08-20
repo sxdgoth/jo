@@ -77,8 +77,7 @@ class AvatarDisplay {
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
-            { name: 'Face', file: '', type: 'Face', isBase: false },
-            { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
+            { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
@@ -130,7 +129,7 @@ class AvatarDisplay {
         });
     }
 
- applySkinTone(obj, type) {
+    applySkinTone(obj, type) {
         if (!['Eyes', 'Face', 'Mouth', 'Nose'].includes(type)) return;
 
         const svgDoc = obj.contentDocument;
@@ -140,7 +139,44 @@ class AvatarDisplay {
         }
     }
 
-   applySkinToneToElement(element, color) {
+    applySkinToneToSpecificParts(svgDoc, itemType, tone) {
+        const partsToColor = {
+            'Eyes': {
+                main: ['eyelid', 'under-eye'],
+                shadow: ['eyelid-crease', 'eye-socket']
+            },
+            'Face': {
+                main: ['cheek', 'forehead', 'chin'],
+                shadow: ['cheekbone', 'jaw-shadow']
+            },
+            'Mouth': {
+                main: ['lip', 'inner-mouth'],
+                shadow: ['lip-shadow']
+            },
+            'Nose': {
+                main: ['nose-bridge', 'nostril'],
+                shadow: ['nose-shadow']
+            }
+        };
+
+        const parts = partsToColor[itemType] || { main: [], shadow: [] };
+        
+        parts.main.forEach(part => {
+            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
+            elements.forEach(element => {
+                this.applySkinToneToElement(element, tone.main);
+            });
+        });
+
+        parts.shadow.forEach(part => {
+            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
+            elements.forEach(element => {
+                this.applySkinToneToElement(element, tone.shadow);
+            });
+        });
+    }
+
+    applySkinToneToElement(element, color) {
         ['fill', 'stroke'].forEach((attr) => {
             const originalColor = element.getAttribute(attr);
             if (originalColor && originalColor.toLowerCase() !== 'none') {
@@ -149,52 +185,8 @@ class AvatarDisplay {
             }
         });
     }
-    
 
-    isSkinTone(color) {
-        const skinTones = Object.values(this.skinTones).map(t => t.main.toLowerCase());
-        return skinTones.includes(color.toLowerCase()) || this.isCloseToSkinTone(color);
-    }
-
-    isShadowTone(color) {
-        const shadowTones = Object.values(this.skinTones).map(t => t.shadow.toLowerCase());
-        return shadowTones.includes(color.toLowerCase()) || this.isCloseToShadowTone(color);
-    }
-
-    isCloseToSkinTone(color) {
-        const rgb = this.hexToRgb(color);
-        return Object.values(this.skinTones).some(tone => {
-            const toneRgb = this.hexToRgb(tone.main);
-            return this.colorDistance(rgb, toneRgb) < 30; // Adjust threshold as needed
-        });
-    }
-
-    isCloseToShadowTone(color) {
-        const rgb = this.hexToRgb(color);
-        return Object.values(this.skinTones).some(tone => {
-            const toneRgb = this.hexToRgb(tone.shadow);
-            return this.colorDistance(rgb, toneRgb) < 30; // Adjust threshold as needed
-        });
-    }
-
-    colorDistance(rgb1, rgb2) {
-        return Math.sqrt(
-            Math.pow(rgb1[0] - rgb2[0], 2) +
-            Math.pow(rgb1[1] - rgb2[1], 2) +
-            Math.pow(rgb1[2] - rgb2[2], 2)
-        );
-    }
-
-    hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
-    }
-
-   tryOnItem(item) {
+    tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         if (!this.triedOnItems) this.triedOnItems = {};
@@ -293,7 +285,7 @@ class AvatarDisplay {
         }
     }
 
-     applySkinToneToShopItem(imgElement, item) {
+    applySkinToneToShopItem(imgElement, item) {
         if (['Eyes', 'Face', 'Mouth', 'Nose'].includes(item.type)) {
             imgElement.addEventListener('load', () => {
                 const svgDoc = imgElement.contentDocument;
@@ -304,43 +296,7 @@ class AvatarDisplay {
             });
         }
     }
-
-    applySkinToneToSpecificParts(svgDoc, itemType, tone) {
-        const partsToColor = {
-            'Eyes': {
-                main: ['eyelid', 'under-eye'],
-                shadow: ['eyelid-crease', 'eye-socket']
-            },
-            'Face': {
-                main: ['cheek', 'forehead', 'chin'],
-                shadow: ['cheekbone', 'jaw-shadow']
-            },
-            'Mouth': {
-                main: ['lip', 'inner-mouth'],
-                shadow: ['lip-shadow']
-            },
-            'Nose': {
-                main: ['nose-bridge', 'nostril'],
-                shadow: ['nose-shadow']
-            }
-        };
-        
-         const parts = partsToColor[itemType] || { main: [], shadow: [] };
-        
-        parts.main.forEach(part => {
-            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
-            elements.forEach(element => {
-                this.applySkinToneToElement(element, tone.main);
-            });
-        });
-
-        parts.shadow.forEach(part => {
-            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
-            elements.forEach(element => {
-                this.applySkinToneToElement(element, tone.shadow);
-            });
-        });
-    }
+}
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
