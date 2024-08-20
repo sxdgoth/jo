@@ -270,20 +270,33 @@ main {
     }
 }
 
-#eye-color-buttons {
+#eye-color-picker {
     margin-top: 10px;
+    display: flex;
+    align-items: center;
 }
 
-#eye-color-buttons button {
-    margin: 0 5px;
-    padding: 5px 10px;
+#eye-color-picker label {
+    margin-right: 10px;
+}
+
+#eye-color-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
     border: none;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
     cursor: pointer;
 }
 
-#eye-color-buttons button:hover {
-    opacity: 0.8;
+#eye-color-input::-webkit-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #ddd;
+}
+
+#eye-color-input::-moz-color-swatch {
+    border-radius: 50%;
+    border: 2px solid #ddd;
 }
