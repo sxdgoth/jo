@@ -1,5 +1,3 @@
-// SkinToneManager.js
-
 class SkinToneManager {
     constructor() {
         this.skinTones = {
@@ -125,23 +123,17 @@ class SkinToneManager {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                const colors = this.getUniqueColors(paths);
+                const mainColor = this.findMainSkinColor(colors);
                 
-                elements.forEach(element => {
-                    const currentFill = element.getAttribute('fill');
-                    const currentStroke = element.getAttribute('stroke');
-                    
+                paths.forEach(path => {
+                    const currentFill = path.getAttribute('fill');
                     if (currentFill && currentFill.toLowerCase() !== 'none') {
-                        const newColor = this.getNewColor(currentFill, tone);
-                        element.setAttribute('fill', newColor);
-                    }
-                    
-                    if (currentStroke && currentStroke.toLowerCase() !== 'none') {
-                        const newColor = this.getNewColor(currentStroke, tone);
-                        element.setAttribute('stroke', newColor);
+                        const newColor = this.getNewColor(currentFill, mainColor, tone);
+                        path.setAttribute('fill', newColor);
                     }
                 });
-
                 console.log(`Skin tone applied to ${partName}`);
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -152,9 +144,24 @@ class SkinToneManager {
             .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
     }
 
-    getNewColor(currentColor, tone) {
+    getUniqueColors(paths) {
+        const colors = new Set();
+        paths.forEach(path => {
+            const fill = path.getAttribute('fill');
+            if (fill && fill.toLowerCase() !== 'none') {
+                colors.add(fill.toLowerCase());
+            }
+        });
+        return Array.from(colors);
+    }
+
+    findMainSkinColor(colors) {
+        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
+    }
+
+    getNewColor(currentColor, mainColor, tone) {
         const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(tone.main);
+        const mainLuminance = this.getLuminance(mainColor);
         const luminanceDiff = currentLuminance - mainLuminance;
         
         if (Math.abs(luminanceDiff) < 0.1) {
@@ -166,15 +173,15 @@ class SkinToneManager {
         }
     }
 
-    getLuminance(hex) {
-        const rgb = this.hexToRgb(hex);
-        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    }
-
     lightenColor(color, amount) {
         const rgb = this.hexToRgb(color);
         const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
         return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
+    }
+
+    getLuminance(hex) {
+        const rgb = this.hexToRgb(hex);
+        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
     }
 
     hexToRgb(hex) {
