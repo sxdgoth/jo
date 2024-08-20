@@ -14,19 +14,23 @@ function renderOwnedItems() {
             </div>
             <h3>${item.name}</h3>
             <p>Type: ${item.type}</p>
-            <button class="change-color-btn">Change Color</button>
+            <button class="change-color-btn" data-id="${item.id}">Change Color</button>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
         
         // Add click event listener to the item image
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
-
-                        // Add click event listener to the change color button
+        
+        // Add click event listener to the change color button
         const changeColorBtn = itemElement.querySelector('.change-color-btn');
         changeColorBtn.addEventListener('click', (event) => {
             event.stopPropagation();
-            window.itemColorManager.showColorPicker(item, event);
+            if (window.itemColorManager) {
+                window.itemColorManager.showColorPicker(item, event);
+            } else {
+                console.error('ItemColorManager not found');
+            }
         });
     });
 }
