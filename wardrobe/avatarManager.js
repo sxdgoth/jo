@@ -5,6 +5,7 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
+        this.debounceTimer = null;
         this.loadEquippedItems();
     }
 
@@ -33,17 +34,17 @@ class AvatarManager {
         }
     }
 
-   setupEyeColorPicker() {
-    const eyeColorPicker = document.getElementById('eye-color-input');
-    if (eyeColorPicker) {
-        eyeColorPicker.value = this.eyeColor;
-        eyeColorPicker.addEventListener('input', (event) => {
-            this.changeEyeColor(event.target.value);
-        });
-    } else {
-        console.error('Eye color picker not found');
+    setupEyeColorPicker() {
+        const eyeColorPicker = document.getElementById('eye-color-input');
+        if (eyeColorPicker) {
+            eyeColorPicker.value = this.eyeColor;
+            eyeColorPicker.addEventListener('input', (event) => {
+                this.debounceChangeEyeColor(event.target.value);
+            });
+        } else {
+            console.error('Eye color picker not found');
+        }
     }
-}
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
@@ -135,14 +136,25 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-    changeEyeColor(newColor) {
-    this.eyeColor = newColor;
-    const eyeColorPicker = document.getElementById('eye-color-input');
-    if (eyeColorPicker) {
-        eyeColorPicker.value = newColor;
+    debounceChangeEyeColor(newColor) {
+        if (this.debounceTimer) {
+            clearTimeout(this.debounceTimer);
+        }
+        this.debounceTimer = setTimeout(() => {
+            this.changeEyeColor(newColor);
+        }, 50); // 50ms debounce time
     }
-    this.updateTempAvatarDisplay();
-}
+
+    changeEyeColor(newColor) {
+        this.eyeColor = newColor;
+        const eyeColorPicker = document.getElementById('eye-color-input');
+        if (eyeColorPicker) {
+            eyeColorPicker.value = newColor;
+        }
+        requestAnimationFrame(() => {
+            this.updateTempAvatarDisplay();
+        });
+    }
 
     applySkinTone() {
         if (window.skinToneManager) {
@@ -165,7 +177,9 @@ class AvatarManager {
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
                 const url = URL.createObjectURL(blob);
                 
-                window.avatarBody.updateLayer(type, url);
+                requestAnimationFrame(() => {
+                    window.avatarBody.updateLayer(type, url);
+                });
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
@@ -223,7 +237,7 @@ class AvatarManager {
     }
 
     applyEyeColorToSVG(svgDoc) {
-        const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"]');
+        const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
         });
