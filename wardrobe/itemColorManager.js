@@ -49,7 +49,7 @@ class ItemColorManager {
         colorPicker.style.left = `${event.clientX}px`;
         colorPicker.style.top = `${event.clientY}px`;
         colorPicker.setAttribute('data-item-id', item.id);
-        event.stopPropagation(); // Prevent the click from being detected on the document
+        event.stopPropagation();
     }
 
     hideColorPicker() {
@@ -80,6 +80,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-
-
