@@ -63,7 +63,7 @@ class ItemColorManager {
         this.currentItemColors[itemId] = newColor;
         this.hideColorPicker();
         if (window.avatarManager) {
-            window.avatarManager.updateTempAvatarDisplay();
+            window.avatarManager.updateItemColor(itemId, newColor);
         }
     }
 
