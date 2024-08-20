@@ -5,7 +5,7 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.itemColors = {};
-        this.eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
+        this.colorableColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
         this.loadEquippedItems();
     }
 
@@ -133,7 +133,7 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
+     updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -142,9 +142,8 @@ class AvatarManager {
                 
                 this.applySkinToneToSVG(svgDoc);
                 
-                // Apply item color if it's set
                 const itemId = this.tempEquippedItems[type];
-                if (itemId && this.itemColors && this.itemColors[itemId]) {
+                if (itemId && this.itemColors[itemId]) {
                     this.applyItemColor(svgDoc, itemId);
                 }
 
@@ -155,8 +154,9 @@ class AvatarManager {
                 
                 window.avatarBody.updateLayer(type, url);
             })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+            .catch(error => console.error(`Error updating layer ${type}:`, error));
     }
+    
  applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
@@ -210,15 +210,15 @@ class AvatarManager {
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
-                if (color && this.eyeColors.includes(color.toUpperCase())) {
+                if (color && this.colorableColors.includes(color.toUpperCase())) {
                     element.setAttribute(attr, newColor);
                 }
             });
 
             let style = element.getAttribute('style');
             if (style) {
-                this.eyeColors.forEach(eyeColor => {
-                    style = style.replace(new RegExp(eyeColor, 'gi'), newColor);
+                this.colorableColors.forEach(colorableColor => {
+                    style = style.replace(new RegExp(colorableColor, 'gi'), newColor);
                 });
                 element.setAttribute('style', style);
             }
@@ -229,11 +229,10 @@ class AvatarManager {
         replaceColor(svgDoc.documentElement);
     }
 
-    updateItemColor(itemId, newColor) {
-        // Find the item in tempEquippedItems
-        const itemType = Object.keys(this.tempEquippedItems).find(
-            type => this.tempEquippedItems[type] === itemId
-        );
+     updateItemColor(itemId, newColor) {
+        this.itemColors[itemId] = newColor;
+        this.updateTempAvatarDisplay();
+    };
 
         if (itemType) {
             // Update the color for this item
