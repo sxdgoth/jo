@@ -218,24 +218,23 @@ class AvatarManager {
     }
 
     updateSVGColor(svgElement, color, itemType) {
-        if (itemType === 'eyes') {
-            const eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
-            eyeColors.forEach(eyeColor => {
-                const eyeElements = svgElement.querySelectorAll(`path[fill="${eyeColor}"], path[style*="fill: ${eyeColor}"]`);
-                eyeElements.forEach(element => {
-                    if (element.hasAttribute('fill')) {
-                        element.setAttribute('fill', color);
-                    }
-                    if (element.hasAttribute('style')) {
-                        let style = element.getAttribute('style');
-                        style = style.replace(new RegExp(`fill:\\s*${eyeColor}`, 'gi'), `fill: ${color}`);
-                        element.setAttribute('style', style);
-                    }
-                });
+    if (itemType === 'eyes') {
+        const eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
+        eyeColors.forEach(eyeColor => {
+            const eyeElements = svgElement.querySelectorAll(`path[fill="${eyeColor}"], path[style*="fill: ${eyeColor}"]`);
+            eyeElements.forEach(element => {
+                if (element.hasAttribute('fill')) {
+                    element.setAttribute('fill', color);
+                }
+                if (element.hasAttribute('style')) {
+                    let style = element.getAttribute('style');
+                    style = style.replace(new RegExp(`fill:\\s*${eyeColor}`, 'gi'), `fill: ${color}`);
+                    element.setAttribute('style', style);
+                }
             });
-        }
-        // Add more conditions for other item types as needed
+        });
     }
+    // Add more conditions for other item types as needed
 }
 
 // Initialize the AvatarManager when the DOM is loaded
