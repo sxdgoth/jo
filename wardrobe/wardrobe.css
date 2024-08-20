@@ -304,36 +304,3 @@ main {
 
 
 
-
-
-#lip-color-picker {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#lip-color-picker label {
-    margin-right: 10px;
-}
-
-#lip-color-input {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#lip-color-input::-webkit-color-swatch {
-    border-radius: 50%;
-    border: 2px solid #ddd;
-}
-
-#lip-color-input::-moz-color-swatch {
-    border-radius: 50%;
-    border: 2px solid #ddd;
-}
