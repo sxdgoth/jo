@@ -4,6 +4,7 @@ class ColorPicker {
             eyes: '#3FA2FF', // Default eye color
             // Add more default colors for other items as needed
         };
+        this.eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
         this.initialize();
     }
 
@@ -12,12 +13,19 @@ class ColorPicker {
     }
 
     setupColorButtons() {
-        const eyeColorButtons = document.querySelectorAll('#eye-color-buttons .color-button');
-        eyeColorButtons.forEach(button => {
-            const color = button.dataset.color;
-            button.style.backgroundColor = color;
-            button.onclick = () => this.changeColor('eyes', color);
-        });
+        const eyeColorButtons = document.getElementById('eye-color-buttons');
+        if (eyeColorButtons) {
+            eyeColorButtons.innerHTML = ''; // Clear existing buttons
+            this.eyeColors.forEach(color => {
+                const button = document.createElement('button');
+                button.className = 'color-button';
+                button.style.backgroundColor = color;
+                button.onclick = () => this.changeColor('eyes', color);
+                eyeColorButtons.appendChild(button);
+            });
+        } else {
+            console.error('Eye color buttons container not found');
+        }
         // Add more color button setups for other items as needed
     }
 
