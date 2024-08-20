@@ -10,7 +10,6 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {};
         this.equippedItems = {};
         this.lastAction = {};
         this.hiddenEquippedItems = new Set();
@@ -159,12 +158,45 @@ class AvatarDisplay {
 
     isSkinTone(color) {
         const skinTones = Object.values(this.skinTones).map(t => t.main.toLowerCase());
-        return skinTones.includes(color.toLowerCase());
+        return skinTones.includes(color.toLowerCase()) || this.isCloseToSkinTone(color);
     }
 
     isShadowTone(color) {
         const shadowTones = Object.values(this.skinTones).map(t => t.shadow.toLowerCase());
-        return shadowTones.includes(color.toLowerCase());
+        return shadowTones.includes(color.toLowerCase()) || this.isCloseToShadowTone(color);
+    }
+
+    isCloseToSkinTone(color) {
+        const rgb = this.hexToRgb(color);
+        return Object.values(this.skinTones).some(tone => {
+            const toneRgb = this.hexToRgb(tone.main);
+            return this.colorDistance(rgb, toneRgb) < 30; // Adjust threshold as needed
+        });
+    }
+
+    isCloseToShadowTone(color) {
+        const rgb = this.hexToRgb(color);
+        return Object.values(this.skinTones).some(tone => {
+            const toneRgb = this.hexToRgb(tone.shadow);
+            return this.colorDistance(rgb, toneRgb) < 30; // Adjust threshold as needed
+        });
+    }
+
+    colorDistance(rgb1, rgb2) {
+        return Math.sqrt(
+            Math.pow(rgb1[0] - rgb2[0], 2) +
+            Math.pow(rgb1[1] - rgb2[1], 2) +
+            Math.pow(rgb1[2] - rgb2[2], 2)
+        );
+    }
+
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
     }
 
     tryOnItem(item) {
@@ -269,14 +301,29 @@ class AvatarDisplay {
             imgElement.addEventListener('load', () => {
                 const svgDoc = imgElement.contentDocument;
                 if (svgDoc) {
-                    const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
                     const tone = this.skinTones[this.skinTone];
-                    elements.forEach(element => {
-                        this.applySkinToneToElement(element, tone);
-                    });
+                    this.applySkinToneToSpecificParts(svgDoc, item.type, tone);
                 }
             });
         }
+    }
+
+    applySkinToneToSpecificParts(svgDoc, itemType, tone) {
+        const partsToColor = {
+            'Eyes': ['eyelid', 'under-eye', 'cheek'],
+            'Eyebrows': ['under-brow'],
+            'Nose': ['nose-bridge', 'nostril'],
+            'Mouth': ['lip', 'inner-mouth'],
+            'Face': ['cheek', 'forehead', 'chin']
+        };
+
+        const parts = partsToColor[itemType] || [];
+        parts.forEach(part => {
+            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
+            elements.forEach(element => {
+                this.applySkinToneToElement(element, tone);
+            });
+        });
     }
 }
 
@@ -285,10 +332,13 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
-        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+    window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
         window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
         console.error('No logged in user found');
     }
 });
+
+
+
