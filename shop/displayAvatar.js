@@ -143,30 +143,37 @@ class AvatarDisplay {
     }
 
     applySkinTone(obj, type) {
-        const svgDoc = obj.contentDocument;
-        if (svgDoc && this.skinTones[this.skinTone]) {
-            const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            const tone = this.skinTones[this.skinTone];
-            
-            elements.forEach((element) => {
-                ['fill', 'stroke'].forEach((attr) => {
-                    const color = element.getAttribute(attr);
-                    if (color && color.toLowerCase() !== 'none') {
-                        if (this.isSkinTone(color)) {
-                            const newColor = this.getNewColor(color, tone.main, tone);
-                            element.setAttribute(attr, newColor);
-                        }
+    const svgDoc = obj.contentDocument;
+    if (svgDoc && this.skinTones[this.skinTone]) {
+        const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        const tone = this.skinTones[this.skinTone];
+        
+        elements.forEach((element) => {
+            ['fill', 'stroke'].forEach((attr) => {
+                const color = element.getAttribute(attr);
+                if (color && color.toLowerCase() !== 'none') {
+                    if (this.isSkinTone(color)) {
+                        const newColor = this.getNewColor(color, tone.main, tone);
+                        element.setAttribute(attr, newColor);
                     }
-                });
+                }
             });
-        }
+        });
     }
+}
 
-    isSkinTone(color) {
-        const rgb = this.hexToRgb(color);
-        // This is a simple check and might need adjustment
-        return (rgb[0] > rgb[1] && rgb[1] > rgb[2] && rgb[0] - rgb[2] > 20);
-    }
+   isSkinTone(color) {
+    const rgb = this.hexToRgb(color);
+    if (!rgb) return false;
+    const [r, g, b] = rgb;
+    
+    // More sophisticated skin tone detection
+    const isSkinHue = (r > g) && (g > b);
+    const isSkinSaturation = Math.max(r, g, b) - Math.min(r, g, b) < 100;
+    const isSkinBrightness = (r + g + b) > 300;
+    
+    return isSkinHue && isSkinSaturation && isSkinBrightness;
+}
 
     getUniqueColors(paths) {
         const colors = new Set();
@@ -187,19 +194,27 @@ class AvatarDisplay {
         return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
     }
 
-    getNewColor(currentColor, mainColor, tone) {
-        const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(mainColor);
-        const luminanceDiff = currentLuminance - mainLuminance;
-        
-        if (Math.abs(luminanceDiff) < 0.1) {
-            return tone.main;
-        } else if (luminanceDiff < 0) {
-            return this.darkenColor(tone.main, Math.abs(luminanceDiff));
-        } else {
-            return this.lightenColor(tone.main, luminanceDiff);
-        }
+ 
+getNewColor(currentColor, mainColor, tone) {
+    const currentLuminance = this.getLuminance(currentColor);
+    const mainLuminance = this.getLuminance(tone.main);
+    const luminanceDiff = currentLuminance - mainLuminance;
+    
+    if (Math.abs(luminanceDiff) < 0.1) {
+        return tone.main;
+    } else if (luminanceDiff < 0) {
+        return this.blendColors(tone.shadow, tone.main, Math.abs(luminanceDiff));
+    } else {
+        return this.blendColors(tone.main, '#FFFFFF', luminanceDiff);
     }
+}
+
+blendColors(color1, color2, ratio) {
+    const rgb1 = this.hexToRgb(color1);
+    const rgb2 = this.hexToRgb(color2);
+    const blend = rgb1.map((c, i) => Math.round(c + (rgb2[i] - c) * ratio));
+    return `rgb(${blend[0]}, ${blend[1]}, ${blend[2]})`;
+}
 
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
