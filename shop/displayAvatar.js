@@ -187,17 +187,23 @@ class AvatarDisplay {
                Math.abs(rgb1[2] - rgb2[2]) < threshold;
     }
 
-     getNewSkinColor(currentColor, newTone) {
-        const lightMain = '#FEE2CA';
-        const lightShadow = '#EFC1B7';
+    getNewSkinColor(currentColor, newTone) {
+    const lightMain = '#FEE2CA';
+    const lightShadow = '#EFC1B7';
 
-        if (this.colorEquals(currentColor, lightMain)) {
-            return newTone.main;
-        } else if (this.colorEquals(currentColor, lightShadow)) {
-            return newTone.shadow;
-        }
-        return null;
+    console.log(`Current color: ${currentColor}`);
+    console.log(`Matching against: ${lightMain} and ${lightShadow}`);
+
+    if (this.colorEquals(currentColor, lightMain)) {
+        console.log(`Matched main color. New color: ${newTone.main}`);
+        return newTone.main;
+    } else if (this.colorEquals(currentColor, lightShadow)) {
+        console.log(`Matched shadow color. New color: ${newTone.shadow}`);
+        return newTone.shadow;
     }
+    console.log('No match found');
+    return null;
+}
 
  colorEquals(color1, color2) {
         return color1.toLowerCase() === color2.toLowerCase();
