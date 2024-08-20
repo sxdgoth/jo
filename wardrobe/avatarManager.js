@@ -57,11 +57,12 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-    updateAvatarDisplay() {
+     updateAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
+
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -95,11 +96,12 @@ class AvatarManager {
         });
     }
 
-    updateTempAvatarDisplay() {
+   updateTempAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
+
             Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -111,12 +113,12 @@ class AvatarManager {
         }
     }
 
-    changeSkinTone(newTone) {
+     changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
     }
 
-    applySkinTone() {
+  applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
             window.skinToneManager.applySkinTone(tone);
@@ -131,6 +133,7 @@ class AvatarManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 this.applySkinToneToSVG(svgDoc);
+
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -154,6 +157,7 @@ class AvatarManager {
             shadow: '#E6BBA8'
         };
         const preserveColors = ['#E6958A'];
+
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -172,6 +176,7 @@ class AvatarManager {
                     }
                 }
             });
+
             let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
@@ -188,62 +193,11 @@ class AvatarManager {
                 }
                 element.setAttribute('style', style);
             }
+
             Array.from(element.children).forEach(replaceColor);
         };
+
         replaceColor(svgDoc.documentElement);
-    }
-
-    updateItemColors(colors) {
-        Object.entries(colors).forEach(([itemType, color]) => {
-            const svgElement = this.getSVGElement(itemType);
-            if (svgElement) {
-                this.updateSVGColor(svgElement, color, itemType);
-                // Update the layer in avatarBody
-                const serializer = new XMLSerializer();
-                const svgString = serializer.serializeToString(svgElement);
-                const blob = new Blob([svgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                window.avatarBody.updateLayer(itemType, url);
-            }
-        });
-    }
-
-    getSVGElement(itemType) {
-        const itemId = this.tempEquippedItems[itemType];
-        if (itemId) {
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                const itemElement = document.querySelector(`[data-id="${item.id}"]`);
-                return itemElement ? itemElement.querySelector('svg') : null;
-            }
-        }
-        return null;
-    }
-
-    updateSVGColor(svgElement, color, itemType) {
-        if (itemType === 'eyes') {
-            const eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
-            eyeColors.forEach(eyeColor => {
-                const eyeElements = svgElement.querySelectorAll(`*[fill="${eyeColor}"], *[style*="fill: ${eyeColor}"]`);
-                eyeElements.forEach(element => {
-                    if (element.hasAttribute('fill')) {
-                        element.setAttribute('fill', color);
-                    }
-                    if (element.hasAttribute('style')) {
-                        let style = element.getAttribute('style');
-                        style = style.replace(new RegExp(`fill:\\s*${eyeColor}`, 'gi'), `fill: ${color}`);
-                        element.setAttribute('style', style);
-                    }
-                });
-            });
-            
-            // Force a redraw of the SVG
-            const parent = svgElement.parentNode;
-            const nextSibling = svgElement.nextSibling;
-            parent.removeChild(svgElement);
-            parent.insertBefore(svgElement, nextSibling);
-        }
-        // Add more conditions for other item types as needed
     }
 }
 
