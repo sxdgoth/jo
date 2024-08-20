@@ -54,13 +54,6 @@ class AvatarManager {
         }
     }
 
-    loadLipColor() {
-        const savedLipColor = localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-        if (savedLipColor) {
-            this.lipColor = savedLipColor;
-        }
-    }
-
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
@@ -138,11 +131,6 @@ class AvatarManager {
 
     changeEyeColor(newColor) {
         this.eyeColor = newColor;
-        this.updateTempAvatarDisplay();
-    }
-
-    changeLipColor(newColor) {
-        this.lipColor = newColor;
         this.updateTempAvatarDisplay();
     }
 
@@ -234,31 +222,6 @@ class AvatarManager {
         });
     }
 
-
-changeLipColor(newColor) {
-    this.lipColor = newColor;
-    this.updateTempAvatarDisplay();
-}
-    
-  applyLipColorToSVG(svgDoc) {
-    const lipColors = ['#b5796f', '#e8afa6', '#f8d2cc', '#dea296', '#d19083', '#ebc7bf', '#a76e64', '#f3ddd8', '#fdedea'];
-    const mouthElements = svgDoc.querySelectorAll('path[fill], path[stroke]');
-    mouthElements.forEach(element => {
-        ['fill', 'stroke'].forEach(attr => {
-            const color = element.getAttribute(attr);
-            if (color && lipColors.includes(color.toLowerCase())) {
-                element.setAttribute(attr, this.lipColor);
-            }
-        });
-        let style = element.getAttribute('style');
-        if (style) {
-            lipColors.forEach(lipColor => {
-                style = style.replace(new RegExp(lipColor, 'gi'), this.lipColor);
-            });
-            element.setAttribute('style', style);
-        }
-    });
-}
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
