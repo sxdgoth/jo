@@ -4,7 +4,6 @@ class AvatarDisplay {
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
-        this.triedOnItems = {};
         this.currentItems = {};
         if (!this.container) {
             console.error(`Container with id "${containerId}" not found`);
@@ -12,7 +11,6 @@ class AvatarDisplay {
         }
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
-        this.triedOnItems = {};
         this.equippedItems = {};
         this.lastAction = {};
         this.hiddenEquippedItems = new Set();
@@ -40,6 +38,7 @@ class AvatarDisplay {
             }
         };
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+        this.skinToneItems = ['Eyes', 'Nose', 'Mouth', 'Face'];
         this.originalColors = {};
         this.loadSkinTone();
         this.loadEquippedItems();
@@ -123,11 +122,14 @@ class AvatarDisplay {
                     this.saveOriginalColors(obj, part.type);
                     this.applySkinTone(obj, part.type);
                 });
+            } else {
+                obj.addEventListener('load', () => {
+                    this.applySkinToneToItem(obj, part.type);
+                });
             }
         });
 
         this.reorderLayers();
-        this.applySkinToneToItems();
     }
 
     reorderLayers() {
@@ -165,6 +167,24 @@ class AvatarDisplay {
         }
     }
 
+    applySkinToneToItem(obj, type) {
+        if (this.skinToneItems.includes(type)) {
+            const svgDoc = obj.contentDocument;
+            if (svgDoc && this.skinTones[this.skinTone]) {
+                const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                const tone = this.skinTones[this.skinTone];
+                
+                paths.forEach(path => {
+                    const currentFill = path.getAttribute('fill');
+                    if (currentFill && currentFill.toLowerCase() !== 'none') {
+                        const newColor = this.getNewColor(currentFill, tone);
+                        path.setAttribute('fill', newColor);
+                    }
+                });
+            }
+        }
+    }
+
     getUniqueColors(paths) {
         const colors = new Set();
         paths.forEach(path => {
@@ -197,7 +217,9 @@ class AvatarDisplay {
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
         return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-        hexToRgb(hex) {
+    }
+
+    hexToRgb(hex) {
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
         hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -217,7 +239,6 @@ class AvatarDisplay {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        if (!this.triedOnItems) this.triedOnItems = {};
         if (!this.currentItems) this.currentItems = {};
 
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
@@ -228,7 +249,6 @@ class AvatarDisplay {
         }
 
         this.reorderLayers();
-        this.applySkinToneToItems();
     }
 
     removeItem(type) {
@@ -243,6 +263,9 @@ class AvatarDisplay {
             if (src) {
                 this.layers[type].data = src;
                 this.layers[type].style.display = 'block';
+                this.layers[type].addEventListener('load', () => {
+                    this.applySkinToneToItem(this.layers[type], type);
+                });
             } else {
                 this.layers[type].style.display = 'none';
             }
@@ -283,12 +306,6 @@ class AvatarDisplay {
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
         });
-    }
-
-    applySkinToneToItems() {
-        if (window.skinToneApplier) {
-            window.skinToneApplier.applySkinToneToItems(this.skinTone);
-        }
     }
 
     changeSkinTone(newTone) {
