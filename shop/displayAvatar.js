@@ -168,7 +168,7 @@ class AvatarDisplay {
         const preserveColors = [
         '#E6958A',
         '#dea296', '#d19083', '#ebc7bf', '#a76e64', 
-        '#f8d2cc', '#ebc7bf', '#f3ddd8', '#fdedea'
+        '#f8d2cc', '#ebc7bf', '#f3ddd8', '#fdedea', '#dc9c90', '#dfbca9' 
     ];
         
         const replaceColor = (element) => {
