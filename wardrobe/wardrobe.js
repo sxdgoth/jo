@@ -58,6 +58,7 @@ function renderOwnedItems() {
         // Add click event listener to the change color button
         const changeColorBtn = itemElement.querySelector('.change-color-btn');
         changeColorBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent the click from being detected on the document
             window.itemColorManager.showColorPicker(item, event);
         });
     });
