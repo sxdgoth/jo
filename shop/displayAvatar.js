@@ -129,6 +129,7 @@ class AvatarDisplay {
         });
 
         this.reorderLayers();
+        this.reapplySkinToneToAllItems(); 
     }
 
     reorderLayers() {
@@ -148,27 +149,28 @@ class AvatarDisplay {
         }
     }
 
-  applySkinTone(obj, type) {
+ applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
-    if (svgDoc && this.skinTones[this.skinTone]) {
-        const elements = svgDoc.querySelectorAll('*');
-        const tone = this.skinTones[this.skinTone];
-        
-        elements.forEach((element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                const currentColor = element.getAttribute(attr);
-                if (currentColor) {
-                    const upperCaseColor = currentColor.toUpperCase();
-                    if (upperCaseColor === '#FEE2CA') {
-                        element.setAttribute(attr, tone.main);
-                    } else if (upperCaseColor === '#EFC1B7') {
-                        element.setAttribute(attr, tone.shadow);
-                    }
+    if (!svgDoc || !this.skinTones[this.skinTone]) return;
+
+    const tone = this.skinTones[this.skinTone];
+    const elements = svgDoc.querySelectorAll('*');
+
+    elements.forEach((element) => {
+        ['fill', 'stroke'].forEach(attr => {
+            const currentColor = element.getAttribute(attr);
+            if (currentColor) {
+                const upperCaseColor = currentColor.toUpperCase();
+                if (upperCaseColor === '#FEE2CA' || upperCaseColor === '#EFC1B7') {
+                    element.setAttribute(attr, upperCaseColor === '#FEE2CA' ? tone.main : tone.shadow);
                 }
-            });
+            }
         });
-    }
+    });
+
+    console.log(`Applied skin tone ${this.skinTone} to ${type}`);
 }
+
 
     isCloseTo(color1, color2) {
         const rgb1 = this.hexToRgb(color1);
@@ -226,6 +228,14 @@ class AvatarDisplay {
     localStorage.setItem(`skinTone_${this.username}`, newTone);
 }
 
+    reapplySkinToneToAllItems() {
+    Object.values(this.layers).forEach(obj => {
+        if (obj.style.display !== 'none') {
+            this.applySkinTone(obj, obj.dataset.type);
+        }
+    });
+}
+
   tryOnItem(item) {
     console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
     
@@ -255,9 +265,7 @@ class AvatarDisplay {
             this.layers[type].data = src;
             this.layers[type].style.display = 'block';
             this.layers[type].onload = () => {
-                if (this.baseParts.includes(type) || this.facialFeatures.includes(type)) {
-                    this.applySkinTone(this.layers[type], type);
-                }
+                this.applySkinTone(this.layers[type], type);
             };
         } else {
             this.layers[type].style.display = 'none';
@@ -266,6 +274,7 @@ class AvatarDisplay {
         console.warn(`Layer not found for type: ${type}`);
     }
 }
+
 
 
   toggleEquippedItem(type) {
@@ -278,9 +287,7 @@ class AvatarDisplay {
                 this.lastAction[type] = 'shown';
                 this.hiddenEquippedItems.delete(type);
                 this.layers[type].onload = () => {
-                    if (this.baseParts.includes(type) || this.facialFeatures.includes(type)) {
-                        this.applySkinTone(this.layers[type], type);
-                    }
+                    this.applySkinTone(this.layers[type], type);
                 };
             }
         } else {
@@ -290,6 +297,7 @@ class AvatarDisplay {
         }
     }
 }
+
 
     isItemEquipped(item) {
         return this.equippedItems[item.type] === item.id;
