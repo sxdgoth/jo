@@ -66,32 +66,6 @@ class ItemColorManager {
             window.avatarManager.updateItemColor(itemId, newColor);
         }
     }
-
-    applyItemColor(svgDoc, itemId) {
-        const newColor = this.currentItemColors[itemId];
-        if (!newColor) return;
-
-        const replaceColor = (element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color && this.colorableColors.includes(color.toUpperCase())) {
-                    element.setAttribute(attr, newColor);
-                }
-            });
-
-            let style = element.getAttribute('style');
-            if (style) {
-                this.colorableColors.forEach(colorableColor => {
-                    style = style.replace(new RegExp(colorableColor, 'gi'), newColor);
-                });
-                element.setAttribute('style', style);
-            }
-
-            Array.from(element.children).forEach(replaceColor);
-        };
-
-        replaceColor(svgDoc.documentElement);
-    }
 }
 
 // Initialize the ItemColorManager when the DOM is loaded
@@ -106,3 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+
