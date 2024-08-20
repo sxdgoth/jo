@@ -1,7 +1,7 @@
 class ColorPicker {
     constructor() {
-        this.eyeColors = ['#000000', '#800080', '#FF0000', '#808080', '#008000', '#0000FF', '#FFA500'];
-        this.currentEyeColor = '#000000'; // Default eye color (black)
+        this.defaultEyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
+        this.currentEyeColor = '#000000'; // Default to black
         this.initialize();
     }
 
@@ -14,7 +14,8 @@ class ColorPicker {
         const eyeColorButtons = document.getElementById('eye-color-buttons');
         if (eyeColorButtons) {
             eyeColorButtons.innerHTML = ''; // Clear existing buttons
-            this.eyeColors.forEach(color => {
+            const colors = ['#000000', '#800080', '#FF0000', '#808080', '#008000', '#0000FF', '#FFA500'];
+            colors.forEach(color => {
                 const button = document.createElement('button');
                 button.className = 'color-button';
                 button.style.backgroundColor = color;
