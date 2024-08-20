@@ -31,12 +31,8 @@ class ColorPicker {
 
     changeColor(itemType, color) {
         this.colors[itemType] = color;
-        this.applyColors();
-    }
-
-    applyColors() {
         if (window.avatarManager) {
-            window.avatarManager.updateItemColors(this.colors);
+            window.avatarManager.updateItemColors({ [itemType]: color });
         }
     }
 }
@@ -45,3 +41,7 @@ class ColorPicker {
 document.addEventListener('DOMContentLoaded', () => {
     window.colorPicker = new ColorPicker();
 });
+
+
+
+These upda
