@@ -1,36 +1,3 @@
-// wardrobe.js
-
-document.addEventListener('DOMContentLoaded', function() {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    
-    if (loggedInUser) {
-        document.getElementById('user-name').textContent = loggedInUser.username;
-        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
-        
-        // Initialize user's inventory
-        window.createUserInventory(loggedInUser.username);
-        
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
-        
-        // Render the avatar
-        if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
-            window.avatarBody.initializeAvatar(loggedInUser.username);
-        }
-        
-        // Initialize SkinToneManager after avatar is rendered
-        if (window.skinToneManager) {
-            window.skinToneManager.initialize();
-        }
-        
-        // Render owned items
-        renderOwnedItems();
-    } else {
-        window.location.href = '../index.html';
-    }
-});
-
 function renderOwnedItems() {
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
@@ -76,3 +43,34 @@ function logout() {
     sessionStorage.removeItem('loggedInUser');
     window.location.href = '../index.html';
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    
+    if (loggedInUser) {
+        document.getElementById('user-name').textContent = loggedInUser.username;
+        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
+        
+        // Initialize user's inventory
+        window.createUserInventory(loggedInUser.username);
+        
+        // Initialize AvatarManager
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
+        
+        // Render the avatar
+        if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
+            window.avatarBody.initializeAvatar(loggedInUser.username);
+        }
+        
+        // Initialize SkinToneManager after avatar is rendered
+        if (window.skinToneManager) {
+            window.skinToneManager.initialize();
+        }
+        
+        // Render owned items
+        renderOwnedItems();
+    } else {
+        window.location.href = '../index.html';
+    }
+});
