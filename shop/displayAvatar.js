@@ -113,9 +113,10 @@ class AvatarDisplay {
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
             if (part.isBase) {
-                obj.addEventListener('load', () => {
-                    this.saveOriginalColors(obj, part.type);
-                    this.applySkinTone(obj, part.type);
+                 obj.addEventListener('load', () => {
+            this.saveOriginalColors(obj, part.type);
+            this.applySkinTone(obj, part.type);
+            this.reapplySkinTone();
                 });
             }
         });
@@ -257,10 +258,10 @@ blendColors(color1, color2, ratio) {
             const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
             this.updateAvatarDisplay(item.type, itemSrc);
             
-            const itemLayer = this.layers[item.type];
-            if (itemLayer) {
-                itemLayer.addEventListener('load', () => {
-                    this.applySkinTone(itemLayer, item.type);
+             const itemLayer = this.layers[item.type];
+              if (itemLayer) {
+        itemLayer.addEventListener('load', () => {
+            this.applySkinTone(itemLayer, item.type);
                 }, { once: true });
             }
         }
@@ -330,10 +331,14 @@ blendColors(color1, color2, ratio) {
         });
     }
 
-    changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        this.reapplySkinTone();
-        localStorage.setItem(`skinTone_${this.username}`, newTone);
+   changeSkinTone(newTone) {
+    this.skinTone = newTone;
+    this.reapplySkinTone();
+    localStorage.setItem(`skinTone_${this.username}`, newTone);
+    
+    // Synchronize with SkinToneManager
+    if (window.skinToneManager) {
+        window.skinToneManager.selectSkinTone(this.skinTones[newTone]);
     }
 }
 
