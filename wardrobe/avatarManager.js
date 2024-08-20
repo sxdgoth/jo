@@ -211,3 +211,80 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
+
+
+
+// Add these methods to the AvatarManager class
+
+previewItemColor(item, color) {
+    this.updateItemColor(item, color, true);
+}
+
+applyItemColor(item, color) {
+    this.updateItemColor(item, color, false);
+    this.saveItemColor(item, color);
+}
+
+updateItemColor(item, color, isPreview) {
+    const svgElement = document.querySelector(`#avatar-display svg #${item.type.toLowerCase()}`);
+    if (svgElement) {
+        const elementsToColor = svgElement.querySelectorAll('path, circle, ellipse');
+        elementsToColor.forEach(element => {
+            const originalColor = element.getAttribute('data-original-color') || element.getAttribute('fill');
+            if (!element.getAttribute('data-original-color')) {
+                element.setAttribute('data-original-color', originalColor);
+            }
+            element.setAttribute('fill', color);
+        });
+
+        if (!isPreview) {
+            this.tempEquippedItems[item.type] = {
+                ...this.tempEquippedItems[item.type],
+                color: color
+            };
+        }
+    }
+}
+
+saveItemColor(item, color) {
+    if (!this.equippedItems[item.type]) {
+        this.equippedItems[item.type] = {};
+    }
+    this.equippedItems[item.type].color = color;
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+}
+
+// Update the updateLayerWithSkinTone method to apply custom colors
+updateLayerWithSkinTone(type, src) {
+    fetch(src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            this.applySkinToneToSVG(svgDoc);
+            
+            // Apply custom color if it exists
+            if (this.equippedItems[type] && this.equippedItems[type].color) {
+                this.applyCustomColorToSVG(svgDoc, this.equippedItems[type].color);
+            }
+            
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            window.avatarBody.updateLayer(type, url);
+        })
+        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+}
+
+applyCustomColorToSVG(svgDoc, color) {
+    const elementsToColor = svgDoc.querySelectorAll('path, circle, ellipse');
+    elementsToColor.forEach(element => {
+        const fill = element.getAttribute('fill');
+        if (fill && (fill.startsWith('#346799') || fill.startsWith('#325880') || fill.startsWith('#3676b2') || fill.startsWith('#3c93e5') || fill.startsWith('#3fa2ff'))) {
+            element.setAttribute('fill', color);
+        }
+    });
+}
