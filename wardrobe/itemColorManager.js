@@ -1,4 +1,4 @@
-class ItemColorManager {
+cclass ItemColorManager {
     constructor() {
         this.colorableColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
         this.colorOptions = {
@@ -43,7 +43,8 @@ class ItemColorManager {
         document.body.appendChild(colorPicker);
     }
 
-    showColorPicker(item, event) {
+     showColorPicker(item, event) {
+        console.log('Showing color picker for item:', item);
         const colorPicker = document.getElementById('color-picker');
         colorPicker.style.display = 'block';
         colorPicker.style.left = `${event.clientX}px`;
@@ -57,16 +58,17 @@ class ItemColorManager {
         colorPicker.style.display = 'none';
     }
 
-   changeItemColor(newColor) {
-    const colorPicker = document.getElementById('color-picker');
-    const itemId = colorPicker.getAttribute('data-item-id');
-    this.currentItemColors[itemId] = newColor;
-    this.hideColorPicker();
-    if (window.avatarManager) {
-        console.log('Updating item color:', itemId, newColor);
-        window.avatarManager.updateItemColor(itemId, newColor);
-    } else {
-        console.error('AvatarManager not found');
+    changeItemColor(newColor) {
+        const colorPicker = document.getElementById('color-picker');
+        const itemId = colorPicker.getAttribute('data-item-id');
+        this.currentItemColors[itemId] = newColor;
+        this.hideColorPicker();
+        if (window.avatarManager) {
+            console.log('Updating item color:', itemId, newColor);
+            window.avatarManager.updateItemColor(itemId, newColor);
+        } else {
+       console.error('AvatarManager not found');
+        }
     }
 }
 
