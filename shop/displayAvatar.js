@@ -149,7 +149,7 @@ class AvatarDisplay {
         tan: ['#F1C27D', '#E0B170'],
         dark: ['#8D5524', '#7C4A1E']
     };
-    const eyeColors = ['#E6BBA8', '#F4D5BF'];
+    const eyeColors = ['#F4D5BF', '#E6BBA8'];
     
      // Colors to preserve (including the scar color)
     const preserveColors = ['#E6958A']; // Add more colors here if needed
