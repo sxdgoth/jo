@@ -259,6 +259,17 @@ class AvatarDisplay {
         this.applyLipColorToSVG(svgDoc);
     }
 
+    // Serialize the modified SVG back to a string
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgDoc);
+
+    // Create a new Blob with the modified SVG content
+    const blob = new Blob([svgString], {type: 'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+
+    // Update the src of the original object
+    obj.data = url;
+
     console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color to ${type}`);
 }
 
