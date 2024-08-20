@@ -33,17 +33,17 @@ class AvatarManager {
         }
     }
 
-    setupEyeColorPicker() {
-        const eyeColorPicker = document.getElementById('eye-color-picker');
-        if (eyeColorPicker) {
-            eyeColorPicker.value = this.eyeColor;
-            eyeColorPicker.addEventListener('input', (event) => {
-                this.changeEyeColor(event.target.value);
-            });
-        } else {
-            console.error('Eye color picker not found');
-        }
+   setupEyeColorPicker() {
+    const eyeColorPicker = document.getElementById('eye-color-input');
+    if (eyeColorPicker) {
+        eyeColorPicker.value = this.eyeColor;
+        eyeColorPicker.addEventListener('input', (event) => {
+            this.changeEyeColor(event.target.value);
+        });
+    } else {
+        console.error('Eye color picker not found');
     }
+}
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
@@ -136,13 +136,13 @@ class AvatarManager {
     }
 
     changeEyeColor(newColor) {
-        this.eyeColor = newColor;
-        const eyeColorPicker = document.getElementById('eye-color-picker');
-        if (eyeColorPicker) {
-            eyeColorPicker.value = newColor;
-        }
-        this.updateTempAvatarDisplay();
+    this.eyeColor = newColor;
+    const eyeColorPicker = document.getElementById('eye-color-input');
+    if (eyeColorPicker) {
+        eyeColorPicker.value = newColor;
     }
+    this.updateTempAvatarDisplay();
+}
 
     applySkinTone() {
         if (window.skinToneManager) {
