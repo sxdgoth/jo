@@ -208,33 +208,31 @@ class AvatarManager {
         if (itemId) {
             const item = window.userInventory.getItems().find(i => i.id === itemId);
             if (item) {
-                const itemElement = document.querySelector(`[data-id="${item.id}"]`);
-                if (itemElement) {
-                    return itemElement.querySelector('svg') || itemElement;
-                }
+                return document.querySelector(`[data-id="${item.id}"] svg`);
             }
         }
         return null;
     }
 
     updateSVGColor(svgElement, color, itemType) {
-    if (itemType === 'eyes') {
-        const eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
-        eyeColors.forEach(eyeColor => {
-            const eyeElements = svgElement.querySelectorAll(`path[fill="${eyeColor}"], path[style*="fill: ${eyeColor}"]`);
-            eyeElements.forEach(element => {
-                if (element.hasAttribute('fill')) {
-                    element.setAttribute('fill', color);
-                }
-                if (element.hasAttribute('style')) {
-                    let style = element.getAttribute('style');
-                    style = style.replace(new RegExp(`fill:\\s*${eyeColor}`, 'gi'), `fill: ${color}`);
-                    element.setAttribute('style', style);
-                }
+        if (itemType === 'eyes') {
+            const eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
+            eyeColors.forEach(eyeColor => {
+                const eyeElements = svgElement.querySelectorAll(`path[fill="${eyeColor}"], path[style*="fill: ${eyeColor}"]`);
+                eyeElements.forEach(element => {
+                    if (element.hasAttribute('fill')) {
+                        element.setAttribute('fill', color);
+                    }
+                    if (element.hasAttribute('style')) {
+                        let style = element.getAttribute('style');
+                        style = style.replace(new RegExp(`fill:\\s*${eyeColor}`, 'gi'), `fill: ${color}`);
+                        element.setAttribute('style', style);
+                    }
+                });
             });
-        });
+        }
+        // Add more conditions for other item types as needed
     }
-    // Add more conditions for other item types as needed
 }
 
 // Initialize the AvatarManager when the DOM is loaded
