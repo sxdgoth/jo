@@ -23,11 +23,11 @@ function renderOwnedItems() {
         itemImage.addEventListener('click', () => toggleItem(item));
         
         // Add click event listener to the change color button
-      const changeColorBtn = itemElement.querySelector('.change-color-btn');
-changeColorBtn.addEventListener('click', (event) => {
-    event.stopPropagation();
-    window.itemColorManager.showColorPicker(item, event);
-});
+        const changeColorBtn = itemElement.querySelector('.change-color-btn');
+        changeColorBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            window.itemColorManager.showColorPicker(item, event);
+        });
     });
 }
 
@@ -55,8 +55,12 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createUserInventory(loggedInUser.username);
         
         // Initialize AvatarManager
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
+        if (window.AvatarManager) {
+            window.avatarManager = new window.AvatarManager(loggedInUser.username);
+            window.avatarManager.initialize();
+        } else {
+            console.error('AvatarManager class not found');
+        }
         
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
@@ -70,7 +74,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Render owned items
         renderOwnedItems();
+
+        // Setup logout button
+        const logoutButton = document.getElementById('logout-btn');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', logout);
+        }
     } else {
         window.location.href = '../index.html';
     }
 });
+
+// Add any additional functions or event listeners here if needed
