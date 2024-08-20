@@ -148,23 +148,36 @@ class AvatarDisplay {
             this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
         }
     }
-       applySkinTone(obj, type) {
+    
+     applySkinToneToItem(obj, type) {
+    if (this.skinToneItems.includes(type)) {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
             const tone = this.skinTones[this.skinTone];
-            const colors = this.getUniqueColors(paths);
-            const mainColor = this.findMainSkinColor(colors);
             
-            paths.forEach((path, index) => {
+            paths.forEach(path => {
                 const currentFill = path.getAttribute('fill');
                 if (currentFill && currentFill.toLowerCase() !== 'none') {
-                    const newColor = this.getNewColor(currentFill, mainColor, tone);
+                    let newColor;
+                    if (type === 'Eyes') {
+                        // Only change colors that are close to skin tones
+                        const luminance = this.getLuminance(currentFill);
+                        if (luminance > 0.5 && luminance < 0.9) {
+                            newColor = this.getNewColor(currentFill, tone.main, tone);
+                        } else {
+                            // Keep the original color for non-skin parts
+                            newColor = currentFill;
+                        }
+                    } else {
+                        newColor = this.getNewColor(currentFill, tone.main, tone);
+                    }
                     path.setAttribute('fill', newColor);
                 }
             });
         }
     }
+}
 
     applySkinToneToItem(obj, type) {
         if (this.skinToneItems.includes(type)) {
