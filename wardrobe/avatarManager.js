@@ -125,24 +125,30 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
-        fetch(src)
-            .then(response => response.text())
-            .then(svgText => {
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                
-                this.applySkinToneToSVG(svgDoc);
+   updateLayerWithSkinTone(type, src) {
+    fetch(src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            this.applySkinToneToSVG(svgDoc);
+            
+            // Apply item color if it's set
+            const item = Object.values(this.tempEquippedItems).find(id => window.userInventory.getItems().find(i => i.id === id && i.type === type));
+            if (item) {
+                window.itemColorManager.applyItemColor(svgDoc, item);
+            }
 
-                const serializer = new XMLSerializer();
-                const modifiedSvgString = serializer.serializeToString(svgDoc);
-                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                
-                window.avatarBody.updateLayer(type, url);
-            })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
-    }
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            window.avatarBody.updateLayer(type, url);
+        })
+        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+}
 
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
