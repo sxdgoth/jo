@@ -149,7 +149,7 @@ class AvatarDisplay {
         tan: ['#F1C27D', '#E0B170'],
         dark: ['#8D5524', '#7C4A1E']
     };
-    const eyeColors = ['#E6BBA8', '#E6958A', '#F4D5BF'];
+    const eyeColors = ['#E6BBA8', '#F4D5BF'];
         
            
       function replaceColor(element) {
