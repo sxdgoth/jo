@@ -1,10 +1,9 @@
 class AvatarDisplay {
-
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
-        this.triedOnItems = {};
-        this.currentItems = {};
+        this.triedOnItems = {}; // Initialize this
+        this.currentItems = {}; // Initialize this
         if (!this.container) {
             console.error(`Container with id "${containerId}" not found`);
             return;
@@ -13,9 +12,9 @@ class AvatarDisplay {
         this.layers = {};
         this.triedOnItems = {};
         this.equippedItems = {};
-        this.lastAction = {};
+        this.lastAction = {}; // Track the last action for each item type
         this.hiddenEquippedItems = new Set();
-        this.skinTone = 'light';
+        this.skinTone = 'light'; // Default skin tone
         this.skinTones = {
             light: {
                 name: 'Light',
@@ -80,7 +79,6 @@ class AvatarDisplay {
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
-
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
@@ -124,7 +122,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -136,50 +134,54 @@ class AvatarDisplay {
         const svgDoc = obj.contentDocument;
         if (svgDoc) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            this.originalColors[type] = Array.from(paths).map(path => ({
-                fill: path.getAttribute('fill'),
-                stroke: path.getAttribute('stroke')
-            }));
+            this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
         }
     }
 
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
-        if (svgDoc && this.skinTones[this.skinTone] && this.baseParts.includes(type)) {
-            const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        if (svgDoc && this.skinTones[this.skinTone]) {
+            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
             const tone = this.skinTones[this.skinTone];
+            const colors = this.getUniqueColors(paths);
+            const mainColor = this.findMainSkinColor(colors);
             
-            elements.forEach((element) => {
-                ['fill', 'stroke'].forEach((attr) => {
-                    const color = element.getAttribute(attr);
-                    if (color && color.toLowerCase() !== 'none' && this.isSkinTone(color)) {
-                        const newColor = this.getNewSkinColor(color, tone);
-                        element.setAttribute(attr, newColor);
-                    }
-                });
+            paths.forEach((path, index) => {
+                const currentFill = path.getAttribute('fill');
+                if (currentFill && currentFill.toLowerCase() !== 'none') {
+                    const newColor = this.getNewColor(currentFill, mainColor, tone);
+                    path.setAttribute('fill', newColor);
+                }
             });
         }
     }
 
-    isSkinTone(color) {
-        const rgb = this.hexToRgb(color);
-        if (!rgb) return false;
-        
-        const [r, g, b] = rgb;
-        return r > g && g > b && r - b > 20;
+    getUniqueColors(paths) {
+        const colors = new Set();
+        paths.forEach(path => {
+            const fill = path.getAttribute('fill');
+            if (fill && fill.toLowerCase() !== 'none') {
+                colors.add(fill.toLowerCase());
+            }
+        });
+        return Array.from(colors);
     }
 
-    getNewSkinColor(currentColor, tone) {
+    findMainSkinColor(colors) {
+        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
+    }
+
+    getNewColor(currentColor, mainColor, tone) {
         const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(tone.main);
-        const shadowLuminance = this.getLuminance(tone.shadow);
+        const mainLuminance = this.getLuminance(mainColor);
+        const luminanceDiff = currentLuminance - mainLuminance;
         
-        const midLuminance = (mainLuminance + shadowLuminance) / 2;
-        
-        if (currentLuminance >= midLuminance) {
+        if (Math.abs(luminanceDiff) < 0.1) {
             return tone.main;
-        } else {
+        } else if (luminanceDiff < 0) {
             return tone.shadow;
+        } else {
+            return this.lightenColor(tone.main, luminanceDiff);
         }
     }
 
@@ -199,42 +201,43 @@ class AvatarDisplay {
         ] : null;
     }
 
+    lightenColor(color, amount) {
+        const rgb = this.hexToRgb(color);
+        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
+        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
+    }
+
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
+        // Initialize the objects if they don't exist
         if (!this.triedOnItems) this.triedOnItems = {};
         if (!this.currentItems) this.currentItems = {};
-        
+
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            // If the same item is clicked again, remove it
             this.removeItem(item.type);
         } else {
+            // Otherwise, update with the new item
             this.currentItems[item.type] = item;
-            const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
-            this.updateAvatarDisplay(item.type, itemSrc);
-            
-            const itemLayer = this.layers[item.type];
-            if (itemLayer) {
-                itemLayer.addEventListener('load', () => {
-                    this.applySkinTone(itemLayer, item.type);
-                }, { once: true });
-            }
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
+
         this.reorderLayers();
     }
 
-    removeItem(type) {
+     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-    updateAvatarDisplay(type, src) {
+     updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
                 this.layers[type].data = src;
                 this.layers[type].style.display = 'block';
-                this.layers[type].dispatchEvent(new Event('load'));
             } else {
                 this.layers[type].style.display = 'none';
             }
@@ -246,17 +249,19 @@ class AvatarDisplay {
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
+                // Show the equipped item
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
                 if (equippedItem) {
                     this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
                     this.layers[type].style.display = 'block';
                     this.lastAction[type] = 'shown';
-                    this.hiddenEquippedItems.delete(type);
+                    this.hiddenEquippedItems.delete(type); // Remove from hidden set
                 }
             } else {
+                // Hide the equipped item
                 this.layers[type].style.display = 'none';
                 this.lastAction[type] = 'hidden';
-                this.hiddenEquippedItems.add(type);
+                this.hiddenEquippedItems.add(type); // Add to hidden set
             }
         }
     }
@@ -275,20 +280,6 @@ class AvatarDisplay {
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
         });
-    }
-
-    reapplySkinTone() {
-        Object.values(this.layers).forEach(layer => {
-            if (layer.contentDocument) {
-                this.applySkinTone(layer, layer.dataset.type);
-            }
-        });
-    }
-
-    changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        this.reapplySkinTone();
-        localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
 }
 
