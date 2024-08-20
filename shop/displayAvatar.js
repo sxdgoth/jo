@@ -81,7 +81,7 @@ class AvatarDisplay {
             { name: 'Face', file: '', type: 'Face', isBase: false }
         ];
 
-            bodyParts.forEach(part => {
+        bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
             obj.data = '';
@@ -174,21 +174,13 @@ class AvatarDisplay {
         const mainLuminance = this.getLuminance(tone.main);
         const shadowLuminance = this.getLuminance(tone.shadow);
         
-        if (currentLuminance >= mainLuminance) {
+        const midLuminance = (mainLuminance + shadowLuminance) / 2;
+        
+        if (currentLuminance >= midLuminance) {
             return tone.main;
-        } else if (currentLuminance <= shadowLuminance) {
-            return tone.shadow;
         } else {
-            const ratio = (currentLuminance - shadowLuminance) / (mainLuminance - shadowLuminance);
-            return this.blendColors(tone.shadow, tone.main, ratio);
+            return tone.shadow;
         }
-    }
-
-    blendColors(color1, color2, ratio) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const blend = rgb1.map((c, i) => Math.round(c + (rgb2[i] - c) * ratio));
-        return `#${blend.map(c => c.toString(16).padStart(2, '0')).join('')}`;
     }
 
     getLuminance(hex) {
