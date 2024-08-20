@@ -138,7 +138,7 @@ class AvatarDisplay {
         });
     }
 
-    applySkinTone(obj, type) {
+ applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
@@ -149,20 +149,27 @@ class AvatarDisplay {
         tan: ['#F1C27D', '#E0B170'],
         dark: ['#8D5524', '#7C4A1E']
     };
-    const eyeColors = ['#E6BBA8', '#F4D5BF'];
-        
-           
-      function replaceColor(element) {
+  const eyeColors = ['#E6BBA8', '#E6958A', '#F4D5BF'];
+    
+    // Colors to preserve (add more as needed)
+    const preserveColors = ['#FF0000', '#800000']; // Example: preserve red and dark red
+
+    function replaceColor(element) {
         ['fill', 'stroke'].forEach(attr => {
             let color = element.getAttribute(attr);
             if (color) {
                 color = color.toUpperCase();
+                // Skip preserved colors
+                if (preserveColors.includes(color)) return;
+                
                 // Replace default skin colors
                 if (defaultColors.light.includes(color)) {
                     element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
                 }
-                // Replace eye and other item colors
-                if (eyeColors.includes(color) || color.startsWith('#E6') || color.startsWith('#F4')) {
+                // Replace eye and other item colors, but be more selective
+                else if (eyeColors.includes(color) || 
+                    (color.startsWith('#E6') && !preserveColors.includes(color)) || 
+                    (color.startsWith('#F4') && !preserveColors.includes(color))) {
                     element.setAttribute(attr, tone.main);
                 }
             }
@@ -175,12 +182,15 @@ class AvatarDisplay {
             defaultColors.light.forEach((defaultColor, index) => {
                 style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
             });
-            // Replace eye and other item colors
+            // Replace eye and other item colors, but be more selective
             eyeColors.forEach(defaultColor => {
                 style = style.replace(new RegExp(defaultColor, 'gi'), tone.main);
             });
-            style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-            style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            // Only replace #E6 and #F4 colors if they're not in the preserve list
+            if (!preserveColors.some(color => style.includes(color))) {
+                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            }
             element.setAttribute('style', style);
         }
 
@@ -191,7 +201,6 @@ class AvatarDisplay {
     replaceColor(svgDoc.documentElement);
     console.log(`Applied skin tone ${this.skinTone} to ${type}`);
 }
-
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
