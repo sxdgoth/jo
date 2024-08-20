@@ -4,6 +4,7 @@ class AvatarManager {
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.skinTone = 'light';
+        this.eyeColor = '#3FA2FF'; // Default eye color
         this.loadEquippedItems();
     }
 
@@ -41,12 +42,17 @@ class AvatarManager {
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
+        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
+        if (savedEyeColor) {
+            this.eyeColor = savedEyeColor;
+        }
     }
 
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -57,12 +63,11 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-     updateAvatarDisplay() {
+    updateAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
-
             Object.entries(this.equippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -96,12 +101,11 @@ class AvatarManager {
         });
     }
 
-   updateTempAvatarDisplay() {
+    updateTempAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
-
             Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -113,12 +117,17 @@ class AvatarManager {
         }
     }
 
-     changeSkinTone(newTone) {
+    changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
     }
 
-  applySkinTone() {
+    changeEyeColor(newColor) {
+        this.eyeColor = newColor;
+        this.updateTempAvatarDisplay();
+    }
+
+    applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
             window.skinToneManager.applySkinTone(tone);
@@ -133,7 +142,7 @@ class AvatarManager {
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
                 this.applySkinToneToSVG(svgDoc);
-
+                this.applyEyeColorToSVG(svgDoc);
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -157,7 +166,6 @@ class AvatarManager {
             shadow: '#E6BBA8'
         };
         const preserveColors = ['#E6958A'];
-
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -176,7 +184,6 @@ class AvatarManager {
                     }
                 }
             });
-
             let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
@@ -193,11 +200,16 @@ class AvatarManager {
                 }
                 element.setAttribute('style', style);
             }
-
             Array.from(element.children).forEach(replaceColor);
         };
-
         replaceColor(svgDoc.documentElement);
+    }
+
+    applyEyeColorToSVG(svgDoc) {
+        const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"]');
+        eyeElements.forEach(element => {
+            element.setAttribute('fill', this.eyeColor);
+        });
     }
 }
 
