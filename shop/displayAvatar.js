@@ -116,20 +116,16 @@ class AvatarDisplay {
                 console.log(`No equipped item for: ${part.name}`);
             }
 
+            obj.onload = () => {
+                this.applySkinTone(obj, part.type);
+            };
+
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
-
-            if (part.isBase || this.facialFeatures.includes(part.type)) {
-                obj.addEventListener('load', () => {
-                    this.saveOriginalColors(obj, part.type);
-                    this.applySkinTone(obj, part.type);
-                });
-            }
         });
 
         this.reorderLayers();
-        this.reapplySkinToneToAllItems(); 
     }
 
     reorderLayers() {
@@ -141,116 +137,69 @@ class AvatarDisplay {
         });
     }
 
-    saveOriginalColors(obj, type) {
+    applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
-        if (svgDoc) {
-            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
+        if (!svgDoc || !this.skinTones[this.skinTone]) return;
+
+        const tone = this.skinTones[this.skinTone];
+        const defaultLight = '#FEE2CA';
+        const defaultShadow = '#EFC1B7';
+
+        function replaceColor(element) {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color) {
+                    color = color.toUpperCase();
+                    if (color === defaultLight) {
+                        element.setAttribute(attr, tone.main);
+                    } else if (color === defaultShadow) {
+                        element.setAttribute(attr, tone.shadow);
+                    }
+                }
+            });
+
+        
+            // Replace colors in style attribute
+            let style = element.getAttribute('style');
+            if (style) {
+                style = style.replace(new RegExp(defaultLight, 'gi'), tone.main);
+                style = style.replace(new RegExp(defaultShadow, 'gi'), tone.shadow);
+                element.setAttribute('style', style);
+            }
+
+            // Recursively apply to child elements
+            Array.from(element.children).forEach(replaceColor);
         }
+
+        replaceColor(svgDoc.documentElement);
+        console.log(`Applied skin tone ${this.skinTone} to ${type}`);
     }
 
- applySkinTone(obj, type) {
-    const svgDoc = obj.contentDocument;
-    if (!svgDoc || !this.skinTones[this.skinTone]) return;
-
-    const tone = this.skinTones[this.skinTone];
-    const elements = svgDoc.querySelectorAll('*');
-
-    elements.forEach((element) => {
-        ['fill', 'stroke'].forEach(attr => {
-            const currentColor = element.getAttribute(attr);
-            if (currentColor) {
-                const upperCaseColor = currentColor.toUpperCase();
-                if (upperCaseColor === '#FEE2CA' || upperCaseColor === '#EFC1B7') {
-                    element.setAttribute(attr, upperCaseColor === '#FEE2CA' ? tone.main : tone.shadow);
-                }
+    changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        Object.values(this.layers).forEach(obj => {
+            if (obj.contentDocument) {
+                this.applySkinTone(obj, obj.dataset.type);
             }
         });
-    });
-
-    console.log(`Applied skin tone ${this.skinTone} to ${type}`);
-}
-
-
-    isCloseTo(color1, color2) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const threshold = 30; // Adjust this value to change the sensitivity
-
-        return Math.abs(rgb1[0] - rgb2[0]) < threshold &&
-               Math.abs(rgb1[1] - rgb2[1]) < threshold &&
-               Math.abs(rgb1[2] - rgb2[2]) < threshold;
+        localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
 
-    getNewColor(currentColor, tone) {
-        const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(tone.main);
-        const luminanceDiff = currentLuminance - mainLuminance;
+    tryOnItem(item) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        if (Math.abs(luminanceDiff) < 0.1) {
-            return tone.main;
-        } else if (luminanceDiff < 0) {
-            return tone.shadow;
+        if (!this.triedOnItems) this.triedOnItems = {};
+        if (!this.currentItems) this.currentItems = {};
+
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            this.removeItem(item.type);
         } else {
-            return this.lightenColor(tone.main, luminanceDiff);
+            this.currentItems[item.type] = item;
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
+
+        this.reorderLayers();
     }
-
-    getLuminance(hex) {
-        const rgb = this.hexToRgb(hex);
-        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    }
-
-    hexToRgb(hex) {
-        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
-    }
-
-    lightenColor(color, amount) {
-        const rgb = this.hexToRgb(color);
-        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
-        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
-    }
-
-   changeSkinTone(newTone) {
-    this.skinTone = newTone;
-    Object.values(this.layers).forEach(obj => {
-        if (obj.contentDocument) {
-            this.applySkinTone(obj, obj.dataset.type);
-        }
-    });
-    localStorage.setItem(`skinTone_${this.username}`, newTone);
-}
-
-    reapplySkinToneToAllItems() {
-    Object.values(this.layers).forEach(obj => {
-        if (obj.style.display !== 'none') {
-            this.applySkinTone(obj, obj.dataset.type);
-        }
-    });
-}
-
-  tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (!this.triedOnItems) this.triedOnItems = {};
-    if (!this.currentItems) this.currentItems = {};
-
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        this.removeItem(item.type);
-    } else {
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-    }
-
-    this.reorderLayers();
-}
 
     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
@@ -258,46 +207,43 @@ class AvatarDisplay {
         this.updateAvatarDisplay(type, null);
     }
 
-  updateAvatarDisplay(type, src) {
-    console.log(`Updating avatar display for ${type} with src: ${src}`);
-    if (this.layers[type]) {
-        if (src) {
-            this.layers[type].data = src;
-            this.layers[type].style.display = 'block';
-            this.layers[type].onload = () => {
-                this.applySkinTone(this.layers[type], type);
-            };
-        } else {
-            this.layers[type].style.display = 'none';
-        }
-    } else {
-        console.warn(`Layer not found for type: ${type}`);
-    }
-}
-
-
-
-  toggleEquippedItem(type) {
-    if (this.layers[type] && this.equippedItems[type]) {
-        if (this.layers[type].style.display === 'none') {
-            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-            if (equippedItem) {
-                this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+    updateAvatarDisplay(type, src) {
+        console.log(`Updating avatar display for ${type} with src: ${src}`);
+        if (this.layers[type]) {
+            if (src) {
+                this.layers[type].data = src;
                 this.layers[type].style.display = 'block';
-                this.lastAction[type] = 'shown';
-                this.hiddenEquippedItems.delete(type);
                 this.layers[type].onload = () => {
                     this.applySkinTone(this.layers[type], type);
                 };
+            } else {
+                this.layers[type].style.display = 'none';
             }
         } else {
-            this.layers[type].style.display = 'none';
-            this.lastAction[type] = 'hidden';
-            this.hiddenEquippedItems.add(type);
+            console.warn(`Layer not found for type: ${type}`);
         }
     }
-}
 
+    toggleEquippedItem(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            if (this.layers[type].style.display === 'none') {
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                    this.lastAction[type] = 'shown';
+                    this.hiddenEquippedItems.delete(type);
+                    this.layers[type].onload = () => {
+                        this.applySkinTone(this.layers[type], type);
+                    };
+                }
+            } else {
+                this.layers[type].style.display = 'none';
+                this.lastAction[type] = 'hidden';
+                this.hiddenEquippedItems.add(type);
+            }
+        }
+    }
 
     isItemEquipped(item) {
         return this.equippedItems[item.type] === item.id;
@@ -307,7 +253,6 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
-    
 
     resetTriedOnItems() {
         this.currentItems = {};
@@ -316,7 +261,6 @@ class AvatarDisplay {
         });
     }
 }
-
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
