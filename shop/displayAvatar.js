@@ -149,22 +149,24 @@ class AvatarDisplay {
     }
 
     applySkinTone(obj, type) {
-        const svgDoc = obj.contentDocument;
-        if (svgDoc && this.skinTones[this.skinTone]) {
-            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            const tone = this.skinTones[this.skinTone];
-            
-            paths.forEach((path) => {
-                const currentFill = path.getAttribute('fill');
-                if (currentFill && currentFill.toLowerCase() !== 'none') {
-                    if (this.isCloseTo(currentFill, '#FEE2CA') || this.isCloseTo(currentFill, '#EFC1B7')) {
-                        const newColor = this.getNewColor(currentFill, tone);
-                        path.setAttribute('fill', newColor);
-                    }
+    const svgDoc = obj.contentDocument;
+    if (svgDoc && this.skinTones[this.skinTone]) {
+        const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+        const tone = this.skinTones[this.skinTone];
+        
+        paths.forEach((path) => {
+            const currentFill = path.getAttribute('fill');
+            if (currentFill) {
+                const upperCaseFill = currentFill.toUpperCase();
+                if (upperCaseFill === '#FEE2CA') {
+                    path.setAttribute('fill', tone.main);
+                } else if (upperCaseFill === '#EFC1B7') {
+                    path.setAttribute('fill', tone.shadow);
                 }
-            });
-        }
+            }
+        });
     }
+}
 
     isCloseTo(color1, color2) {
         const rgb1 = this.hexToRgb(color1);
@@ -213,14 +215,14 @@ class AvatarDisplay {
     }
 
     changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        this.baseParts.concat(this.facialFeatures).forEach(part => {
-            if (this.layers[part]) {
-                this.applySkinTone(this.layers[part], part);
-            }
-        });
-        localStorage.setItem(`skinTone_${this.username}`, newTone);
-    }
+    this.skinTone = newTone;
+    Object.values(this.layers).forEach(obj => {
+        if (obj.contentDocument) {
+            this.applySkinTone(obj, obj.dataset.type);
+        }
+    });
+    localStorage.setItem(`skinTone_${this.username}`, newTone);
+}
 
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
