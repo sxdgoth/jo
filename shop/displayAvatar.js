@@ -148,23 +148,28 @@ class AvatarDisplay {
             this.originalColors[type] = Array.from(paths).map(path => path.getAttribute('fill'));
         }
     }
-       applySkinTone(obj, type) {
+       applySkinToneToItem(obj, type) {
+    if (this.skinToneItems.includes(type)) {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
             const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
             const tone = this.skinTones[this.skinTone];
-            const colors = this.getUniqueColors(paths);
-            const mainColor = this.findMainSkinColor(colors);
+            const defaultSkinColors = ['#FEE2CA', '#EFC1B7'];
             
-            paths.forEach((path, index) => {
+            paths.forEach(path => {
                 const currentFill = path.getAttribute('fill');
                 if (currentFill && currentFill.toLowerCase() !== 'none') {
-                    const newColor = this.getNewColor(currentFill, mainColor, tone);
-                    path.setAttribute('fill', newColor);
+                    if (defaultSkinColors.includes(currentFill.toUpperCase())) {
+                        // Replace default skin color with new skin tone
+                        const newColor = currentFill.toUpperCase() === '#FEE2CA' ? tone.main : tone.shadow;
+                        path.setAttribute('fill', newColor);
+                    }
+                    // Keep other colors unchanged
                 }
             });
         }
     }
+}
 
     applySkinToneToItem(obj, type) {
         if (this.skinToneItems.includes(type)) {
