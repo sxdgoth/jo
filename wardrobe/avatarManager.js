@@ -5,10 +5,7 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
-        this.lipColor = '#dea296'; // Default lip color
         this.loadEquippedItems();
-        this.loadEyeColor();
-        this.loadLipColor();
     }
 
     initialize() {
@@ -45,9 +42,6 @@ class AvatarManager {
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
-    }
-
-    loadEyeColor() {
         const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
@@ -59,7 +53,6 @@ class AvatarManager {
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -150,9 +143,6 @@ class AvatarManager {
                 
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
-                if (type === 'Mouth') {
-                    this.applyLipColorToSVG(svgDoc);
-                }
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -221,7 +211,7 @@ class AvatarManager {
             element.setAttribute('fill', this.eyeColor);
         });
     }
-
+}
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
