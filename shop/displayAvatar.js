@@ -330,40 +330,6 @@ class AvatarDisplay {
     }
 }
 
-applyLipColorToSVG(svgDoc) {
-    const lipColors = [
-        '#dea296', '#d19083', '#ebc7bf', '#a76e64', 
-        '#f8d2cc', '#ebc7bf', '#f3ddd8', '#fdedea', 
-        '#dc9c90', '#dfbca9', '#e8afa6', '#b5796f'
-    ];
-    
-    const replaceColor = (element) => {
-        ['fill', 'stroke'].forEach(attr => {
-            let color = element.getAttribute(attr);
-            if (color) {
-                color = color.toLowerCase();
-                if (lipColors.includes(color)) {
-                    element.setAttribute(attr, this.lipColor);
-                }
-            }
-        });
-
-        let style = element.getAttribute('style');
-        if (style) {
-            lipColors.forEach(lipColor => {
-                const regex = new RegExp(lipColor, 'gi');
-                style = style.replace(regex, this.lipColor);
-            });
-            element.setAttribute('style', style);
-        }
-
-        // Recursively apply to child elements
-        Array.from(element.children).forEach(replaceColor);
-    };
-
-    replaceColor(svgDoc.documentElement);
-}
-
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
