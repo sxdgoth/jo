@@ -77,7 +77,8 @@ class AvatarDisplay {
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
-            { name: 'Face', file: '', type: 'Face', isBase: false }
+            { name: 'Face', file: '', type: 'Face', isBase: false },
+            { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
         ];
         bodyParts.forEach(part => {
             const obj = document.createElement('object');
@@ -141,13 +142,16 @@ class AvatarDisplay {
         }
     }
 
-     applySkinToneToElement(element, color) {
+    applySkinToneToElement(element, tone) {
         ['fill', 'stroke'].forEach((attr) => {
             const originalColor = element.getAttribute(attr);
             if (originalColor && originalColor.toLowerCase() !== 'none') {
-                if (this.isSkinTone(originalColor) || this.isShadowTone(originalColor)) {
-                    element.setAttribute(attr, color);
-                    console.log(`Changed ${attr} from ${originalColor} to ${color}`);
+                if (this.isSkinTone(originalColor)) {
+                    element.setAttribute(attr, tone.main);
+                    console.log(`Changed ${attr} from ${originalColor} to ${tone.main}`);
+                } else if (this.isShadowTone(originalColor)) {
+                    element.setAttribute(attr, tone.shadow);
+                    console.log(`Changed ${attr} from ${originalColor} to ${tone.shadow}`);
                 }
             }
         });
@@ -212,7 +216,9 @@ class AvatarDisplay {
             const itemLayer = this.layers[item.type];
             if (itemLayer) {
                 itemLayer.addEventListener('load', () => {
-                    this.applySkinTone(itemLayer, item.type);
+                    if (['Eyes', 'Face', 'Accessories', 'Mouth', 'Nose'].includes(item.type)) {
+                        this.applySkinTone(itemLayer, item.type);
+                    }
                 }, { once: true });
             }
         }
@@ -293,8 +299,8 @@ class AvatarDisplay {
         }
     }
 
-   applySkinToneToShopItem(imgElement, item) {
-        if (['Eyes', 'Eyebrows', 'Nose', 'Mouth', 'Face'].includes(item.type)) {
+    applySkinToneToShopItem(imgElement, item) {
+        if (['Eyes', 'Face', 'Accessories', 'Mouth', 'Nose'].includes(item.type)) {
             imgElement.addEventListener('load', () => {
                 const svgDoc = imgElement.contentDocument;
                 if (svgDoc) {
@@ -305,33 +311,31 @@ class AvatarDisplay {
         }
     }
 
-     applySkinToneToSpecificParts(svgDoc, itemType, tone) {
+    applySkinToneToSpecificParts(svgDoc, itemType, tone) {
         const partsToColor = {
             'Eyes': {
                 main: ['eyelid', 'under-eye'],
                 shadow: ['eyelid-crease', 'eye-socket']
             },
-            'Eyebrows': {
-                main: ['under-brow'],
-                shadow: ['brow-shadow']
+            'Face': {
+                main: ['cheek', 'forehead', 'chin'],
+                shadow: ['cheekbone', 'jaw-shadow']
             },
-            'Nose': {
-                main: ['nose-bridge', 'nostril'],
-                shadow: ['nose-shadow']
+            'Accessories': {
+                main: ['skin-contact'],
+                shadow: ['skin-shadow']
             },
             'Mouth': {
                 main: ['lip', 'inner-mouth'],
                 shadow: ['lip-shadow']
             },
-            'Face': {
-                main: ['cheek', 'forehead', 'chin'],
-                shadow: ['cheekbone', 'jaw-shadow']
+            'Nose': {
+                main: ['nose-bridge', 'nostril'],
+                shadow: ['nose-shadow']
             }
         };
-         
-        
+
         const parts = partsToColor[itemType] || { main: [], shadow: [] };
-        
         parts.main.forEach(part => {
             const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
             elements.forEach(element => {
@@ -346,20 +350,17 @@ class AvatarDisplay {
             });
         });
     }
-
+}
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
-    window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
         window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
         console.error('No logged in user found');
     }
 });
-
-
-
