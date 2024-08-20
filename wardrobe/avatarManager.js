@@ -5,6 +5,7 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.itemColors = {};
+        this.eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
         this.loadEquippedItems();
     }
 
@@ -144,7 +145,7 @@ class AvatarManager {
                 // Apply item color if it's set
                 const itemId = this.tempEquippedItems[type];
                 if (itemId && this.itemColors && this.itemColors[itemId]) {
-                    window.itemColorManager.applyItemColor(svgDoc, itemId);
+                    this.applyItemColor(svgDoc, itemId);
                 }
 
                 const serializer = new XMLSerializer();
@@ -156,8 +157,7 @@ class AvatarManager {
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
-
-    applySkinToneToSVG(svgDoc) {
+ applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7'],
@@ -165,11 +165,7 @@ class AvatarManager {
             tan: ['#F1C27D', '#E0B170'],
             dark: ['#8D5524', '#7C4A1E']
         };
-        const eyeColors = {
-            main: '#F4D5BF',
-            shadow: '#E6BBA8'
-        };
-        const preserveColors = ['#E6958A'];
+        const preserveColors = ['#E6958A', ...this.eyeColors];
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -180,10 +176,6 @@ class AvatarManager {
                     
                     if (defaultColors.light.includes(color)) {
                         element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
-                    } else if (color === eyeColors.main) {
-                        element.setAttribute(attr, tone.main);
-                    } else if (color === eyeColors.shadow) {
-                        element.setAttribute(attr, tone.shadow);
                     } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
                         element.setAttribute(attr, tone.main);
                     }
@@ -195,8 +187,6 @@ class AvatarManager {
                 defaultColors.light.forEach((defaultColor, index) => {
                     style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
                 });
-                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
                 preserveColors.forEach(color => {
                     style = style.replace(new RegExp(color, 'gi'), color);
                 });
@@ -204,6 +194,32 @@ class AvatarManager {
                     style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                     style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
                 }
+                element.setAttribute('style', style);
+            }
+
+            Array.from(element.children).forEach(replaceColor);
+        };
+
+        replaceColor(svgDoc.documentElement);
+    }
+
+    applyItemColor(svgDoc, itemId) {
+        const newColor = this.itemColors[itemId];
+        if (!newColor) return;
+
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color && this.eyeColors.includes(color.toUpperCase())) {
+                    element.setAttribute(attr, newColor);
+                }
+            });
+
+            let style = element.getAttribute('style');
+            if (style) {
+                this.eyeColors.forEach(eyeColor => {
+                    style = style.replace(new RegExp(eyeColor, 'gi'), newColor);
+                });
                 element.setAttribute('style', style);
             }
 
