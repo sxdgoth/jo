@@ -207,38 +207,55 @@ class AvatarManager {
         replaceColor(svgDoc.documentElement);
     }
 
-    applyItemColor(svgDoc, itemId) {
-        const newColor = this.itemColors[itemId];
-        if (!newColor) return;
+   applyItemColor(svgDoc, itemId) {
+    const newColor = this.itemColors[itemId];
+    if (!newColor) return;
 
-        const replaceColor = (element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    if (this.colorableColors.includes(color)) {
-                        element.setAttribute(attr, newColor);
-                    }
+    const replaceColor = (element) => {
+        ['fill', 'stroke'].forEach(attr => {
+            let color = element.getAttribute(attr);
+            if (color) {
+                color = color.toUpperCase();
+                if (this.colorableColors.includes(color)) {
+                    element.setAttribute(attr, newColor);
                 }
-            });
-
-            let style = element.getAttribute('style');
-            if (style) {
-                this.colorableColors.forEach(colorableColor => {
-                    const regex = new RegExp(colorableColor, 'gi');
-                    style = style.replace(regex, newColor);
-                });
-                element.setAttribute('style', style);
             }
+        });
 
-            Array.from(element.children).forEach(replaceColor);
-        };
+        let style = element.getAttribute('style');
+        if (style) {
+            this.colorableColors.forEach(colorableColor => {
+                const regex = new RegExp(colorableColor, 'gi');
+                style = style.replace(regex, newColor);
+            });
+            element.setAttribute('style', style);
+        }
 
-        replaceColor(svgDoc.documentElement);
+        // Special handling for eyes
+        if (element.tagName.toLowerCase() === 'g' && element.id && element.id.toLowerCase().includes('eye')) {
+            this.applyEyeColor(element, newColor);
+        }
 
-        // Log the modified SVG for debugging
-        console.log('Modified SVG:', new XMLSerializer().serializeToString(svgDoc));
-    }
+        Array.from(element.children).forEach(replaceColor);
+    };
+
+    replaceColor(svgDoc.documentElement);
+
+    // Log the modified SVG for debugging
+    console.log('Modified SVG:', new XMLSerializer().serializeToString(svgDoc));
+}
+
+    applyEyeColor(eyeElement, newColor) {
+    const eyeParts = eyeElement.querySelectorAll('path, circle, ellipse');
+    eyeParts.forEach(part => {
+        if (part.getAttribute('fill') && !part.getAttribute('fill').toLowerCase().includes('url')) {
+            part.setAttribute('fill', newColor);
+        }
+        if (part.getAttribute('stroke') && !part.getAttribute('stroke').toLowerCase().includes('url')) {
+            part.setAttribute('stroke', newColor);
+        }
+    });
+}
 
     updateItemColor(itemId, newColor) {
         console.log('Updating item color:', itemId, newColor); // Add this log
