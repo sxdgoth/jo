@@ -160,3 +160,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the shop
     renderShopItems();
 });
+
