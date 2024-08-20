@@ -1,10 +1,12 @@
 class ColorPicker {
     constructor() {
-        this.defaultColors = {
-            eyes: ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'],
-            // Add other item types and their default colors here
+        this.eyeColors = {
+            main: '#3FA2FF',
+            skin: '#E6BBA8',
+            highlight: '#FFFFFF',
+            shadow: '#F4D5BF'
         };
-        this.currentColors = {};
+        this.currentColors = {...this.eyeColors};
         this.initialize();
     }
 
@@ -19,58 +21,53 @@ class ColorPicker {
             return;
         }
 
-        for (const [itemType, colors] of Object.entries(this.defaultColors)) {
+        for (const [colorType, color] of Object.entries(this.eyeColors)) {
             const pickerDiv = document.createElement('div');
             pickerDiv.innerHTML = `
-                <h3>${itemType.charAt(0).toUpperCase() + itemType.slice(1)} Color</h3>
-                <input type="color" id="${itemType}-color-picker" value="${colors[0]}">
+                <label for="${colorType}-color-picker">${colorType.charAt(0).toUpperCase() + colorType.slice(1)} Color:</label>
+                <input type="color" id="${colorType}-color-picker" value="${color}">
             `;
             colorPickerContainer.appendChild(pickerDiv);
 
-            const colorPicker = document.getElementById(`${itemType}-color-picker`);
-            colorPicker.addEventListener('input', (e) => this.changeColor(itemType, e.target.value));
+            const colorPicker = document.getElementById(`${colorType}-color-picker`);
+            colorPicker.addEventListener('input', (e) => this.changeColor(colorType, e.target.value));
         }
     }
 
-    changeColor(itemType, newColor) {
-        this.currentColors[itemType] = newColor;
-        this.applyColor(itemType);
+    changeColor(colorType, newColor) {
+        this.currentColors[colorType] = newColor;
+        this.applyColors();
     }
 
-    applyColor(itemType) {
-        const svgObjects = document.querySelectorAll(`object[data-type="${itemType}"]`);
-        svgObjects.forEach(obj => {
-            if (obj.contentDocument) {
-                this.updateColorInSVG(obj.contentDocument, itemType);
+    applyColors() {
+        const eyeSVGs = document.querySelectorAll('object[data-type="eyes"]');
+        eyeSVGs.forEach(svg => {
+            if (svg.contentDocument) {
+                this.updateColorsInSVG(svg.contentDocument);
             }
         });
     }
 
-    updateColorInSVG(svgDoc, itemType) {
-        const newColor = this.currentColors[itemType];
-        const defaultColors = this.defaultColors[itemType];
+    updateColorsInSVG(svgDoc) {
+        // Update main eye color
+        const mainEyeElement = svgDoc.querySelector('path[fill="#3FA2FF"]');
+        if (mainEyeElement) {
+            mainEyeElement.setAttribute('fill', this.currentColors.main);
+        }
 
-        defaultColors.forEach(oldColor => {
-            const elements = svgDoc.querySelectorAll(`[fill="${oldColor}"], [stroke="${oldColor}"]`);
-            elements.forEach(element => {
-                if (element.getAttribute('fill') === oldColor) {
-                    element.setAttribute('fill', newColor);
-                }
-                if (element.getAttribute('stroke') === oldColor) {
-                    element.setAttribute('stroke', newColor);
-                }
-            });
+        // Update skin color
+        const skinElements = svgDoc.querySelectorAll('path[fill="#E6BBA8"]');
+        skinElements.forEach(el => el.setAttribute('fill', this.currentColors.skin));
 
-            const styledElements = svgDoc.querySelectorAll('*');
-            styledElements.forEach(element => {
-                let style = element.getAttribute('style');
-                if (style) {
-                    style = style.replace(new RegExp(`fill:\\s*${oldColor}`, 'gi'), `fill: ${newColor}`);
-                    style = style.replace(new RegExp(`stroke:\\s*${oldColor}`, 'gi'), `stroke: ${newColor}`);
-                    element.setAttribute('style', style);
-                }
-            });
-        });
+        // Update highlight color
+        const highlightElements = svgDoc.querySelectorAll('path[fill="#FFFFFF"]');
+        highlightElements.forEach(el => el.setAttribute('fill', this.currentColors.highlight));
+
+        // Update shadow color
+        const shadowElement = svgDoc.querySelector('path[fill="#F4D5BF"]');
+        if (shadowElement) {
+            shadowElement.setAttribute('fill', this.currentColors.shadow);
+        }
 
         // Force a redraw of the SVG
         const parent = svgDoc.documentElement.parentNode;
