@@ -1,12 +1,13 @@
 class ColorPicker {
     constructor() {
-        this.eyeColors = ['#346799', '#325880', '#3676b2', '#3c93e5', '#3fa2ff'];
-        this.currentEyeColor = '#3fa2ff'; // Default eye color
+        this.eyeColors = ['#000000', '#800080', '#FF0000', '#808080', '#008000', '#0000FF', '#FFA500'];
+        this.currentEyeColor = '#000000'; // Default eye color (black)
         this.initialize();
     }
 
     initialize() {
         this.setupColorButtons();
+        this.setupCustomColorInput();
     }
 
     setupColorButtons() {
@@ -31,38 +32,24 @@ class ColorPicker {
         }
     }
 
+    setupCustomColorInput() {
+        const customColorInput = document.getElementById('custom-eye-color');
+        if (customColorInput) {
+            customColorInput.oninput = (e) => this.changeEyeColor(e.target.value);
+        } else {
+            console.error('Custom color input not found');
+        }
+    }
+
     changeEyeColor(color) {
         this.currentEyeColor = color;
         this.applyEyeColor();
     }
 
     applyEyeColor() {
-        const eyesLayer = document.querySelector('object[data-type="Eyes"]');
-        if (eyesLayer && eyesLayer.contentDocument) {
-            this.updateEyeColorInSVG(eyesLayer.contentDocument, this.currentEyeColor);
-        } else {
-            console.error('Eyes layer not found or not loaded');
+        if (window.avatarDisplay) {
+            window.avatarDisplay.updateEyeColor(this.currentEyeColor);
         }
-    }
-
-    updateEyeColorInSVG(svgDoc, newColor) {
-        const eyeElements = svgDoc.querySelectorAll('path, circle, ellipse');
-        eyeElements.forEach(element => {
-            this.eyeColors.forEach(oldColor => {
-                if (element.getAttribute('fill') === oldColor) {
-                    element.setAttribute('fill', newColor);
-                }
-                if (element.getAttribute('stroke') === oldColor) {
-                    element.setAttribute('stroke', newColor);
-                }
-                let style = element.getAttribute('style');
-                if (style) {
-                    style = style.replace(new RegExp(`fill:\\s*${oldColor}`, 'gi'), `fill: ${newColor}`);
-                    style = style.replace(new RegExp(`stroke:\\s*${oldColor}`, 'gi'), `stroke: ${newColor}`);
-                    element.setAttribute('style', style);
-                }
-            });
-        });
     }
 }
 
