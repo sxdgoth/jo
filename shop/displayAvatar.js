@@ -142,7 +142,7 @@ class AvatarDisplay {
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
     const tone = this.skinTones[this.skinTone];
-    const defaultColors = ['#E6BBA8', '#E6958A', '#F4D5BF'];
+    const defaultColors = ['#E6BBA8', '#E6958A'];
 
     function replaceColor(element) {
         ['fill', 'stroke'].forEach(attr => {
