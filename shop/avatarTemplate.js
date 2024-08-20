@@ -13,8 +13,7 @@ class AvatarBody {
     { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
     { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
     { name: 'Face', file: '', type: 'Face', isBase: false },
-    { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
-    { name: 'Mouth', file: '', type: 'Mouth', isBase: false }
+    { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
 ];
         this.layers = {};
     }
