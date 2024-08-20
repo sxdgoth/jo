@@ -21,8 +21,8 @@ function renderOwnedItems() {
         // Add click event listener to the item image
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
-        
-        // Add click event listener to the change color button
+
+                        // Add click event listener to the change color button
         const changeColorBtn = itemElement.querySelector('.change-color-btn');
         changeColorBtn.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -66,8 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
             window.avatarBody.initializeAvatar(loggedInUser.username);
         }
-        
-        // Initialize SkinToneManager after avatar is rendered
+
+      // Initialize SkinToneManager after avatar is rendered
         if (window.skinToneManager) {
             window.skinToneManager.initialize();
         }
