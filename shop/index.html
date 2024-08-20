@@ -74,18 +74,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.createUserInventory(loggedInUser.username);
-        initializeInventoryState();
-        renderOwnedItems(); // This function should be defined in your inventory.js
-        console.log("Inventory initialized and items rendered for logged-in user");
-    } else {
-        console.log("No logged-in user found");
-    }
-});
-</script>
 </body>
 </html>
