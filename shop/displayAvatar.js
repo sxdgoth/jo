@@ -1,4 +1,5 @@
 class AvatarDisplay {
+
     constructor(containerId, username) {
         this.username = username;
         this.container = document.getElementById(containerId);
@@ -113,10 +114,9 @@ class AvatarDisplay {
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
             if (part.isBase) {
-                 obj.addEventListener('load', () => {
-            this.saveOriginalColors(obj, part.type);
-            this.applySkinTone(obj, part.type);
-            this.reapplySkinTone();
+                obj.addEventListener('load', () => {
+                    this.saveOriginalColors(obj, part.type);
+                    this.applySkinTone(obj, part.type);
                 });
             }
         });
@@ -144,78 +144,44 @@ class AvatarDisplay {
     }
 
     applySkinTone(obj, type) {
-    const svgDoc = obj.contentDocument;
-    if (svgDoc && this.skinTones[this.skinTone]) {
-        const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-        const tone = this.skinTones[this.skinTone];
-        
-        elements.forEach((element) => {
-            ['fill', 'stroke'].forEach((attr) => {
-                const color = element.getAttribute(attr);
-                if (color && color.toLowerCase() !== 'none') {
-                    if (this.isSkinTone(color)) {
-                        const newColor = this.getNewColor(color, tone.main, tone);
+        const svgDoc = obj.contentDocument;
+        if (svgDoc && this.skinTones[this.skinTone]) {
+            const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+            const tone = this.skinTones[this.skinTone];
+            
+            elements.forEach((element) => {
+                ['fill', 'stroke'].forEach((attr) => {
+                    const color = element.getAttribute(attr);
+                    if (color && color.toLowerCase() !== 'none') {
+                        const newColor = this.getNewSkinColor(color, tone);
                         element.setAttribute(attr, newColor);
                     }
-                }
+                });
             });
-        });
-    }
-}
-
-   isSkinTone(color) {
-    const rgb = this.hexToRgb(color);
-    if (!rgb) return false;
-    const [r, g, b] = rgb;
-    
-    // More sophisticated skin tone detection
-    const isSkinHue = (r > g) && (g > b);
-    const isSkinSaturation = Math.max(r, g, b) - Math.min(r, g, b) < 100;
-    const isSkinBrightness = (r + g + b) > 300;
-    
-    return isSkinHue && isSkinSaturation && isSkinBrightness;
-}
-
-    getUniqueColors(paths) {
-        const colors = new Set();
-        paths.forEach(path => {
-            const fill = path.getAttribute('fill');
-            const stroke = path.getAttribute('stroke');
-            if (fill && fill.toLowerCase() !== 'none') {
-                colors.add(fill.toLowerCase());
-            }
-            if (stroke && stroke.toLowerCase() !== 'none') {
-                colors.add(stroke.toLowerCase());
-            }
-        });
-        return Array.from(colors);
+        }
     }
 
-    findMainSkinColor(colors) {
-        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
+    getNewSkinColor(currentColor, tone) {
+        const currentLuminance = this.getLuminance(currentColor);
+        const mainLuminance = this.getLuminance(tone.main);
+        const shadowLuminance = this.getLuminance(tone.shadow);
+        
+        if (currentLuminance > mainLuminance) {
+            return tone.main;
+        } else if (currentLuminance < shadowLuminance) {
+            return tone.shadow;
+        } else {
+            const ratio = (currentLuminance - shadowLuminance) / (mainLuminance - shadowLuminance);
+            return this.blendColors(tone.shadow, tone.main, ratio);
+        }
     }
 
- 
-getNewColor(currentColor, mainColor, tone) {
-    const currentLuminance = this.getLuminance(currentColor);
-    const mainLuminance = this.getLuminance(tone.main);
-    const luminanceDiff = currentLuminance - mainLuminance;
-    
-    if (Math.abs(luminanceDiff) < 0.1) {
-        return tone.main;
-    } else if (luminanceDiff < 0) {
-        return this.blendColors(tone.shadow, tone.main, Math.abs(luminanceDiff));
-    } else {
-        return this.blendColors(tone.main, '#FFFFFF', luminanceDiff);
+    blendColors(color1, color2, ratio) {
+        const rgb1 = this.hexToRgb(color1);
+        const rgb2 = this.hexToRgb(color2);
+        const blend = rgb1.map((c, i) => Math.round(c + (rgb2[i] - c) * ratio));
+        return `#${blend.map(c => c.toString(16).padStart(2, '0')).join('')}`;
     }
-}
-
-blendColors(color1, color2, ratio) {
-    const rgb1 = this.hexToRgb(color1);
-    const rgb2 = this.hexToRgb(color2);
-    const blend = rgb1.map((c, i) => Math.round(c + (rgb2[i] - c) * ratio));
-    return `rgb(${blend[0]}, ${blend[1]}, ${blend[2]})`;
-}
 
     getLuminance(hex) {
         const rgb = this.hexToRgb(hex);
@@ -233,18 +199,6 @@ blendColors(color1, color2, ratio) {
         ] : null;
     }
 
-    lightenColor(color, amount) {
-        const rgb = this.hexToRgb(color);
-        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
-        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
-    }
-
-    darkenColor(color, amount) {
-        const rgb = this.hexToRgb(color);
-        const newRgb = rgb.map(c => Math.max(0, c - Math.round(amount * 255)));
-        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
-    }
-
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
@@ -258,10 +212,10 @@ blendColors(color1, color2, ratio) {
             const itemSrc = `${this.baseUrl}${item.path}${item.id}`;
             this.updateAvatarDisplay(item.type, itemSrc);
             
-             const itemLayer = this.layers[item.type];
-              if (itemLayer) {
-        itemLayer.addEventListener('load', () => {
-            this.applySkinTone(itemLayer, item.type);
+            const itemLayer = this.layers[item.type];
+            if (itemLayer) {
+                itemLayer.addEventListener('load', () => {
+                    this.applySkinTone(itemLayer, item.type);
                 }, { once: true });
             }
         }
@@ -331,14 +285,10 @@ blendColors(color1, color2, ratio) {
         });
     }
 
-   changeSkinTone(newTone) {
-    this.skinTone = newTone;
-    this.reapplySkinTone();
-    localStorage.setItem(`skinTone_${this.username}`, newTone);
-    
-    // Synchronize with SkinToneManager
-    if (window.skinToneManager) {
-        window.skinToneManager.selectSkinTone(this.skinTones[newTone]);
+    changeSkinTone(newTone) {
+        this.skinTone = newTone;
+        this.reapplySkinTone();
+        localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
 }
 
