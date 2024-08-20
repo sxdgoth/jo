@@ -133,7 +133,7 @@ class AvatarManager {
         }
     }
 
-     updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -156,8 +156,8 @@ class AvatarManager {
             })
             .catch(error => console.error(`Error updating layer ${type}:`, error));
     }
-    
- applySkinToneToSVG(svgDoc) {
+
+    applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7'],
@@ -165,7 +165,7 @@ class AvatarManager {
             tan: ['#F1C27D', '#E0B170'],
             dark: ['#8D5524', '#7C4A1E']
         };
-        const preserveColors = ['#E6958A', ...this.eyeColors];
+        const preserveColors = ['#E6958A', ...this.colorableColors];
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -182,7 +182,7 @@ class AvatarManager {
                 }
             });
 
-            let style = element.getAttribute('style');
+              let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
                     style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
@@ -229,20 +229,15 @@ class AvatarManager {
         replaceColor(svgDoc.documentElement);
     }
 
-     updateItemColor(itemId, newColor) {
+
+    updateItemColor(itemId, newColor) {
         this.itemColors[itemId] = newColor;
         this.updateTempAvatarDisplay();
-    };
-
-        if (itemType) {
-            // Update the color for this item
-            this.itemColors[itemId] = newColor;
-
-            // Refresh the avatar display
-            this.updateTempAvatarDisplay();
-        }
     }
 }
+
+// Make AvatarManager available globally
+window.AvatarManager = AvatarManager;
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
