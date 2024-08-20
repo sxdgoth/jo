@@ -141,16 +141,13 @@ class AvatarDisplay {
         }
     }
 
-    applySkinToneToElement(element, tone) {
+     applySkinToneToElement(element, color) {
         ['fill', 'stroke'].forEach((attr) => {
             const originalColor = element.getAttribute(attr);
             if (originalColor && originalColor.toLowerCase() !== 'none') {
-                if (this.isSkinTone(originalColor)) {
-                    element.setAttribute(attr, tone.main);
-                    console.log(`Changed ${attr} from ${originalColor} to ${tone.main}`);
-                } else if (this.isShadowTone(originalColor)) {
-                    element.setAttribute(attr, tone.shadow);
-                    console.log(`Changed ${attr} from ${originalColor} to ${tone.shadow}`);
+                if (this.isSkinTone(originalColor) || this.isShadowTone(originalColor)) {
+                    element.setAttribute(attr, color);
+                    console.log(`Changed ${attr} from ${originalColor} to ${color}`);
                 }
             }
         });
@@ -296,7 +293,7 @@ class AvatarDisplay {
         }
     }
 
-    applySkinToneToShopItem(imgElement, item) {
+   applySkinToneToShopItem(imgElement, item) {
         if (['Eyes', 'Eyebrows', 'Nose', 'Mouth', 'Face'].includes(item.type)) {
             imgElement.addEventListener('load', () => {
                 const svgDoc = imgElement.contentDocument;
@@ -308,24 +305,48 @@ class AvatarDisplay {
         }
     }
 
-    applySkinToneToSpecificParts(svgDoc, itemType, tone) {
+     applySkinToneToSpecificParts(svgDoc, itemType, tone) {
         const partsToColor = {
-            'Eyes': ['eyelid', 'under-eye', 'cheek'],
-            'Eyebrows': ['under-brow'],
-            'Nose': ['nose-bridge', 'nostril'],
-            'Mouth': ['lip', 'inner-mouth'],
-            'Face': ['cheek', 'forehead', 'chin']
+            'Eyes': {
+                main: ['eyelid', 'under-eye'],
+                shadow: ['eyelid-crease', 'eye-socket']
+            },
+            'Eyebrows': {
+                main: ['under-brow'],
+                shadow: ['brow-shadow']
+            },
+            'Nose': {
+                main: ['nose-bridge', 'nostril'],
+                shadow: ['nose-shadow']
+            },
+            'Mouth': {
+                main: ['lip', 'inner-mouth'],
+                shadow: ['lip-shadow']
+            },
+            'Face': {
+                main: ['cheek', 'forehead', 'chin'],
+                shadow: ['cheekbone', 'jaw-shadow']
+            }
         };
-
-        const parts = partsToColor[itemType] || [];
-        parts.forEach(part => {
+         
+        
+        const parts = partsToColor[itemType] || { main: [], shadow: [] };
+        
+        parts.main.forEach(part => {
             const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
             elements.forEach(element => {
-                this.applySkinToneToElement(element, tone);
+                this.applySkinToneToElement(element, tone.main);
+            });
+        });
+
+        parts.shadow.forEach(part => {
+            const elements = svgDoc.querySelectorAll(`[id*="${part}"], [class*="${part}"]`);
+            elements.forEach(element => {
+                this.applySkinToneToElement(element, tone.shadow);
             });
         });
     }
-}
+
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
