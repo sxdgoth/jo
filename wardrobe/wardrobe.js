@@ -32,12 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function renderOwnedItems() {
-    console.log("Rendering owned items");
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
     
-    console.log("Owned items:", ownedItems);
-
     wardrobeItemsContainer.innerHTML = ''; // Clear existing items
     
     ownedItems.forEach(item => {
@@ -56,12 +53,9 @@ function renderOwnedItems() {
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
     });
-
-    console.log("Finished rendering owned items");
 }
 
 function toggleItem(item) {
-    console.log("Toggling item:", item);
     if (window.avatarManager) {
         window.avatarManager.toggleItem(item);
     } else {
