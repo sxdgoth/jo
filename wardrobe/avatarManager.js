@@ -5,7 +5,10 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
+        this.lipColor = '#dea296'; // Default lip color
         this.loadEquippedItems();
+        this.loadEyeColor();
+        this.loadLipColor();
     }
 
     initialize() {
@@ -42,9 +45,19 @@ class AvatarManager {
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
+    }
+
+    loadEyeColor() {
         const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
+        }
+    }
+
+    loadLipColor() {
+        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
+        if (savedLipColor) {
+            this.lipColor = savedLipColor;
         }
     }
 
@@ -53,6 +66,7 @@ class AvatarManager {
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -127,6 +141,11 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
+    changeLipColor(newColor) {
+        this.lipColor = newColor;
+        this.updateTempAvatarDisplay();
+    }
+
     applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -143,6 +162,9 @@ class AvatarManager {
                 
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
+                if (type === 'Mouth') {
+                    this.applyLipColorToSVG(svgDoc);
+                }
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -209,6 +231,26 @@ class AvatarManager {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
+        });
+    }
+
+    applyLipColorToSVG(svgDoc) {
+        const lipColors = ['#dea296', '#d19083', '#ebc7bf', '#a76e64', '#f8d2cc', '#ebc7bf', '#f3ddd8', '#fdedea'];
+        const mouthElements = svgDoc.querySelectorAll('path[fill], path[stroke]');
+        mouthElements.forEach(element => {
+            ['fill', 'stroke'].forEach(attr => {
+                const color = element.getAttribute(attr);
+                if (color && lipColors.includes(color.toLowerCase())) {
+                    element.setAttribute(attr, this.lipColor);
+                }
+            });
+            let style = element.getAttribute('style');
+            if (style) {
+                lipColors.forEach(lipColor => {
+                    style = style.replace(new RegExp(lipColor, 'gi'), this.lipColor);
+                });
+                element.setAttribute('style', style);
+            }
         });
     }
 }
