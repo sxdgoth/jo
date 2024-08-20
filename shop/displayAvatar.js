@@ -138,42 +138,46 @@ class AvatarDisplay {
     }
 
     applySkinTone(obj, type) {
-        const svgDoc = obj.contentDocument;
-        if (!svgDoc || !this.skinTones[this.skinTone]) return;
+    const svgDoc = obj.contentDocument;
+    if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
-        const tone = this.skinTones[this.skinTone];
-        const defaultLight = '#FEE2CA';
-        const defaultShadow = '#EFC1B7';
+    const tone = this.skinTones[this.skinTone];
+    const defaultColors = ['#E6BBA8', '#E6958A', '#F4D5BF'];
 
-        function replaceColor(element) {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    if (color === defaultLight) {
-                        element.setAttribute(attr, tone.main);
-                    } else if (color === defaultShadow) {
-                        element.setAttribute(attr, tone.shadow);
-                    }
+    function replaceColor(element) {
+        ['fill', 'stroke'].forEach(attr => {
+            let color = element.getAttribute(attr);
+            if (color) {
+                color = color.toUpperCase();
+                if (defaultColors.includes(color) || color.startsWith('#E6') || color.startsWith('#F4')) {
+                    element.setAttribute(attr, tone.main);
                 }
-            });
+            }
+        });
 
         
-            // Replace colors in style attribute
-            let style = element.getAttribute('style');
-            if (style) {
-                style = style.replace(new RegExp(defaultLight, 'gi'), tone.main);
-                style = style.replace(new RegExp(defaultShadow, 'gi'), tone.shadow);
-                element.setAttribute('style', style);
-            }
-
-            // Recursively apply to child elements
-            Array.from(element.children).forEach(replaceColor);
+           
+        // Replace colors in style attribute
+        let style = element.getAttribute('style');
+        if (style) {
+            defaultColors.forEach(defaultColor => {
+                style = style.replace(new RegExp(defaultColor, 'gi'), tone.main);
+            });
+            style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+            style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            element.setAttribute('style', style);
         }
 
-        replaceColor(svgDoc.documentElement);
-        console.log(`Applied skin tone ${this.skinTone} to ${type}`);
+        // Recursively apply to child elements
+        Array.from(element.children).forEach(replaceColor);
     }
+
+    replaceColor(svgDoc.documentElement);
+    console.log(`Applied skin tone ${this.skinTone} to ${type}`);
+}
+
+
+
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
@@ -208,21 +212,25 @@ class AvatarDisplay {
     }
 
     updateAvatarDisplay(type, src) {
-        console.log(`Updating avatar display for ${type} with src: ${src}`);
-        if (this.layers[type]) {
-            if (src) {
-                this.layers[type].data = src;
-                this.layers[type].style.display = 'block';
-                this.layers[type].onload = () => {
-                    this.applySkinTone(this.layers[type], type);
-                };
-            } else {
-                this.layers[type].style.display = 'none';
-            }
+    console.log(`Updating avatar display for ${type} with src: ${src}`);
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Eyes') {
+                    // Apply skin tone again after a short delay to ensure all elements are loaded
+                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                }
+            };
         } else {
-            console.warn(`Layer not found for type: ${type}`);
+            this.layers[type].style.display = 'none';
         }
+    } else {
+        console.warn(`Layer not found for type: ${type}`);
     }
+}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
