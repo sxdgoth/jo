@@ -1,5 +1,37 @@
+// wardrobe.js
+
+document.addEventListener('DOMContentLoaded', function() {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    
+    if (loggedInUser) {
+        document.getElementById('user-name').textContent = loggedInUser.username;
+        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
+        
+        // Initialize user's inventory
+        window.createUserInventory(loggedInUser.username);
+        
+        // Initialize AvatarManager
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
+        
+        // Render the avatar
+        if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
+            window.avatarBody.initializeAvatar(loggedInUser.username);
+        }
+        
+        // Initialize SkinToneManager after avatar is rendered
+        if (window.skinToneManager) {
+            window.skinToneManager.initialize();
+        }
+        
+        // Render owned items
+        renderOwnedItems();
+    } else {
+        window.location.href = '../index.html';
+    }
+});
+
 function renderOwnedItems() {
-    console.log('Rendering owned items');
     const wardrobeItemsContainer = document.querySelector('.wardrobe-items');
     const ownedItems = window.userInventory.getItems();
     
@@ -15,25 +47,11 @@ function renderOwnedItems() {
             </div>
             <h3>${item.name}</h3>
             <p>Type: ${item.type}</p>
-            <button class="change-color-btn" data-id="${item.id}">Change Color</button>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
-        
         // Add click event listener to the item image
         const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
-        
-        // Add click event listener to the change color button
-        const changeColorBtn = itemElement.querySelector('.change-color-btn');
-        changeColorBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            console.log('Change color button clicked for item:', item);
-            if (window.itemColorManager) {
-                window.itemColorManager.showColorPicker(item, event);
-            } else {
-                console.error('ItemColorManager not found. window.itemColorManager:', window.itemColorManager);
-            }
-        });
     });
 }
 
@@ -49,45 +67,3 @@ function logout() {
     sessionStorage.removeItem('loggedInUser');
     window.location.href = '../index.html';
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded in wardrobe.js');
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    
-    if (loggedInUser) {
-        document.getElementById('user-name').textContent = loggedInUser.username;
-        document.getElementById('user-coins').textContent = loggedInUser.coins.toLocaleString();
-        
-        // Initialize user's inventory
-        window.createUserInventory(loggedInUser.username);
-        
-        // Initialize AvatarManager
-        if (window.AvatarManager) {
-            window.avatarManager = new window.AvatarManager(loggedInUser.username);
-            window.avatarManager.initialize();
-        } else {
-            console.error('AvatarManager class not found');
-        }
-        
-        // Check if ItemColorManager is available
-        if (window.ItemColorManager) {
-            console.log('ItemColorManager is available');
-        } else {
-            console.error('ItemColorManager is not available');
-        }
-        
-        // Render owned items
-        renderOwnedItems();
-
-        // Setup logout button
-        const logoutButton = document.getElementById('logout-btn');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', logout);
-        }
-    } else {
-        console.error('No logged in user found');
-        window.location.href = '../index.html';
-    }
-});
-
-// Add any additional functions or event listeners here if needed
