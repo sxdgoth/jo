@@ -270,13 +270,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
-
-   const lipColorInput = document.getElementById('lip-color-input');
-    if (lipColorInput) {
-        lipColorInput.addEventListener('input', (event) => {
-            if (window.avatarManager) {
-                window.avatarManager.changeLipColor(event.target.value);
-            }
-        });
-    }
-});
