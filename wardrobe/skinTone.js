@@ -1,4 +1,4 @@
-// skinTone.js
+// SkinToneManager.js
 
 class SkinToneManager {
     constructor() {
@@ -125,7 +125,20 @@ class SkinToneManager {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                this.applySkinToneToSVGElements(svgDoc, tone);
+                const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                
+                elements.forEach(element => {
+                    const currentFill = element.getAttribute('fill');
+                    const currentStroke = element.getAttribute('stroke');
+                    
+                    if (currentFill && currentFill.toLowerCase() !== 'none') {
+                        element.setAttribute('fill', tone.main);
+                    }
+                    
+                    if (currentStroke && currentStroke.toLowerCase() !== 'none') {
+                        element.setAttribute('stroke', tone.shadow);
+                    }
+                });
 
                 console.log(`Skin tone applied to ${partName}`);
                 const serializer = new XMLSerializer();
@@ -137,70 +150,27 @@ class SkinToneManager {
             .catch(error => console.error(`Error applying skin tone to ${partName}:`, error));
     }
 
-    applySkinToneToSVGElements(svgDoc, tone) {
-        const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-        elements.forEach((element) => {
-            ['fill', 'stroke'].forEach((attr) => {
-                const color = element.getAttribute(attr);
-                if (color && color.toLowerCase() !== 'none' && this.isSkinTone(color)) {
-                    const newColor = this.getNewColor(color, tone.main, tone);
-                    element.setAttribute(attr, newColor);
-                }
-            });
-        });
-    }
-
     applySkinToneToShopItem(imgElement, item) {
         if (['Eyes', 'Face', 'Accessories', 'Mouth', 'Nose'].includes(item.type)) {
             imgElement.addEventListener('load', () => {
                 const svgDoc = imgElement.contentDocument;
                 if (svgDoc) {
-                    const tone = this.skinTones[this.getSkinToneKey(this.currentSkinTone)];
-                    this.applySkinToneToSVGElements(svgDoc, tone);
+                    const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                    elements.forEach(element => {
+                        const currentFill = element.getAttribute('fill');
+                        const currentStroke = element.getAttribute('stroke');
+                        
+                        if (currentFill && currentFill.toLowerCase() !== 'none') {
+                            element.setAttribute('fill', this.currentSkinTone.main);
+                        }
+                        
+                        if (currentStroke && currentStroke.toLowerCase() !== 'none') {
+                            element.setAttribute('stroke', this.currentSkinTone.shadow);
+                        }
+                    });
                 }
             });
         }
-    }
-
-    isSkinTone(color) {
-        const rgb = this.hexToRgb(color);
-        return (rgb[0] > rgb[1] && rgb[1] > rgb[2] && rgb[0] - rgb[2] > 20);
-    }
-
-    getNewColor(currentColor, mainColor, tone) {
-        const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(mainColor);
-        const luminanceDiff = currentLuminance - mainLuminance;
-        
-        if (Math.abs(luminanceDiff) < 0.1) {
-            return tone.main;
-        } else if (luminanceDiff < 0) {
-            return tone.shadow;
-        } else {
-            return this.lightenColor(tone.main, luminanceDiff);
-        }
-    }
-
-    lightenColor(color, amount) {
-        const rgb = this.hexToRgb(color);
-        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
-        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
-    }
-
-    getLuminance(hex) {
-        const rgb = this.hexToRgb(hex);
-        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    }
-
-    hexToRgb(hex) {
-        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
     }
 
     saveSkinTone(toneKey) {
@@ -221,4 +191,162 @@ document.addEventListener('DOMContentLoaded', () => {
     window.skinToneManager.initialize();
 });
 
-// avatarManager.js and displayAvatar.js remain unchanged
+// ShopManager.js
+
+class ShopManager {
+    constructor(username) {
+        this.username = username;
+        this.baseUrl = 'https://sxdgoth.github.io/jo/';
+        this.shopItems = shopItems;
+        this.inventory = [];
+        this.loadInventory();
+    }
+
+    loadInventory() {
+        const savedInventory = localStorage.getItem(`inventory_${this.username}`);
+        if (savedInventory) {
+            this.inventory = JSON.parse(savedInventory);
+        }
+    }
+
+    saveInventory() {
+        localStorage.setItem(`inventory_${this.username}`, JSON.stringify(this.inventory));
+    }
+
+    updateShopDisplay() {
+        const shopContainer = document.getElementById('shop-container');
+        shopContainer.innerHTML = '';
+
+        this.shopItems.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'shop-item';
+
+            const img = document.createElement('object');
+            img.type = 'image/svg+xml';
+            img.data = `${this.baseUrl}${item.path}${item.id}`;
+            img.className = 'item-image';
+            img.dataset.id = item.id;
+
+            // Apply skin tone to shop item
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinToneToShopItem(img, item);
+            }
+
+            const nameElement = document.createElement('p');
+            nameElement.textContent = item.name;
+
+            const priceElement = document.createElement('p');
+            priceElement.textContent = `Price: ${item.price}`;
+
+            const buyButton = document.createElement('button');
+            buyButton.textContent = 'Buy';
+            buyButton.addEventListener('click', () => this.buyItem(item));
+
+            const tryOnButton = document.createElement('button');
+            tryOnButton.textContent = 'Try On';
+            tryOnButton.addEventListener('click', () => this.tryOnItem(item));
+
+            itemElement.appendChild(img);
+            itemElement.appendChild(nameElement);
+            itemElement.appendChild(priceElement);
+            itemElement.appendChild(buyButton);
+            itemElement.appendChild(tryOnButton);
+
+            shopContainer.appendChild(itemElement);
+        });
+    }
+
+    buyItem(item) {
+        if (this.inventory.some(invItem => invItem.id === item.id)) {
+            alert('You already own this item!');
+            return;
+        }
+
+        this.inventory.push(item);
+        this.saveInventory();
+        alert(`You bought ${item.name}!`);
+
+        if (window.inventoryManager) {
+            window.inventoryManager.updateInventoryDisplay();
+        }
+    }
+
+    tryOnItem(item) {
+        if (window.avatarDisplay) {
+            window.avatarDisplay.tryOnItem(item);
+        } else {
+            console.error('Avatar display not found');
+        }
+    }
+
+    filterItems(category) {
+        const filteredItems = category === 'all' 
+            ? this.shopItems 
+            : this.shopItems.filter(item => item.type === category);
+        
+        this.updateShopDisplay(filteredItems);
+    }
+
+    updateShopDisplay(items = this.shopItems) {
+        const shopContainer = document.getElementById('shop-container');
+        shopContainer.innerHTML = '';
+
+        items.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'shop-item';
+
+            const img = document.createElement('object');
+            img.type = 'image/svg+xml';
+            img.data = `${this.baseUrl}${item.path}${item.id}`;
+            img.className = 'item-image';
+            img.dataset.id = item.id;
+
+            // Apply skin tone to shop item
+            if (window.skinToneManager) {
+                window.skinToneManager.applySkinToneToShopItem(img, item);
+            }
+
+            const nameElement = document.createElement('p');
+            nameElement.textContent = item.name;
+
+            const priceElement = document.createElement('p');
+            priceElement.textContent = `Price: ${item.price}`;
+
+            const buyButton = document.createElement('button');
+            buyButton.textContent = 'Buy';
+            buyButton.addEventListener('click', () => this.buyItem(item));
+
+            const tryOnButton = document.createElement('button');
+            tryOnButton.textContent = 'Try On';
+            tryOnButton.addEventListener('click', () => this.tryOnItem(item));
+
+            itemElement.appendChild(img);
+            itemElement.appendChild(nameElement);
+            itemElement.appendChild(priceElement);
+            itemElement.appendChild(buyButton);
+            itemElement.appendChild(tryOnButton);
+
+            shopContainer.appendChild(itemElement);
+        });
+    }
+}
+
+// Initialize the ShopManager when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.shopManager = new ShopManager(loggedInUser.username);
+        window.shopManager.updateShopDisplay();
+
+        // Set up category filter buttons
+        const categoryButtons = document.querySelectorAll('.category-button');
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.dataset.category;
+                window.shopManager.filterItems(category);
+            });
+        });
+    } else {
+        console.error('No logged in user found');
+    }
+});
