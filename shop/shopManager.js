@@ -1,3 +1,5 @@
+// shopManager.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
@@ -160,4 +162,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the shop
     renderShopItems();
 });
-
