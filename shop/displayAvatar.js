@@ -48,7 +48,7 @@ class AvatarDisplay {
         if (savedSkinTone && this.skinTones[savedSkinTone]) {
             this.skinTone = savedSkinTone;
         }
-        console.log("Loaded skin tone:", this.skinTone);
+        console.log("Loaded skin tone:", this.skinTone, "Color:", this.skinTones[this.skinTone].main);
     }
 
     loadEquippedItems() {
@@ -114,7 +114,6 @@ class AvatarDisplay {
             this.layers[part.type] = obj;
             if (part.isBase) {
                 obj.addEventListener('load', () => {
-                    this.saveOriginalColors(obj, part.type);
                     this.applySkinTone(obj, part.type);
                 });
             }
@@ -131,17 +130,6 @@ class AvatarDisplay {
         });
     }
 
-    saveOriginalColors(obj, type) {
-        const svgDoc = obj.contentDocument;
-        if (svgDoc) {
-            const paths = svgDoc.querySelectorAll('path, circle, ellipse, rect');
-            this.originalColors[type] = Array.from(paths).map(path => ({
-                fill: path.getAttribute('fill'),
-                stroke: path.getAttribute('stroke')
-            }));
-        }
-    }
-
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
         if (svgDoc && this.skinTones[this.skinTone]) {
@@ -149,87 +137,34 @@ class AvatarDisplay {
             const tone = this.skinTones[this.skinTone];
             
             elements.forEach((element) => {
-                this.applySkinToneToElement(element, type);
+                this.applySkinToneToElement(element, tone);
             });
         }
     }
 
-    applySkinToneToElement(element, type) {
+    applySkinToneToElement(element, tone) {
         ['fill', 'stroke'].forEach((attr) => {
-            const color = element.getAttribute(attr);
-            if (color && color.toLowerCase() !== 'none' && this.isSkinTone(color)) {
-                const newColor = this.getNewColor(color, this.skinTones[this.skinTone].main, this.skinTones[this.skinTone]);
-                element.setAttribute(attr, newColor);
+            const originalColor = element.getAttribute(attr);
+            if (originalColor && originalColor.toLowerCase() !== 'none') {
+                if (this.isSkinTone(originalColor)) {
+                    element.setAttribute(attr, tone.main);
+                    console.log(`Changed ${attr} from ${originalColor} to ${tone.main}`);
+                } else if (this.isShadowTone(originalColor)) {
+                    element.setAttribute(attr, tone.shadow);
+                    console.log(`Changed ${attr} from ${originalColor} to ${tone.shadow}`);
+                }
             }
         });
     }
 
     isSkinTone(color) {
-        const rgb = this.hexToRgb(color);
-        if (!rgb) return false;
-        return (rgb[0] > rgb[1] && rgb[1] > rgb[2] && rgb[0] - rgb[2] > 20);
+        const skinTones = Object.values(this.skinTones).map(t => t.main.toLowerCase());
+        return skinTones.includes(color.toLowerCase());
     }
 
-    getUniqueColors(paths) {
-        const colors = new Set();
-        paths.forEach(path => {
-            const fill = path.getAttribute('fill');
-            const stroke = path.getAttribute('stroke');
-            if (fill && fill.toLowerCase() !== 'none') {
-                colors.add(fill.toLowerCase());
-            }
-            if (stroke && stroke.toLowerCase() !== 'none') {
-                colors.add(stroke.toLowerCase());
-            }
-        });
-        return Array.from(colors);
-    }
-
-    findMainSkinColor(colors) {
-        return colors.reduce((a, b) => this.getLuminance(a) > this.getLuminance(b) ? a : b);
-    }
-
-    getNewColor(currentColor, mainColor, tone) {
-        const currentLuminance = this.getLuminance(currentColor);
-        const mainLuminance = this.getLuminance(mainColor);
-        const luminanceDiff = currentLuminance - mainLuminance;
-        
-        if (Math.abs(luminanceDiff) < 0.1) {
-            return tone.main;
-        } else if (luminanceDiff < 0) {
-            return this.darkenColor(tone.main, Math.abs(luminanceDiff));
-        } else {
-            return this.lightenColor(tone.main, luminanceDiff);
-        }
-    }
-
-    getLuminance(hex) {
-        const rgb = this.hexToRgb(hex);
-        if (!rgb) return 0;
-        return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    }
-
-    hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
-    }
-
-    lightenColor(color, amount) {
-        const rgb = this.hexToRgb(color);
-        if (!rgb) return color;
-        const newRgb = rgb.map(c => Math.min(255, c + Math.round(amount * 255)));
-        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
-    }
-
-    darkenColor(color, amount) {
-        const rgb = this.hexToRgb(color);
-        if (!rgb) return color;
-        const newRgb = rgb.map(c => Math.max(0, c - Math.round(amount * 255)));
-        return `rgb(${newRgb[0]}, ${newRgb[1]}, ${newRgb[2]})`;
+    isShadowTone(color) {
+        const shadowTones = Object.values(this.skinTones).map(t => t.shadow.toLowerCase());
+        return shadowTones.includes(color.toLowerCase());
     }
 
     tryOnItem(item) {
@@ -330,13 +265,14 @@ class AvatarDisplay {
     }
 
     applySkinToneToShopItem(imgElement, item) {
-        if (['Eyes', 'Eyebrows', 'Nose', 'Mouth'].includes(item.type)) {
+        if (['Eyes', 'Eyebrows', 'Nose', 'Mouth', 'Face'].includes(item.type)) {
             imgElement.addEventListener('load', () => {
                 const svgDoc = imgElement.contentDocument;
                 if (svgDoc) {
-                      const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                    const elements = svgDoc.querySelectorAll('path, circle, ellipse, rect');
+                    const tone = this.skinTones[this.skinTone];
                     elements.forEach(element => {
-                        this.applySkinToneToElement(element, item.type);
+                        this.applySkinToneToElement(element, tone);
                     });
                 }
             });
