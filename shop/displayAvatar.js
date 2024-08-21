@@ -28,19 +28,19 @@ class AvatarDisplay {
                 name: 'Medium',
                 main: '#FFE0BD',
                 shadow: '#EFD0B1',
-                highlight: '#C4A28A'
+                highlight: '#C4A28A'  // New darker highlight tone
             },
             tan: {
                 name: 'Tan',
                 main: '#F1C27D',
                 shadow: '#E0B170',
-                highlight: '#B39059'
+                highlight: '#B39059'  // New darker highlight tone
             },
             dark: {
                 name: 'Dark',
                 main: '#8D5524',
                 shadow: '#7C4A1E',
-                highlight: '#5E3919'
+                highlight: '#5E3919'  // New darker highlight tone
             }
         };
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
@@ -76,9 +76,9 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         console.log("Saved items:", savedItems);
         const equippedItems = savedItems ? JSON.parse(savedItems) : {};
+
         this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
         this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
-
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
@@ -134,9 +134,6 @@ class AvatarDisplay {
 
             obj.onload = () => {
                 this.applySkinTone(obj, part.type);
-                if (part.type === 'Mouth') {
-                    this.applyLipColors(obj);
-                }
             };
 
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
@@ -160,6 +157,7 @@ class AvatarDisplay {
         const svgDoc = obj.contentDocument;
         if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
+    
         const tone = this.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -173,17 +171,16 @@ class AvatarDisplay {
         };
         
         // Colors to preserve (including the scar color)
-        const preserveColors = ['#E6958A'];
-
+        const preserveColors = ['#E6958A']; // Add more colors here if needed
+        
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
                 if (color) {
                     color = color.toUpperCase();
-                    
                     // Skip preserved colors
                     if (preserveColors.includes(color)) return;
-
+                    
                     // Replace default skin colors
                     if (defaultColors.light.includes(color)) {
                         if (color === defaultColors.light[0]) {
@@ -244,50 +241,11 @@ class AvatarDisplay {
         replaceColor(svgDoc.documentElement);
         console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
     }
-
-    applyLipColors(obj) {
-        const svgDoc = obj.contentDocument;
-        if (!svgDoc) return;
-
-        const lipColors = ['#E6BBA8', '#F2ADA5', '#E6998F', '#BF766E', '#FFD1CC'];
-
-        const preserveLipColor = (element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    if (lipColors.includes(color)) {
-                        // Preserve the original lip color
-                        element.setAttribute(attr, color);
-                    }
-                }
-            });
-
-            // Handle style attribute
-            let style = element.getAttribute('style');
-            if (style) {
-                lipColors.forEach(color => {
-                    style = style.replace(new RegExp(color, 'gi'), color);
-                });
-                element.setAttribute('style', style);
-            }
-
-            // Recursively apply to child elements
-            Array.from(element.children).forEach(preserveLipColor);
-        };
-
-        preserveLipColor(svgDoc.documentElement);
-        console.log('Preserved lip colors');
-    }
-
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         Object.values(this.layers).forEach(obj => {
             if (obj.contentDocument) {
                 this.applySkinTone(obj, obj.dataset.type);
-                if (obj.dataset.type === 'Mouth') {
-                    this.applyLipColors(obj);
-                }
             }
         });
         localStorage.setItem(`skinTone_${this.username}`, newTone);
@@ -304,141 +262,82 @@ class AvatarDisplay {
     }
 
     tryOnItem(item) {
-        if (!item) return;
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        const type = item.type;
-        this.triedOnItems[type] = item.id;
-        
-        if (this.layers[type]) {
-            this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
-            this.layers[type].style.display = 'block';
-            this.layers[type].onload = () => {
-                this.applySkinTone(this.layers[type], type);
-                if (type === 'Mouth') {
-                    this.applyLipColors(this.layers[type]);
-                }
-            };
+        if (!this.triedOnItems) this.triedOnItems = {};
+        if (!this.currentItems) this.currentItems = {};
+
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            this.removeItem(item.type);
         } else {
-            console.warn(`Layer not found for type: ${type}`);
+            this.currentItems[item.type] = item;
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
 
         this.reorderLayers();
-        this.lastAction = { action: 'tryOn', item: item };
     }
 
     removeItem(type) {
+        console.log(`Removing item of type: ${type}`);
+        delete this.currentItems[type];
+        this.updateAvatarDisplay(type, null);
+    }
+
+    updateAvatarDisplay(type, src) {
+        console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
-            if (this.baseParts.includes(type)) {
-                // For base parts, reset to default
-                const defaultItem = this.getDefaultItem(type);
-                this.layers[type].data = `${this.baseUrl}${defaultItem.path}${defaultItem.id}`;
+            if (src) {
+                this.layers[type].data = src;
+                this.layers[type].style.display = 'block';
+                this.layers[type].onload = () => {
+                    this.applySkinTone(this.layers[type], type);
+                    if (type === 'Eyes') {
+                           // Apply skin tone and eye color again after a short delay to ensure all elements are loaded
+                        setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                    }
+                };
             } else {
                 this.layers[type].style.display = 'none';
             }
-            delete this.triedOnItems[type];
-            delete this.equippedItems[type];
-        }
-        this.lastAction = { action: 'remove', type: type };
-    }
-
-      getDefaultItem(type) {
-        // Define default items for base parts
-        const defaults = {
-            Legs: { id: 'default-legs', path: 'home/assets/body/', type: 'Legs' },
-            Arms: { id: 'default-arms', path: 'home/assets/body/', type: 'Arms' },
-            Body: { id: 'default-body', path: 'home/assets/body/', type: 'Body' },
-            Head: { id: 'default-head', path: 'home/assets/body/', type: 'Head' }
-        };
-        return defaults[type];
-    }
-
-    equipItem(item) {
-        if (!item) return;
-        
-        const type = item.type;
-        this.equippedItems[type] = item.id;
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        
-        if (this.layers[type]) {
-            this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
-            this.layers[type].style.display = 'block';
-            this.layers[type].onload = () => {
-                this.applySkinTone(this.layers[type], type);
-                if (type === 'Mouth') {
-                    this.applyLipColors(this.layers[type]);
-                }
-            };
         } else {
             console.warn(`Layer not found for type: ${type}`);
         }
-
-        this.reorderLayers();
-        delete this.triedOnItems[type];
-        this.lastAction = { action: 'equip', item: item };
     }
-
-    undoLastAction() {
-        if (this.lastAction.action === 'tryOn') {
-            this.removeItem(this.lastAction.item.type);
-        } else if (this.lastAction.action === 'remove') {
-            const equippedItem = this.equippedItems[this.lastAction.type];
-            if (equippedItem) {
-                const item = shopItems.find(item => item.id === equippedItem);
-                if (item) {
-                    this.equipItem(item);
+     toggleEquippedItem(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            if (this.layers[type].style.display === 'none') {
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                    this.lastAction[type] = 'shown';
+                    this.hiddenEquippedItems.delete(type);
+                    this.layers[type].onload = () => {
+                        this.applySkinTone(this.layers[type], type);
+                    };
                 }
-            }
-        } else if (this.lastAction.action === 'equip') {
-            this.removeItem(this.lastAction.item.type);
-        }
-        this.lastAction = {};
-    }
-
-    toggleItemVisibility(type) {
-        if (this.layers[type]) {
-            if (this.hiddenEquippedItems.has(type)) {
-                this.layers[type].style.display = 'block';
-                this.hiddenEquippedItems.delete(type);
             } else {
-                this.layers[type].style.display = 'none';
+                   this.layers[type].style.display = 'none';
+                this.lastAction[type] = 'hidden';
                 this.hiddenEquippedItems.add(type);
             }
         }
     }
 
-    updateAvatarDisplay() {
-        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-            const item = shopItems.find(item => item.id === itemId);
-            if (item && this.layers[type]) {
-                this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
-                this.layers[type].style.display = this.hiddenEquippedItems.has(type) ? 'none' : 'block';
-            }
-        });
-        this.reorderLayers();
+    isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
     }
 
-    saveAvatar() {
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        console.log('Avatar saved');
-    }
-
-    loadSavedAvatar() {
+    updateEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
-            this.updateAvatarDisplay();
-        }
-        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
-            this.changeSkinTone(savedSkinTone);
-        }
-        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
-        if (savedEyeColor) {
-            this.changeEyeColor(savedEyeColor);
-        }
-        console.log('Saved avatar loaded');
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
+    }
+
+      resetTriedOnItems() {
+        this.currentItems = {};
+        Object.keys(this.layers).forEach(type => {
+            this.updateAvatarDisplay(type, null);
+        });
     }
 }
 
