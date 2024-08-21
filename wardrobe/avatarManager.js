@@ -211,9 +211,7 @@ class AvatarManager {
                 
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
-                this.applyMouthToneToSVG(svgDoc);
                 this.applyLipColorToSVG(svgDoc);
-                
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -238,7 +236,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E', '#FFF4F2', '#FFD1CC'];
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -264,7 +262,7 @@ class AvatarManager {
                     }
                 }
             });
-                let style = element.getAttribute('style');
+            let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
                     style = style.replace(new RegExp(defaultColor, 'gi'), 
@@ -283,7 +281,6 @@ class AvatarManager {
             }
             Array.from(element.children).forEach(replaceColor);
         };
-
         replaceColor(svgDoc.documentElement);
     }
 
@@ -294,51 +291,14 @@ class AvatarManager {
         });
     }
 
-    applyMouthToneToSVG(svgDoc) {
-        const mouthColors = {
-            light: ['#FFF4F2', '#FFD1CC'],
-            medium: ['#FFE0D4', '#FFBDB0'],
-            tan: ['#FFCEB5', '#FFAA8D'],
-            dark: ['#A66A5E', '#8C4B3C']
-        };
-
-        const mouthElements = svgDoc.querySelectorAll('path[fill="#FFF4F2"], path[fill="#FFD1CC"]');
-        console.log('Found mouth elements:', mouthElements.length);
-        mouthElements.forEach((element, index) => {
-            const newColor = mouthColors[this.skinTone][index % 2];
-            console.log(`Changing mouth color from ${element.getAttribute('fill')} to ${newColor}`);
-            element.setAttribute('fill', newColor);
-        });
-    }
-
     applyLipColorToSVG(svgDoc) {
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             element.setAttribute('fill', this.lipColor);
         });
     }
-
-    blendColors(color1, color2, ratio) {
-        const hex = (x) => {
-            x = x.toString(16);
-            return (x.length === 1) ? '0' + x : x;
-        };
-
-        const r1 = parseInt(color1.substring(1, 3), 16);
-        const g1 = parseInt(color1.substring(3, 5), 16);
-        const b1 = parseInt(color1.substring(5, 7), 16);
-
-        const r2 = parseInt(color2.substring(1, 3), 16);
-        const g2 = parseInt(color2.substring(3, 5), 16);
-        const b2 = parseInt(color2.substring(5, 7), 16);
-
-        const r = Math.round(r1 * (1 - ratio) + r2 * ratio);
-        const g = Math.round(g1 * (1 - ratio) + g2 * ratio);
-        const b = Math.round(b1 * (1 - ratio) + b2 * ratio);
-
-        return `#${hex(r)}${hex(g)}${hex(b)}`;
-    }
 }
+
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
