@@ -5,6 +5,7 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
+        this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
     }
@@ -13,6 +14,7 @@ class AvatarManager {
         this.setupApplyAvatarButton();
         this.setupClearAvatarButton();
         this.setupEyeColorPicker();
+        this.setupLipColorPicker();
         this.updateAvatarDisplay();
     }
 
@@ -46,6 +48,18 @@ class AvatarManager {
         }
     }
 
+    setupLipColorPicker() {
+        const lipColorPicker = document.getElementById('lip-color-input');
+        if (lipColorPicker) {
+            lipColorPicker.value = this.lipColor;
+            lipColorPicker.addEventListener('input', (event) => {
+                this.debounceChangeLipColor(event.target.value);
+            });
+        } else {
+            console.error('Lip color picker not found');
+        }
+    }
+
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
@@ -60,6 +74,10 @@ class AvatarManager {
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
         }
+        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
+        if (savedLipColor) {
+            this.lipColor = savedLipColor;
+        }
     }
 
     applyAvatar() {
@@ -67,6 +85,7 @@ class AvatarManager {
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -156,6 +175,26 @@ class AvatarManager {
         });
     }
 
+    debounceChangeLipColor(newColor) {
+        if (this.debounceTimer) {
+            clearTimeout(this.debounceTimer);
+        }
+        this.debounceTimer = setTimeout(() => {
+            this.changeLipColor(newColor);
+        }, 50); // 50ms debounce time
+    }
+
+    changeLipColor(newColor) {
+        this.lipColor = newColor;
+        const lipColorPicker = document.getElementById('lip-color-input');
+        if (lipColorPicker) {
+            lipColorPicker.value = newColor;
+        }
+        requestAnimationFrame(() => {
+            this.updateTempAvatarDisplay();
+        });
+    }
+
     applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -172,6 +211,7 @@ class AvatarManager {
                 
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
+                this.applyLipColorToSVG(svgDoc);
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -222,7 +262,6 @@ class AvatarManager {
                     }
                 }
             });
-
             let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
@@ -240,10 +279,8 @@ class AvatarManager {
                 }
                 element.setAttribute('style', style);
             }
-
             Array.from(element.children).forEach(replaceColor);
         };
-
         replaceColor(svgDoc.documentElement);
     }
 
@@ -251,6 +288,13 @@ class AvatarManager {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
+        });
+    }
+
+    applyLipColorToSVG(svgDoc) {
+        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#F2ADA5"], path[fill="#E6BBA8"]');
+        lipElements.forEach(element => {
+            element.setAttribute('fill', this.lipColor);
         });
     }
 }
