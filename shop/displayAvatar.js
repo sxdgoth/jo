@@ -241,6 +241,44 @@ class AvatarDisplay {
     replaceColor(svgDoc.documentElement);
     console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
 }
+
+
+    applyLipColors(obj) {
+    const svgDoc = obj.contentDocument;
+    if (!svgDoc) return;
+
+    const lipColors = ['#E6BBA8', '#F2ADA5', '#E6998F', '#BF766E', '#FFD1CC'];
+
+    const preserveLipColor = (element) => {
+        ['fill', 'stroke'].forEach(attr => {
+            let color = element.getAttribute(attr);
+            if (color) {
+                color = color.toUpperCase();
+                if (lipColors.includes(color)) {
+                    // Preserve the original lip color
+                    element.setAttribute(attr, color);
+                }
+            }
+        });
+
+        // Handle style attribute
+        let style = element.getAttribute('style');
+        if (style) {
+            lipColors.forEach(color => {
+                style = style.replace(new RegExp(color, 'gi'), color);
+            });
+            element.setAttribute('style', style);
+        }
+
+        // Recursively apply to child elements
+        Array.from(element.children).forEach(preserveLipColor);
+    };
+
+    preserveLipColor(svgDoc.documentElement);
+    console.log('Preserved lip colors');
+}
+
+    
     
     changeSkinTone(newTone) {
         this.skinTone = newTone;
