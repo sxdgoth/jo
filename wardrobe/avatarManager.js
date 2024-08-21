@@ -202,7 +202,7 @@ class AvatarManager {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -224,7 +224,7 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-     applySkinToneToSVG(svgDoc) {
+    applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -260,15 +260,16 @@ class AvatarManager {
                     } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
                         element.setAttribute(attr, tone.main);
                     }
-                     if (element.getAttribute('fill') === '#FFF4F2') {
+                }
+            });
+
+            // Apply mouth tones
+            if (element.getAttribute('fill') === '#FFF4F2') {
                 element.setAttribute('fill', tone.mouthLight);
             } else if (element.getAttribute('fill') === '#FFD1CC') {
                 element.setAttribute('fill', tone.mouthDark);
-    
-                }
-            });
-            
-            
+            }
+
             let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
@@ -288,6 +289,7 @@ class AvatarManager {
             }
             Array.from(element.children).forEach(replaceColor);
         };
+
         replaceColor(svgDoc.documentElement);
     }
 
@@ -305,16 +307,6 @@ class AvatarManager {
         });
     }
 }
-
-applyMouthToneToSVG(svgDoc) {
-    const mouthTone = window.mouthToneManager.getMouthTone(this.skinTone);
-    const lipElements = svgDoc.querySelectorAll('path[fill="#FFF4F2"], path[fill="#FFD1CC"]');
-    lipElements.forEach((element, index) => {
-        element.setAttribute('fill', mouthTone[index % 2]);
-    });
-}
-
-
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
