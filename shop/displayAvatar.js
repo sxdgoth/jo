@@ -163,7 +163,7 @@ class AvatarDisplay {
         });
     }
 
-    applySkinTone(obj, type) {
+   applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
@@ -188,7 +188,9 @@ class AvatarDisplay {
             if (color) {
                 color = color.toUpperCase();
                 
-                if (lipColors.includes(color)) {
+                if (preserveColors.includes(color)) {
+                    return; // Skip preserved colors
+                } else if (lipColors.includes(color)) {
                     element.setAttribute(attr, this.lipColor);
                 } else if (defaultColors.light.includes(color)) {
                     if (color === defaultColors.light[0]) {
@@ -219,9 +221,11 @@ class AvatarDisplay {
             style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
             style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
             lipColors.forEach(color => {
-                style = style.replace(new RegExp(color, 'gi'), this.lipColor);
+                if (!preserveColors.includes(color)) {
+                    style = style.replace(new RegExp(color, 'gi'), this.lipColor);
+                }
             });
-            if (!lipColors.some(color => style.includes(color))) {
+            if (!preserveColors.some(color => style.includes(color)) && !lipColors.some(color => style.includes(color))) {
                 style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                 style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
             }
