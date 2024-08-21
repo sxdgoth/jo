@@ -163,82 +163,86 @@ class AvatarDisplay {
         });
     }
 
-   applySkinTone(obj, type) {
-    const svgDoc = obj.contentDocument;
-    if (!svgDoc || !this.skinTones[this.skinTone]) return;
+    applySkinTone(obj, type) {
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
-    const tone = this.skinTones[this.skinTone];
-    const defaultColors = {
-        light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
-        medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
-        tan: ['#F1C27D', '#E0B170', '#B39059'],
-        dark: ['#8D5524', '#7C4A1E', '#5E3919']
-    };
-    const eyeColors = {
-        main: '#F4D5BF',
-        shadow: '#E6BBA8'
-    };
-    
-    const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];  // Add colors here to prevent changes
-    const lipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
-    
-    const replaceColor = (element) => {
-        ['fill', 'stroke'].forEach(attr => {
-            let color = element.getAttribute(attr);
-            if (color) {
-                color = color.toUpperCase();
-                
-                if (preserveColors.includes(color)) {
-                    return; // Skip preserved colors
-                } else if (lipColors.includes(color)) {
-                    element.setAttribute(attr, this.lipColor);
-                } else if (defaultColors.light.includes(color)) {
-                    if (color === defaultColors.light[0]) {
-                        element.setAttribute(attr, tone.main);
-                    } else if (color === defaultColors.light[1]) {
-                        element.setAttribute(attr, tone.shadow);
-                    } else if (color === defaultColors.light[2]) {
-                        element.setAttribute(attr, tone.highlight);
+        const tone = this.skinTones[this.skinTone];
+        const defaultColors = {
+            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
+            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
+            tan: ['#F1C27D', '#E0B170', '#B39059'],
+            dark: ['#8D5524', '#7C4A1E', '#5E3919']
+        };
+        const eyeColors = {
+            main: '#F4D5BF',
+            shadow: '#E6BBA8'
+        };
+        
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
+        
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color) {
+                    color = color.toUpperCase();
+                    if (preserveColors.includes(color)) return;
+                    
+                    if (defaultColors.light.includes(color)) {
+                        if (color === defaultColors.light[0]) {
+                            element.setAttribute(attr, tone.main);
+                        } else if (color === defaultColors.light[1]) {
+                            element.setAttribute(attr, tone.shadow);
+                        } else if (color === defaultColors.light[2]) {
+                            element.setAttribute(attr, tone.highlight);
+                        }
                     }
-                } else if (color === eyeColors.main) {
-                    element.setAttribute(attr, tone.main);
-                } else if (color === eyeColors.shadow) {
-                    element.setAttribute(attr, tone.shadow);
-                } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !lipColors.includes(color)) {
-                    element.setAttribute(attr, tone.main);
-                } else if (color === '#3FA2FF') {
-                    element.setAttribute(attr, this.eyeColor);
-                }
-            }
-        });
-
-        let style = element.getAttribute('style');
-        if (style) {
-            defaultColors.light.forEach((defaultColor, index) => {
-                style = style.replace(new RegExp(defaultColor, 'gi'), 
-                    index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
-            });
-            style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-            style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-            lipColors.forEach(color => {
-                if (!preserveColors.includes(color)) {
-                    style = style.replace(new RegExp(color, 'gi'), this.lipColor);
+                    else if (color === eyeColors.main) {
+                        element.setAttribute(attr, tone.main);
+                    }
+                    else if (color === eyeColors.shadow) {
+                        element.setAttribute(attr, tone.shadow);
+                    }
+                    else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
+                        element.setAttribute(attr, tone.main);
+                    }
+                    else if (color === '#3FA2FF') {
+                        element.setAttribute(attr, this.eyeColor);
+                    }
+                    else if (color === '#E6998F' || color === '#BF766E' || color === '#F2ADA5') {
+                        element.setAttribute(attr, this.lipColor);
+                    }
                 }
             });
-            if (!preserveColors.some(color => style.includes(color)) && !lipColors.some(color => style.includes(color))) {
-                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+
+            let style = element.getAttribute('style');
+            if (style) {
+                defaultColors.light.forEach((defaultColor, index) => {
+                    style = style.replace(new RegExp(defaultColor, 'gi'), 
+                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
+                });
+                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
+                preserveColors.forEach(color => {
+                    style = style.replace(new RegExp(color, 'gi'), color);
+                });
+                if (!preserveColors.some(color => style.includes(color))) {
+                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+                }
+                style = style.replace(/#3FA2FF/gi, this.eyeColor);
+                style = style.replace(/#E6998F/gi, this.lipColor);
+                style = style.replace(/#BF766E/gi, this.lipColor);
+                style = style.replace(/#F2ADA5/gi, this.lipColor);
+                element.setAttribute('style', style);
             }
-            style = style.replace(/#3FA2FF/gi, this.eyeColor);
-            element.setAttribute('style', style);
-        }
 
-        Array.from(element.children).forEach(replaceColor);
-    };
+            Array.from(element.children).forEach(replaceColor);
+        };
 
-    replaceColor(svgDoc.documentElement);
-    console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color ${this.lipColor} to ${type}`);
-}
+        replaceColor(svgDoc.documentElement);
+        console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color ${this.lipColor} to ${type}`);
+    }
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
@@ -321,7 +325,7 @@ class AvatarDisplay {
                     this.layers[type].style.display = 'block';
                     this.lastAction[type] = 'shown';
                     this.hiddenEquippedItems.delete(type);
-                     this.layers[type].onload = () => {
+                      this.layers[type].onload = () => {
                         this.applySkinTone(this.layers[type], type);
                     };
                 }
