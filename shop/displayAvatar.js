@@ -154,24 +154,23 @@ class AvatarDisplay {
     }
 
     applySkinTone(obj, type) {
-        const svgDoc = obj.contentDocument;
-        if (!svgDoc || !this.skinTones[this.skinTone]) return;
+    const svgDoc = obj.contentDocument;
+    if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
-    
-        const tone = this.skinTones[this.skinTone];
-        const defaultColors = {
-            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
-            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
-            tan: ['#F1C27D', '#E0B170', '#B39059'],
-            dark: ['#8D5524', '#7C4A1E', '#5E3919']
-        };
-        const eyeColors = {
-            main: '#F4D5BF',
-            shadow: '#E6BBA8'
-        };
+    const tone = this.skinTones[this.skinTone];
+    const defaultColors = {
+        light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
+        medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
+        tan: ['#F1C27D', '#E0B170', '#B39059'],
+        dark: ['#8D5524', '#7C4A1E', '#5E3919']
+    };
+    const eyeColors = {
+        main: '#F4D5BF',
+        shadow: '#E6BBA8'
+    };
         
         // Colors to preserve (including the scar color)
-        const preserveColors = ['#E6958A']; // Add more colors here if needed
+       const preserveColors = ['#E6958A', '#dc9c90', '#e8afa6', '#b5796f', '#f8d2cc']; // Add more colors here if needed
         
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
