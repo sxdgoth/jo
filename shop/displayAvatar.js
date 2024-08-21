@@ -9,7 +9,6 @@ class AvatarDisplay {
             console.error(`Container with id "${containerId}" not found`);
             return;
         }
-
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
         this.equippedItems = {};
@@ -46,7 +45,6 @@ class AvatarDisplay {
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
-
         this.loadSkinTone();
         this.loadEyeColor();
         this.loadEquippedItems();
@@ -76,9 +74,9 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         console.log("Saved items:", savedItems);
         const equippedItems = savedItems ? JSON.parse(savedItems) : {};
-
         this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
         this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
+
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
@@ -112,7 +110,7 @@ class AvatarDisplay {
             obj.style.left = '0';
             obj.style.width = '100%';
             obj.style.height = '100%';
-
+            
             if (part.isBase) {
                 obj.data = this.baseUrl + part.file;
                 obj.style.display = 'block';
@@ -156,7 +154,6 @@ class AvatarDisplay {
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
         if (!svgDoc || !this.skinTones[this.skinTone]) return;
-
     
         const tone = this.skinTones[this.skinTone];
         const defaultColors = {
@@ -180,8 +177,7 @@ class AvatarDisplay {
                     color = color.toUpperCase();
                     // Skip preserved colors
                     if (preserveColors.includes(color)) return;
-                    
-                    // Replace default skin colors
+                                  // Replace default skin colors
                     if (defaultColors.light.includes(color)) {
                         if (color === defaultColors.light[0]) {
                             element.setAttribute(attr, tone.main);
@@ -208,7 +204,6 @@ class AvatarDisplay {
                     }
                 }
             });
-
             // Replace colors in style attribute
             let style = element.getAttribute('style');
             if (style) {
@@ -233,14 +228,13 @@ class AvatarDisplay {
                 style = style.replace(/#3FA2FF/gi, this.eyeColor);
                 element.setAttribute('style', style);
             }
-
             // Recursively apply to child elements
             Array.from(element.children).forEach(replaceColor);
         };
-
         replaceColor(svgDoc.documentElement);
         console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
     }
+
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         Object.values(this.layers).forEach(obj => {
@@ -266,14 +260,12 @@ class AvatarDisplay {
         
         if (!this.triedOnItems) this.triedOnItems = {};
         if (!this.currentItems) this.currentItems = {};
-
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
             this.removeItem(item.type);
         } else {
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
-
         this.reorderLayers();
     }
 
@@ -292,7 +284,7 @@ class AvatarDisplay {
                 this.layers[type].onload = () => {
                     this.applySkinTone(this.layers[type], type);
                     if (type === 'Eyes') {
-                           // Apply skin tone and eye color again after a short delay to ensure all elements are loaded
+                        // Apply skin tone and eye color again after a short delay to ensure all elements are loaded
                         setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
                     }
                 };
@@ -300,10 +292,11 @@ class AvatarDisplay {
                 this.layers[type].style.display = 'none';
             }
         } else {
-            console.warn(`Layer not found for type: ${type}`);
+                     console.warn(`Layer not found for type: ${type}`);
         }
     }
-     toggleEquippedItem(type) {
+
+    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -317,7 +310,7 @@ class AvatarDisplay {
                     };
                 }
             } else {
-                   this.layers[type].style.display = 'none';
+                this.layers[type].style.display = 'none';
                 this.lastAction[type] = 'hidden';
                 this.hiddenEquippedItems.add(type);
             }
@@ -332,12 +325,80 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
-
-      resetTriedOnItems() {
+  resetTriedOnItems() {
         this.currentItems = {};
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
         });
+    }
+
+    applyMouthSkin(obj) {
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc || !this.skinTones[this.skinTone]) return;
+
+        const tone = this.skinTones[this.skinTone];
+        const defaultColors = {
+            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
+            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
+            tan: ['#F1C27D', '#E0B170', '#B39059'],
+            dark: ['#8D5524', '#7C4A1E', '#5E3919']
+        };
+
+        // Colors to preserve (lip colors)
+        const lipColors = ['#E6BBA8', '#F2ADA5', '#E6998F', '#BF766E', '#FFD1CC'];
+
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color) {
+                    color = color.toUpperCase();
+                    
+                    // Skip lip colors
+                    if (lipColors.includes(color)) return;
+
+                    // Replace default skin colors
+                    if (defaultColors.light.includes(color)) {
+                        if (color === defaultColors.light[0]) {
+                            element.setAttribute(attr, tone.main);
+                        } else if (color === defaultColors.light[1]) {
+                            element.setAttribute(attr, tone.shadow);
+                        } else if (color === defaultColors.light[2]) {
+                            element.setAttribute(attr, tone.highlight);
+                        }
+                    }
+                    // Replace other potential skin tone colors
+                    else if (color.startsWith('#E6') || color.startsWith('#F4')) {
+                        element.setAttribute(attr, tone.main);
+                    }
+                }
+            });
+
+            // Replace colors in style attribute
+            let style = element.getAttribute('style');
+            if (style) {
+                // Replace default skin colors
+                defaultColors.light.forEach((defaultColor, index) => {
+                    style = style.replace(new RegExp(defaultColor, 'gi'), 
+                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
+                });
+                // Preserve lip colors
+                lipColors.forEach(color => {
+                    style = style.replace(new RegExp(color, 'gi'), color);
+                });
+                // Replace other potential skin tone colors
+                if (!lipColors.some(color => style.includes(color))) {
+                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+                }
+                element.setAttribute('style', style);
+            }
+            
+            // Recursively apply to child elements
+            Array.from(element.children).forEach(replaceColor);
+        };
+
+        replaceColor(svgDoc.documentElement);
+        console.log(`Applied skin tone ${this.skinTone} to mouth, preserving lip colors`);
     }
 }
 
@@ -346,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
-        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+          window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
         window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
