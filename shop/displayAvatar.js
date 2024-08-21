@@ -278,14 +278,14 @@ applySkinTone(obj, type) {
     }
 
     changeLipColor(newColor) {
-        this.lipColor = newColor;
-        Object.values(this.layers).forEach(obj => {
-            if (obj.contentDocument) {
-                this.applySkinTone(obj, obj.dataset.type);
-            }
-        });
-        localStorage.setItem(`lipColor_${this.username}`, newColor);
-    }
+    this.lipColor = newColor;
+    Object.values(this.layers).forEach(obj => {
+        if (obj.contentDocument) {
+            this.applySkinTone(obj, obj.dataset.type);
+        }
+    });
+    localStorage.setItem(`lipColor_${this.username}`, newColor);
+}
 
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
