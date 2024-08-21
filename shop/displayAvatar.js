@@ -172,19 +172,13 @@ class AvatarDisplay {
     // Colors to preserve (including the scar color)
     const preserveColors = ['#E6958A'];
 
-    // Lip colors from the provided SVG
-    const lipColors = ['#E6BBA8', '#F2ADA5', '#E6998F', '#BF766E', '#FFD1CC'];
-
     const replaceColor = (element) => {
         ['fill', 'stroke'].forEach(attr => {
             let color = element.getAttribute(attr);
             if (color) {
                 color = color.toUpperCase();
                 
-                // Always preserve lip colors
-                if (lipColors.includes(color)) return;
-                
-                // Skip other preserved colors
+                // Skip preserved colors
                 if (preserveColors.includes(color)) return;
 
                 // Replace default skin colors
@@ -205,7 +199,7 @@ class AvatarDisplay {
                     element.setAttribute(attr, tone.shadow);
                 }
                 // Replace other potential skin tone colors
-                else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color) && !lipColors.includes(color)) {
+                else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
                     element.setAttribute(attr, tone.main);
                 }
                 // Apply eye color
@@ -218,11 +212,6 @@ class AvatarDisplay {
         // Replace colors in style attribute
         let style = element.getAttribute('style');
         if (style) {
-            // Preserve lip colors
-            lipColors.forEach(color => {
-                style = style.replace(new RegExp(color, 'gi'), color);
-            });
-
             // Replace default skin colors
             defaultColors.light.forEach((defaultColor, index) => {
                 style = style.replace(new RegExp(defaultColor, 'gi'), 
@@ -236,7 +225,7 @@ class AvatarDisplay {
                 style = style.replace(new RegExp(color, 'gi'), color);
             });
             // Replace other potential skin tone colors
-            if (!preserveColors.some(color => style.includes(color)) && !lipColors.some(color => style.includes(color))) {
+            if (!preserveColors.some(color => style.includes(color))) {
                 style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                 style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
             }
