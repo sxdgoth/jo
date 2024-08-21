@@ -2,42 +2,32 @@
 
 class SkinToneManager {
     constructor() {
-        this.skinTones = {
-            light: {
-                name: 'Light',
-                main: '#FEE2CA',
-                shadow: '#EFC1B7',
-                highlight: '#B37E78',
-                lipLight: '#FFF4F2',
-                lipDark: '#FFD1CC'
-            },
-            medium: {
-                name: 'Medium',
-                main: '#FFE0BD',
-                shadow: '#EFD0B1',
-                highlight: '#C4A28A',
-                lipLight: '#FFE0D4',
-                lipDark: '#FFBDB0'
-            },
-            tan: {
-                name: 'Tan',
-                main: '#F1C27D',
-                shadow: '#E0B170',
-                highlight: '#B39059',
-                lipLight: '#FFCEB5',
-                lipDark: '#FFAA8D'
-            },
-            dark: {
-                name: 'Dark',
-                main: '#8D5524',
-                shadow: '#7C4A1E',
-                highlight: '#5E3919',
-                lipLight: '#A66A5E',
-                lipDark: '#8C4B3C'
-            }
-        };
+       this.skinTones = {
+    light: {
+        name: 'Light',
+        main: '#FEE2CA',
+        shadow: '#EFC1B7',
+        highlight: '#B37E78'  
+    },
+    medium: {
+        name: 'Medium',
+        main: '#FFE0BD',
+        shadow: '#EFD0B1',
+        highlight: '#C4A28A'  // New darker highlight tone
+    },
+    tan: {
+        name: 'Tan',
+        main: '#F1C27D',
+        shadow: '#E0B170',
+        highlight: '#B39059'  // New darker highlight tone
+    },
+    dark: {
+        name: 'Dark',
+        main: '#8D5524',
+        shadow: '#7C4A1E',
+        highlight: '#5E3919'  // New darker highlight tone
     }
-}
+};
         this.currentSkinTone = this.skinTones.light;
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
