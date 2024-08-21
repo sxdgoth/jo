@@ -168,78 +168,93 @@ class AvatarDisplay {
         main: '#F4D5BF',
         shadow: '#E6BBA8'
     };
-        
-        // Colors to preserve (including the scar color)
-       const preserveColors = ['#E6958A', '#dc9c90', '#e8afa6', '#b5796f', '#f8d2cc']; // Add more colors here if needed
-        
-        const replaceColor = (element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    // Skip preserved colors
-                    if (preserveColors.includes(color)) return;
-                    
-                    // Replace default skin colors
-                    if (defaultColors.light.includes(color)) {
-                        if (color === defaultColors.light[0]) {
-                            element.setAttribute(attr, tone.main);
-                        } else if (color === defaultColors.light[1]) {
-                            element.setAttribute(attr, tone.shadow);
-                        } else if (color === defaultColors.light[2]) {
-                            element.setAttribute(attr, tone.highlight);
-                        }
-                    }
-                    // Replace eye colors
-                    else if (color === eyeColors.main) {
+    
+    // Colors to preserve (including the scar color)
+    const preserveColors = ['#E6958A'];
+
+    // Lip colors
+    const lipColors = ['#dc9c90', '#e8afa6', '#b5796f', '#f8d2cc'];
+
+    const replaceColor = (element) => {
+        ['fill', 'stroke'].forEach(attr => {
+            let color = element.getAttribute(attr);
+            if (color) {
+                color = color.toUpperCase();
+                
+                // Skip preserved colors
+                if (preserveColors.includes(color)) return;
+                
+                // Preserve lip colors for mouth elements
+                if (type === 'Mouth' && lipColors.includes(color)) return;
+
+                // Replace default skin colors
+                if (defaultColors.light.includes(color)) {
+                    if (color === defaultColors.light[0]) {
                         element.setAttribute(attr, tone.main);
-                    }
-                    else if (color === eyeColors.shadow) {
+                    } else if (color === defaultColors.light[1]) {
                         element.setAttribute(attr, tone.shadow);
-                    }
-                    // Replace other potential skin tone colors
-                    else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
-                        element.setAttribute(attr, tone.main);
-                    }
-                    // Apply eye color
-                    else if (color === '#3FA2FF') {
-                        element.setAttribute(attr, this.eyeColor);
+                    } else if (color === defaultColors.light[2]) {
+                        element.setAttribute(attr, tone.highlight);
                     }
                 }
-            });
-
-            // Replace colors in style attribute
-            let style = element.getAttribute('style');
-            if (style) {
-                // Replace default skin colors
-                defaultColors.light.forEach((defaultColor, index) => {
-                    style = style.replace(new RegExp(defaultColor, 'gi'), 
-                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
-                });
                 // Replace eye colors
-                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-                // Preserve specific colors
-                preserveColors.forEach(color => {
-                    style = style.replace(new RegExp(color, 'gi'), color);
-                });
+                else if (color === eyeColors.main) {
+                    element.setAttribute(attr, tone.main);
+                }
+                else if (color === eyeColors.shadow) {
+                    element.setAttribute(attr, tone.shadow);
+                }
                 // Replace other potential skin tone colors
-                if (!preserveColors.some(color => style.includes(color))) {
-                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+                else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
+                    element.setAttribute(attr, tone.main);
                 }
                 // Apply eye color
-                style = style.replace(/#3FA2FF/gi, this.eyeColor);
-                element.setAttribute('style', style);
+                else if (color === '#3FA2FF') {
+                    element.setAttribute(attr, this.eyeColor);
+                }
             }
+        });
 
-            // Recursively apply to child elements
-            Array.from(element.children).forEach(replaceColor);
-        };
+        // Replace colors in style attribute
+        let style = element.getAttribute('style');
+        if (style) {
+            // Replace default skin colors
+            defaultColors.light.forEach((defaultColor, index) => {
+                style = style.replace(new RegExp(defaultColor, 'gi'), 
+                    index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
+            });
+            // Replace eye colors
+            style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+            style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
+            // Preserve specific colors
+            preserveColors.forEach(color => {
+                style = style.replace(new RegExp(color, 'gi'), color);
+            });
+            // Preserve lip colors for mouth elements
+            if (type === 'Mouth') {
+                lipColors.forEach(color => {
+                    style = style.replace(new RegExp(color, 'gi'), color);
+                });
+            }
+            // Replace other potential skin tone colors
+            if (!preserveColors.includes(style) && (type !== 'Mouth' || !lipColors.some(color => style.includes(color)))) {
+                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+            }
+            // Apply eye color
+            style = style.replace(/#3FA2FF/gi, this.eyeColor);
+            element.setAttribute('style', style);
+        }
 
-        replaceColor(svgDoc.documentElement);
-        console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
-    }
+        // Recursively apply to child elements
+        Array.from(element.children).forEach(replaceColor);
+    };
+
+    replaceColor(svgDoc.documentElement);
+    console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
+}
+
+    
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         Object.values(this.layers).forEach(obj => {
