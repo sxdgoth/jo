@@ -97,8 +97,18 @@ class AvatarManager {
     }
 
     updateAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.loadAvatar();
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                }
+            });
         }
     }
 
@@ -125,16 +135,24 @@ class AvatarManager {
     }
 
     updateTempAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.loadAvatar();
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                }
+            });
         }
     }
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
-        if (window.avatarDisplay) {
-            window.avatarDisplay.changeSkinTone(newTone);
-        }
+        this.updateTempAvatarDisplay();
     }
 
     debounceChangeEyeColor(newColor) {
@@ -152,9 +170,9 @@ class AvatarManager {
         if (eyeColorPicker) {
             eyeColorPicker.value = newColor;
         }
-        if (window.avatarDisplay) {
-            window.avatarDisplay.changeEyeColor(newColor);
-        }
+        requestAnimationFrame(() => {
+            this.updateTempAvatarDisplay();
+        });
     }
 
     debounceChangeLipColor(newColor) {
@@ -172,9 +190,112 @@ class AvatarManager {
         if (lipColorPicker) {
             lipColorPicker.value = newColor;
         }
-        if (window.avatarDisplay) {
-            window.avatarDisplay.changeLipColor(newColor);
+        requestAnimationFrame(() => {
+            this.updateTempAvatarDisplay();
+        });
+    }
+
+    applySkinTone() {
+        if (window.skinToneManager) {
+            const tone = window.skinToneManager.skinTones[this.skinTone];
+            window.skinToneManager.applySkinTone(tone);
         }
+    }
+
+    updateLayerWithSkinTone(type, src) {
+        fetch(src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                this.applySkinToneToSVG(svgDoc);
+                this.applyEyeColorToSVG(svgDoc);
+                this.applyLipColorToSVG(svgDoc);
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                
+                requestAnimationFrame(() => {
+                    window.avatarBody.updateLayer(type, url);
+                });
+            })
+            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+    }
+
+    applySkinToneToSVG(svgDoc) {
+        const tone = window.skinToneManager.skinTones[this.skinTone];
+        const defaultColors = {
+            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
+            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
+            tan: ['#F1C27D', '#E0B170', '#B39059'],
+            dark: ['#8D5524', '#7C4A1E', '#5E3919']
+        };
+        const eyeColors = {
+            main: '#F4D5BF',
+            shadow: '#E6BBA8'
+        };
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color) {
+                    color = color.toUpperCase();
+                    if (preserveColors.includes(color)) return;
+                    
+                    if (defaultColors.light.includes(color)) {
+                        if (color === defaultColors.light[0]) {
+                            element.setAttribute(attr, tone.main);
+                        } else if (color === defaultColors.light[1]) {
+                            element.setAttribute(attr, tone.shadow);
+                        } else if (color === defaultColors.light[2]) {
+                            element.setAttribute(attr, tone.highlight);
+                        }
+                    } else if (color === eyeColors.main) {
+                        element.setAttribute(attr, tone.main);
+                    } else if (color === eyeColors.shadow) {
+                        element.setAttribute(attr, tone.shadow);
+                    } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
+                        element.setAttribute(attr, tone.main);
+                    }
+                }
+            });
+            let style = element.getAttribute('style');
+            if (style) {
+                defaultColors.light.forEach((defaultColor, index) => {
+                    style = style.replace(new RegExp(defaultColor, 'gi'), 
+                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
+                });
+                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
+                preserveColors.forEach(color => {
+                    style = style.replace(new RegExp(color, 'gi'), color);
+                });
+                if (!preserveColors.some(color => style.includes(color))) {
+                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+                }
+                element.setAttribute('style', style);
+            }
+            Array.from(element.children).forEach(replaceColor);
+        };
+        replaceColor(svgDoc.documentElement);
+    }
+
+    applyEyeColorToSVG(svgDoc) {
+        const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
+        eyeElements.forEach(element => {
+            element.setAttribute('fill', this.eyeColor);
+        });
+    }
+
+    applyLipColorToSVG(svgDoc) {
+        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
+        lipElements.forEach(element => {
+            element.setAttribute('fill', this.lipColor);
+        });
     }
 }
 
