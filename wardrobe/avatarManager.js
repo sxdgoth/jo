@@ -292,7 +292,7 @@ class AvatarManager {
     }
 
     applyLipColorToSVG(svgDoc) {
-        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#F2ADA5"], path[fill="#E6BBA8"]');
+        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             element.setAttribute('fill', this.lipColor);
         });
