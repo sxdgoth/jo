@@ -44,7 +44,7 @@ class AvatarDisplay {
                 highlight: '#5E3919'
             }
         };
-        this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
+        this.facialFeatures = ['Eyes', 'Nose', 'Lips'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
 
@@ -101,7 +101,7 @@ class AvatarDisplay {
             { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
             { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
-            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
+            { name: 'Lips', file: '', type: 'Lips', isBase: false },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
             { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
             { name: 'Pants', file: '', type: 'Pants', isBase: false },
@@ -155,7 +155,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Cheeks', 'Eyes', 'Lips', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -180,7 +180,6 @@ class AvatarDisplay {
         };
         
         const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
-        const lipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -205,7 +204,7 @@ class AvatarDisplay {
                         element.setAttribute(attr, tone.main);
                     } else if (color === '#3FA2FF') {
                         element.setAttribute(attr, this.eyeColor);
-                    } else if (lipColors.includes(color)) {
+                    } else if (color === '#E6998F') {
                         element.setAttribute(attr, this.lipColor);
                     }
                 }
@@ -227,9 +226,7 @@ class AvatarDisplay {
                     style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
                 }
                 style = style.replace(/#3FA2FF/gi, this.eyeColor);
-                lipColors.forEach(lipColor => {
-                    style = style.replace(new RegExp(lipColor, 'gi'), this.lipColor);
-                });
+                style = style.replace(/#E6998F/gi, this.lipColor);
                 element.setAttribute('style', style);
             }
 
@@ -252,21 +249,17 @@ class AvatarDisplay {
 
     changeEyeColor(newColor) {
         this.eyeColor = newColor;
-        Object.values(this.layers).forEach(obj => {
-            if (obj.contentDocument) {
-                this.applySkinTone(obj, obj.dataset.type);
-            }
-        });
+        if (this.layers['Eyes'] && this.layers['Eyes'].contentDocument) {
+            this.applySkinTone(this.layers['Eyes'], 'Eyes');
+        }
         localStorage.setItem(`eyeColor_${this.username}`, newColor);
     }
 
     changeLipColor(newColor) {
         this.lipColor = newColor;
-        Object.values(this.layers).forEach(obj => {
-            if (obj.contentDocument) {
-                this.applySkinTone(obj, obj.dataset.type);
-            }
-        });
+        if (this.layers['Lips'] && this.layers['Lips'].contentDocument) {
+            this.applySkinTone(this.layers['Lips'], 'Lips');
+        }
         localStorage.setItem(`lipColor_${this.username}`, newColor);
     }
 
@@ -300,7 +293,7 @@ class AvatarDisplay {
                 this.layers[type].style.display = 'block';
                 this.layers[type].onload = () => {
                     this.applySkinTone(this.layers[type], type);
-                    if (type === 'Eyes' || type === 'Mouth') {
+                    if (type === 'Eyes' || type === 'Lips') {
                         setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
                     }
                 };
@@ -325,10 +318,10 @@ class AvatarDisplay {
                         this.applySkinTone(this.layers[type], type);
                     };
                 }
-            } else {
-                         this.layers[type].style.display = 'none';
+                  } else {
+                this.layers[type].style.display = 'none';
                 this.lastAction[type] = 'hidden';
-                this.hiddenEquippedItems.add(type);
+                     this.hiddenEquippedItems.add(type);
             }
         }
     }
