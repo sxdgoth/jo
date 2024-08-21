@@ -202,27 +202,29 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
-        fetch(src)
-            .then(response => response.text())
-            .then(svgText => {
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                
-                this.applySkinToneToSVG(svgDoc);
-                this.applyEyeColorToSVG(svgDoc);
-                this.applyLipColorToSVG(svgDoc);
-                const serializer = new XMLSerializer();
-                const modifiedSvgString = serializer.serializeToString(svgDoc);
-                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                
-                requestAnimationFrame(() => {
-                    window.avatarBody.updateLayer(type, url);
-                });
-            })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
-    }
+  updateLayerWithSkinTone(type, src) {
+    fetch(src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            this.applySkinToneToSVG(svgDoc);
+            this.applyEyeColorToSVG(svgDoc);
+            this.applyMouthToneToSVG(svgDoc);  // Add this line
+            this.applyLipColorToSVG(svgDoc);
+            
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            requestAnimationFrame(() => {
+                window.avatarBody.updateLayer(type, url);
+            });
+        })
+        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+}
 
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -298,6 +300,16 @@ class AvatarManager {
         });
     }
 }
+
+applyMouthToneToSVG(svgDoc) {
+    const mouthTone = window.mouthToneManager.getMouthTone(this.skinTone);
+    const lipElements = svgDoc.querySelectorAll('path[fill="#FFF4F2"], path[fill="#FFD1CC"]');
+    lipElements.forEach((element, index) => {
+        element.setAttribute('fill', mouthTone[index % 2]);
+    });
+}
+
+
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
