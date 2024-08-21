@@ -52,7 +52,7 @@ def clean_svg(input_file, output_file):
     content = re.sub(r'<\?xml[^>]+\?>\s*', '', content)
     
     # Replace the opening svg tag
-    new_svg_tag = '<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547" preserveAspectRatio="xMidYMid meet" width="300"  height="400">'
+    new_svg_tag = '<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="-40.94377899169922 -146.29818725585938 68.82828521728516 163.4471893310547" preserveAspectRatio="xMidYMid meet" width="300"  height="400" ><g transform="translate(0, -27) scale(0.7)" preserveAspectRatio="none">'
     content = re.sub(r'<svg[^>]*>', new_svg_tag, content)
     
     # Write the corrected content back to the file
