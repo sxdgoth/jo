@@ -153,7 +153,7 @@ class AvatarDisplay {
         });
     }
 
-    applySkinTone(obj, type) {
+   applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
@@ -172,8 +172,8 @@ class AvatarDisplay {
     // Colors to preserve (including the scar color)
     const preserveColors = ['#E6958A'];
 
-    // Lip colors
-    const lipColors = ['#dc9c90', '#e8afa6', '#b5796f', '#f8d2cc'];
+    // Mouth colors
+    const mouthColors = ['#dc9c90', '#e8afa6', '#b5796f', '#f8d2cc'];
 
     const replaceColor = (element) => {
         ['fill', 'stroke'].forEach(attr => {
@@ -184,8 +184,8 @@ class AvatarDisplay {
                 // Skip preserved colors
                 if (preserveColors.includes(color)) return;
                 
-                // Preserve lip colors for mouth elements
-                if (type === 'Mouth' && lipColors.includes(color)) return;
+                // Preserve mouth colors for mouth elements
+                if (type === 'Mouth' && mouthColors.includes(color)) return;
 
                 // Replace default skin colors
                 if (defaultColors.light.includes(color)) {
@@ -230,14 +230,14 @@ class AvatarDisplay {
             preserveColors.forEach(color => {
                 style = style.replace(new RegExp(color, 'gi'), color);
             });
-            // Preserve lip colors for mouth elements
+            // Preserve mouth colors for mouth elements
             if (type === 'Mouth') {
-                lipColors.forEach(color => {
+                mouthColors.forEach(color => {
                     style = style.replace(new RegExp(color, 'gi'), color);
                 });
             }
             // Replace other potential skin tone colors
-            if (!preserveColors.includes(style) && (type !== 'Mouth' || !lipColors.some(color => style.includes(color)))) {
+            if (!preserveColors.includes(style) && (type !== 'Mouth' || !mouthColors.some(color => style.includes(color)))) {
                 style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                 style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
             }
