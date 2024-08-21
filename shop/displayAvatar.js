@@ -163,7 +163,7 @@ class AvatarDisplay {
         });
     }
 
-   applySkinTone(obj, type) {
+applySkinTone(obj, type) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
@@ -180,7 +180,23 @@ class AvatarDisplay {
     };
     
     const preserveColors = ['#E6958A'];  // Add colors here to prevent changes
-    const lipColors = ['#E6998F','#BF766E', '#F2ADA5'];
+    const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
+    
+    // Function to create a lip color palette
+    const createLipPalette = (baseColor) => {
+        const rgb = parseInt(baseColor.slice(1), 16);
+        const r = (rgb >> 16) & 255;
+        const g = (rgb >> 8) & 255;
+        const b = rgb & 255;
+        
+        return [
+            `#${baseColor.slice(1)}`, // Main color
+            `#${Math.max(0, r - 40).toString(16).padStart(2, '0')}${Math.max(0, g - 40).toString(16).padStart(2, '0')}${Math.max(0, b - 40).toString(16).padStart(2, '0')}`, // Darker shade
+            `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
+        ];
+    };
+
+    const lipPalette = createLipPalette(this.lipColor);
     
     const replaceColor = (element) => {
         ['fill', 'stroke'].forEach(attr => {
@@ -190,8 +206,9 @@ class AvatarDisplay {
                 
                 if (preserveColors.includes(color)) {
                     return; // Skip preserved colors
-                } else if (lipColors.includes(color)) {
-                    element.setAttribute(attr, this.lipColor);
+                } else if (originalLipColors.includes(color)) {
+                    const index = originalLipColors.indexOf(color);
+                    element.setAttribute(attr, lipPalette[index]);
                 } else if (defaultColors.light.includes(color)) {
                     if (color === defaultColors.light[0]) {
                         element.setAttribute(attr, tone.main);
@@ -204,7 +221,7 @@ class AvatarDisplay {
                     element.setAttribute(attr, tone.main);
                 } else if (color === eyeColors.shadow) {
                     element.setAttribute(attr, tone.shadow);
-                } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !lipColors.includes(color)) {
+                } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !originalLipColors.includes(color)) {
                     element.setAttribute(attr, tone.main);
                 } else if (color === '#3FA2FF') {
                     element.setAttribute(attr, this.eyeColor);
@@ -220,12 +237,12 @@ class AvatarDisplay {
             });
             style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
             style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-            lipColors.forEach(color => {
+            originalLipColors.forEach((color, index) => {
                 if (!preserveColors.includes(color)) {
-                    style = style.replace(new RegExp(color, 'gi'), this.lipColor);
+                    style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
                 }
             });
-            if (!preserveColors.some(color => style.includes(color)) && !lipColors.some(color => style.includes(color))) {
+            if (!preserveColors.some(color => style.includes(color)) && !originalLipColors.some(color => style.includes(color))) {
                 style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                 style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
             }
@@ -237,7 +254,7 @@ class AvatarDisplay {
     };
 
     replaceColor(svgDoc.documentElement);
-    console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color ${this.lipColor} to ${type}`);
+    console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
 }
 
     changeSkinTone(newTone) {
