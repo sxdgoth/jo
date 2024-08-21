@@ -303,7 +303,143 @@ class AvatarDisplay {
         localStorage.setItem(`eyeColor_${this.username}`, newColor);
     }
 
-    // ... (other methods like tryOnItem, removeItem, updateAvatarDisplay, etc.)
+    tryOnItem(item) {
+        if (!item) return;
+        
+        const type = item.type;
+        this.triedOnItems[type] = item.id;
+        
+        if (this.layers[type]) {
+            this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Mouth') {
+                    this.applyLipColors(this.layers[type]);
+                }
+            };
+        } else {
+            console.warn(`Layer not found for type: ${type}`);
+        }
+
+        this.reorderLayers();
+        this.lastAction = { action: 'tryOn', item: item };
+    }
+
+    removeItem(type) {
+        if (this.layers[type]) {
+            if (this.baseParts.includes(type)) {
+                // For base parts, reset to default
+                const defaultItem = this.getDefaultItem(type);
+                this.layers[type].data = `${this.baseUrl}${defaultItem.path}${defaultItem.id}`;
+            } else {
+                this.layers[type].style.display = 'none';
+            }
+            delete this.triedOnItems[type];
+            delete this.equippedItems[type];
+        }
+        this.lastAction = { action: 'remove', type: type };
+    }
+
+      getDefaultItem(type) {
+        // Define default items for base parts
+        const defaults = {
+            Legs: { id: 'default-legs', path: 'home/assets/body/', type: 'Legs' },
+            Arms: { id: 'default-arms', path: 'home/assets/body/', type: 'Arms' },
+            Body: { id: 'default-body', path: 'home/assets/body/', type: 'Body' },
+            Head: { id: 'default-head', path: 'home/assets/body/', type: 'Head' }
+        };
+        return defaults[type];
+    }
+
+    equipItem(item) {
+        if (!item) return;
+        
+        const type = item.type;
+        this.equippedItems[type] = item.id;
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        
+        if (this.layers[type]) {
+            this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Mouth') {
+                    this.applyLipColors(this.layers[type]);
+                }
+            };
+        } else {
+            console.warn(`Layer not found for type: ${type}`);
+        }
+
+        this.reorderLayers();
+        delete this.triedOnItems[type];
+        this.lastAction = { action: 'equip', item: item };
+    }
+
+    undoLastAction() {
+        if (this.lastAction.action === 'tryOn') {
+            this.removeItem(this.lastAction.item.type);
+        } else if (this.lastAction.action === 'remove') {
+            const equippedItem = this.equippedItems[this.lastAction.type];
+            if (equippedItem) {
+                const item = shopItems.find(item => item.id === equippedItem);
+                if (item) {
+                    this.equipItem(item);
+                }
+            }
+        } else if (this.lastAction.action === 'equip') {
+            this.removeItem(this.lastAction.item.type);
+        }
+        this.lastAction = {};
+    }
+
+    toggleItemVisibility(type) {
+        if (this.layers[type]) {
+            if (this.hiddenEquippedItems.has(type)) {
+                this.layers[type].style.display = 'block';
+                this.hiddenEquippedItems.delete(type);
+            } else {
+                this.layers[type].style.display = 'none';
+                this.hiddenEquippedItems.add(type);
+            }
+        }
+    }
+
+    updateAvatarDisplay() {
+        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+            const item = shopItems.find(item => item.id === itemId);
+            if (item && this.layers[type]) {
+                this.layers[type].data = `${this.baseUrl}${item.path}${item.id}`;
+                this.layers[type].style.display = this.hiddenEquippedItems.has(type) ? 'none' : 'block';
+            }
+        });
+        this.reorderLayers();
+    }
+
+    saveAvatar() {
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        console.log('Avatar saved');
+    }
+
+    loadSavedAvatar() {
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+            this.updateAvatarDisplay();
+        }
+        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+        if (savedSkinTone) {
+            this.changeSkinTone(savedSkinTone);
+        }
+        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
+        if (savedEyeColor) {
+            this.changeEyeColor(savedEyeColor);
+        }
+        console.log('Saved avatar loaded');
+    }
 }
 
 // Initialize the avatar display when the DOM is loaded
