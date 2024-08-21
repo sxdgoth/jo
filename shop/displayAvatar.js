@@ -179,7 +179,7 @@ class AvatarDisplay {
             shadow: '#E6BBA8'
         };
         
-        const preserveColors = ['#E6958A', '#BF766E'];
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];  // add colors here to prevent colors
         
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
