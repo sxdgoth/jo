@@ -17,32 +17,36 @@ class AvatarDisplay {
         this.hiddenEquippedItems = new Set();
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
-        this.skinTones = {
-            light: {
-                name: 'Light',
-                main: '#FEE2CA',
-                shadow: '#EFC1B7',
-                highlight: '#B37E78'  
-            },
-            medium: {
-                name: 'Medium',
-                main: '#FFE0BD',
-                shadow: '#EFD0B1',
-                highlight: '#C4A28A'  // New darker highlight tone
-            },
-            tan: {
-                name: 'Tan',
-                main: '#F1C27D',
-                shadow: '#E0B170',
-                highlight: '#B39059'  // New darker highlight tone
-            },
-            dark: {
-                name: 'Dark',
-                main: '#8D5524',
-                shadow: '#7C4A1E',
-                highlight: '#5E3919'  // New darker highlight tone
-            }
-        };
+       this.skinTones = {
+    light: {
+        name: 'Light',
+        main: '#FEE2CA',
+        shadow: '#EFC1B7',
+        highlight: '#B37E78',
+        lightest: '#FCFCFC'
+    },
+    medium: {
+        name: 'Medium',
+        main: '#FFE0BD',
+        shadow: '#EFD0B1',
+        highlight: '#C4A28A',
+        lightest: '#FFF5E7'
+    },
+    tan: {
+        name: 'Tan',
+        main: '#F1C27D',
+        shadow: '#E0B170',
+        highlight: '#B39059',
+        lightest: '#FFF0DB'
+    },
+    dark: {
+        name: 'Dark',
+        main: '#8D5524',
+        shadow: '#7C4A1E',
+        highlight: '#5E3919',
+        lightest: '#A06B3A'
+    }
+};
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
@@ -160,11 +164,12 @@ class AvatarDisplay {
     
         const tone = this.skinTones[this.skinTone];
         const defaultColors = {
-            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
-            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
-            tan: ['#F1C27D', '#E0B170', '#B39059'],
-            dark: ['#8D5524', '#7C4A1E', '#5E3919']
-        };
+           const defaultColors = {
+             light: ['#FEE2CA', '#EFC1B7', '#B37E78', '#FCFCFC'],
+             medium: ['#FFE0BD', '#EFD0B1', '#C4A28A', '#FFF5E7'],
+             tan: ['#F1C27D', '#E0B170', '#B39059', '#FFF0DB'],
+             dark: ['#8D5524', '#7C4A1E', '#5E3919', '#A06B3A']
+};
         const eyeColors = {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
