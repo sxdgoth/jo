@@ -224,7 +224,8 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-   applySkinToneToSVG(svgDoc) {
+    
+ applySkinToneToSVG(svgDoc) {
     const tone = window.skinToneManager.skinTones[this.skinTone];
     const defaultColors = {
         light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -240,7 +241,7 @@ class AvatarManager {
         light: '#FFF4F2',
         dark: '#FFD1CC'
     };
-    const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+    const preserveColors = ['#E6958A', '#E6998F', '#BF766E', '#FFF4F2', '#FFD1CC']; // Added lip colors to preserve
 
     const replaceColor = (element) => {
         ['fill', 'stroke'].forEach(attr => {
@@ -261,10 +262,6 @@ class AvatarManager {
                     element.setAttribute(attr, tone.main);
                 } else if (color === eyeColors.shadow) {
                     element.setAttribute(attr, tone.shadow);
-                } else if (color === lipColors.light) {
-                    element.setAttribute(attr, tone.main);
-                } else if (color === lipColors.dark) {
-                    element.setAttribute(attr, tone.shadow);
                 } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
                     element.setAttribute(attr, tone.main);
                 }
@@ -279,8 +276,6 @@ class AvatarManager {
             });
             style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
             style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-            style = style.replace(new RegExp(lipColors.light, 'gi'), tone.main);
-            style = style.replace(new RegExp(lipColors.dark, 'gi'), tone.shadow);
             preserveColors.forEach(color => {
                 style = style.replace(new RegExp(color, 'gi'), color);
             });
