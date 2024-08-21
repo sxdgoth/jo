@@ -197,6 +197,7 @@ class AvatarManager {
             shadow: '#E6BBA8'
         };
         const preserveColors = ['#E6958A'];
+
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -205,7 +206,13 @@ class AvatarManager {
                     if (preserveColors.includes(color)) return;
                     
                     if (defaultColors.light.includes(color)) {
-                        element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
+                        if (color === defaultColors.light[0]) {
+                            element.setAttribute(attr, tone.main);
+                        } else if (color === defaultColors.light[1]) {
+                            element.setAttribute(attr, tone.shadow);
+                        } else if (color === defaultColors.light[2]) {
+                            element.setAttribute(attr, tone.highlight);
+                        }
                     } else if (color === eyeColors.main) {
                         element.setAttribute(attr, tone.main);
                     } else if (color === eyeColors.shadow) {
@@ -215,10 +222,12 @@ class AvatarManager {
                     }
                 }
             });
+
             let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
-                    style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
+                    style = style.replace(new RegExp(defaultColor, 'gi'), 
+                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
                 });
                 style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
                 style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
@@ -231,8 +240,10 @@ class AvatarManager {
                 }
                 element.setAttribute('style', style);
             }
+
             Array.from(element.children).forEach(replaceColor);
         };
+
         replaceColor(svgDoc.documentElement);
     }
 
