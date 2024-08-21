@@ -2,32 +2,40 @@
 
 class SkinToneManager {
     constructor() {
-       this.skinTones = {
-    light: {
-        name: 'Light',
-        main: '#FEE2CA',
-        shadow: '#EFC1B7',
-        highlight: '#B37E78'  
-    },
-    medium: {
-        name: 'Medium',
-        main: '#FFE0BD',
-        shadow: '#EFD0B1',
-        highlight: '#C4A28A'  // New darker highlight tone
-    },
-    tan: {
-        name: 'Tan',
-        main: '#F1C27D',
-        shadow: '#E0B170',
-        highlight: '#B39059'  // New darker highlight tone
-    },
-    dark: {
-        name: 'Dark',
-        main: '#8D5524',
-        shadow: '#7C4A1E',
-        highlight: '#5E3919'  // New darker highlight tone
-    }
-};
+        this.skinTones = {
+            light: {
+                name: 'Light',
+                main: '#FEE2CA',
+                shadow: '#EFC1B7',
+                highlight: '#B37E78',
+                mouthLight: '#FFF4F2',
+                mouthDark: '#FFD1CC'
+            },
+            medium: {
+                name: 'Medium',
+                main: '#FFE0BD',
+                shadow: '#EFD0B1',
+                highlight: '#C4A28A',
+                mouthLight: '#FFE0D4',
+                mouthDark: '#FFBDB0'
+            },
+            tan: {
+                name: 'Tan',
+                main: '#F1C27D',
+                shadow: '#E0B170',
+                highlight: '#B39059',
+                mouthLight: '#FFCEB5',
+                mouthDark: '#FFAA8D'
+            },
+            dark: {
+                name: 'Dark',
+                main: '#8D5524',
+                shadow: '#7C4A1E',
+                highlight: '#5E3919',
+                mouthLight: '#A66A5E',
+                mouthDark: '#8C4B3C'
+            }
+        };
         this.currentSkinTone = this.skinTones.light;
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
@@ -115,7 +123,7 @@ class SkinToneManager {
         }
     }
 
-    applySkinToneToSVG(img, tone, originalSrc, partName) {
+      applySkinToneToSVG(img, tone, originalSrc, partName) {
         fetch(originalSrc)
             .then(response => response.text())
             .then(svgText => {
@@ -132,6 +140,12 @@ class SkinToneManager {
                         const newColor = this.getNewColor(currentFill, mainColor, tone);
                         path.setAttribute('fill', newColor);
                     }
+                });
+
+                // Apply mouth tones
+                const mouthElements = svgDoc.querySelectorAll('path[fill="#FFF4F2"], path[fill="#FFD1CC"]');
+                mouthElements.forEach((element, index) => {
+                    element.setAttribute('fill', index % 2 === 0 ? tone.mouthLight : tone.mouthDark);
                 });
 
                 console.log(`Skin tone applied to ${partName}`);
