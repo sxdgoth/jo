@@ -17,32 +17,32 @@ class AvatarDisplay {
         this.hiddenEquippedItems = new Set();
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
-      this.skinTones = {
-    light: {
-        name: 'Light',
-        main: '#FEE2CA',
-        shadow: '#EFC1B7',
-        highlight: '#B37E78'  
-    },
-    medium: {
-        name: 'Medium',
-        main: '#FFE0BD',
-        shadow: '#EFD0B1',
-        highlight: '#C4A28A'  // New darker highlight tone
-    },
-    tan: {
-        name: 'Tan',
-        main: '#F1C27D',
-        shadow: '#E0B170',
-        highlight: '#B39059'  // New darker highlight tone
-    },
-    dark: {
-        name: 'Dark',
-        main: '#8D5524',
-        shadow: '#7C4A1E',
-        highlight: '#5E3919'  // New darker highlight tone
-    }
-};
+        this.skinTones = {
+            light: {
+                name: 'Light',
+                main: '#FEE2CA',
+                shadow: '#EFC1B7',
+                highlight: '#B37E78'  
+            },
+            medium: {
+                name: 'Medium',
+                main: '#FFE0BD',
+                shadow: '#EFD0B1',
+                highlight: '#C4A28A'  // New darker highlight tone
+            },
+            tan: {
+                name: 'Tan',
+                main: '#F1C27D',
+                shadow: '#E0B170',
+                highlight: '#B39059'  // New darker highlight tone
+            },
+            dark: {
+                name: 'Dark',
+                main: '#8D5524',
+                shadow: '#7C4A1E',
+                highlight: '#5E3919'  // New darker highlight tone
+            }
+        };
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
@@ -99,7 +99,6 @@ class AvatarDisplay {
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false },
             { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
-            
         ];
 
         bodyParts.forEach(part => {
@@ -146,7 +145,7 @@ class AvatarDisplay {
     }
 
     reorderLayers() {
-         const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
         order.forEach((type, index) => {
             if (this.layers[type]) {
                 this.layers[type].style.zIndex = index + 1;
@@ -158,6 +157,7 @@ class AvatarDisplay {
         const svgDoc = obj.contentDocument;
         if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
+    
         const tone = this.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -183,7 +183,13 @@ class AvatarDisplay {
                     
                     // Replace default skin colors
                     if (defaultColors.light.includes(color)) {
-                        element.setAttribute(attr, color === defaultColors.light[0] ? tone.main : tone.shadow);
+                        if (color === defaultColors.light[0]) {
+                            element.setAttribute(attr, tone.main);
+                        } else if (color === defaultColors.light[1]) {
+                            element.setAttribute(attr, tone.shadow);
+                        } else if (color === defaultColors.light[2]) {
+                            element.setAttribute(attr, tone.highlight);
+                        }
                     }
                     // Replace eye colors
                     else if (color === eyeColors.main) {
@@ -208,7 +214,8 @@ class AvatarDisplay {
             if (style) {
                 // Replace default skin colors
                 defaultColors.light.forEach((defaultColor, index) => {
-                    style = style.replace(new RegExp(defaultColor, 'gi'), index === 0 ? tone.main : tone.shadow);
+                    style = style.replace(new RegExp(defaultColor, 'gi'), 
+                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
                 });
                 // Replace eye colors
                 style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
@@ -234,7 +241,6 @@ class AvatarDisplay {
         replaceColor(svgDoc.documentElement);
         console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
     }
-
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         Object.values(this.layers).forEach(obj => {
@@ -286,7 +292,7 @@ class AvatarDisplay {
                 this.layers[type].onload = () => {
                     this.applySkinTone(this.layers[type], type);
                     if (type === 'Eyes') {
-                        // Apply skin tone and eye color again after a short delay to ensure all elements are loaded
+                           // Apply skin tone and eye color again after a short delay to ensure all elements are loaded
                         setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
                     }
                 };
@@ -297,8 +303,7 @@ class AvatarDisplay {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
-
-    toggleEquippedItem(type) {
+     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -312,7 +317,7 @@ class AvatarDisplay {
                     };
                 }
             } else {
-                this.layers[type].style.display = 'none';
+                   this.layers[type].style.display = 'none';
                 this.lastAction[type] = 'hidden';
                 this.hiddenEquippedItems.add(type);
             }
@@ -328,7 +333,7 @@ class AvatarDisplay {
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
-    resetTriedOnItems() {
+      resetTriedOnItems() {
         this.currentItems = {};
         Object.keys(this.layers).forEach(type => {
             this.updateAvatarDisplay(type, null);
