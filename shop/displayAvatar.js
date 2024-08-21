@@ -195,8 +195,8 @@ class AvatarDisplay {
                     } else if (color === '#3FA2FF') {
                         element.setAttribute(attr, this.eyeColor);
                     } else if (color === '#E6998F') {
-                        const mouthColor = window.avatarManager ? window.avatarManager.mouthColor : '#E6998F';
-                        element.setAttribute(attr, mouthColor);
+                        const lipColor = window.avatarManager ? window.avatarManager.lipColor : '#E6998F';
+                        element.setAttribute(attr, lipColor);
                     }
                 }
             });
@@ -217,8 +217,8 @@ class AvatarDisplay {
                     style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
                 }
                 style = style.replace(/#3FA2FF/gi, this.eyeColor);
-                const mouthColor = window.avatarManager ? window.avatarManager.mouthColor : '#E6998F';
-                style = style.replace(/#E6998F/gi, mouthColor);
+                const lipColor = window.avatarManager ? window.avatarManager.lipColor : '#E6998F';
+                style = style.replace(/#E6998F/gi, lipColor);
                 element.setAttribute('style', style);
             }
 
