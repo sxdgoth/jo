@@ -171,7 +171,7 @@ class AvatarDisplay {
         };
         
         // Colors to preserve (including the scar color)
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+        const preserveColors = ['#E6958A', '#BF766E']; // Add more colors here if needed
         
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
