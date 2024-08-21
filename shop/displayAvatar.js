@@ -181,11 +181,11 @@ class AvatarDisplay {
             if (color) {
                 color = color.toUpperCase();
                 
-                // Skip preserved colors
-                if (preserveColors.includes(color)) return;
+                // Always preserve mouth colors, regardless of the element type
+                if (mouthColors.includes(color)) return;
                 
-                // Preserve mouth colors for mouth elements
-                if (type === 'Mouth' && mouthColors.includes(color)) return;
+                // Skip other preserved colors
+                if (preserveColors.includes(color)) return;
 
                 // Replace default skin colors
                 if (defaultColors.light.includes(color)) {
@@ -205,7 +205,7 @@ class AvatarDisplay {
                     element.setAttribute(attr, tone.shadow);
                 }
                 // Replace other potential skin tone colors
-                else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
+                else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color) && !mouthColors.includes(color)) {
                     element.setAttribute(attr, tone.main);
                 }
                 // Apply eye color
@@ -218,6 +218,11 @@ class AvatarDisplay {
         // Replace colors in style attribute
         let style = element.getAttribute('style');
         if (style) {
+            // Preserve mouth colors
+            mouthColors.forEach(color => {
+                style = style.replace(new RegExp(color, 'gi'), color);
+            });
+
             // Replace default skin colors
             defaultColors.light.forEach((defaultColor, index) => {
                 style = style.replace(new RegExp(defaultColor, 'gi'), 
@@ -230,14 +235,8 @@ class AvatarDisplay {
             preserveColors.forEach(color => {
                 style = style.replace(new RegExp(color, 'gi'), color);
             });
-            // Preserve mouth colors for mouth elements
-            if (type === 'Mouth') {
-                mouthColors.forEach(color => {
-                    style = style.replace(new RegExp(color, 'gi'), color);
-                });
-            }
             // Replace other potential skin tone colors
-            if (!preserveColors.includes(style) && (type !== 'Mouth' || !mouthColors.some(color => style.includes(color)))) {
+            if (!preserveColors.some(color => style.includes(color)) && !mouthColors.some(color => style.includes(color))) {
                 style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
                 style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
             }
@@ -253,7 +252,6 @@ class AvatarDisplay {
     replaceColor(svgDoc.documentElement);
     console.log(`Applied skin tone ${this.skinTone} and eye color ${this.eyeColor} to ${type}`);
 }
-
     
     changeSkinTone(newTone) {
         this.skinTone = newTone;
