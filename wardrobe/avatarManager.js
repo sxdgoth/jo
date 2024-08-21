@@ -1,3 +1,16 @@
+function createLipPalette(baseColor) {
+    const rgb = parseInt(baseColor.slice(1), 16);
+    const r = (rgb >> 16) & 255;
+    const g = (rgb >> 8) & 255;
+    const b = rgb & 255;
+    
+    return [
+        `#${baseColor.slice(1)}`, // Main color
+        `#${Math.max(0, r - 40).toString(16).padStart(2, '0')}${Math.max(0, g - 40).toString(16).padStart(2, '0')}${Math.max(0, b - 40).toString(16).padStart(2, '0')}`, // Darker shade
+        `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
+    ];
+}
+
 class AvatarManager {
     constructor(username) {
         this.username = username;
@@ -190,6 +203,8 @@ class AvatarManager {
         if (lipColorPicker) {
             lipColorPicker.value = newColor;
         }
+        const lipPalette = createLipPalette(newColor);
+        console.log(`New lip color palette: ${lipPalette.join(', ')}`);
         requestAnimationFrame(() => {
             this.updateTempAvatarDisplay();
         });
@@ -292,10 +307,29 @@ class AvatarManager {
     }
 
     applyLipColorToSVG(svgDoc) {
+        const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
+        const lipPalette = createLipPalette(this.lipColor);
+
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
-            element.setAttribute('fill', this.lipColor);
+            const currentColor = element.getAttribute('fill').toUpperCase();
+            const index = originalLipColors.indexOf(currentColor);
+            if (index !== -1) {
+                element.setAttribute('fill', lipPalette[index]);
+            }
         });
+
+        // Also update lip colors in style attributes
+        const allElements = svgDoc.getElementsByTagName('*');
+        for (let element of allElements) {
+            let style = element.getAttribute('style');
+            if (style) {
+                originalLipColors.forEach((color, index) => {
+                    style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
+                });
+                element.setAttribute('style', style);
+            }
+        }
     }
 }
 
