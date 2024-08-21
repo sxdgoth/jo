@@ -194,7 +194,7 @@ class AvatarDisplay {
                         element.setAttribute(attr, tone.main);
                     } else if (color === '#3FA2FF') {
                         element.setAttribute(attr, this.eyeColor);
-                    } else if (color === '#E6998F') {
+                    } else if (color === '#E6998F' || color === '#BF766E' || color === '#F2ADA5') {
                         const lipColor = window.avatarManager ? window.avatarManager.lipColor : '#E6998F';
                         element.setAttribute(attr, lipColor);
                     }
@@ -219,6 +219,8 @@ class AvatarDisplay {
                 style = style.replace(/#3FA2FF/gi, this.eyeColor);
                 const lipColor = window.avatarManager ? window.avatarManager.lipColor : '#E6998F';
                 style = style.replace(/#E6998F/gi, lipColor);
+                style = style.replace(/#BF766E/gi, lipColor);
+                style = style.replace(/#F2ADA5/gi, lipColor);
                 element.setAttribute('style', style);
             }
 
@@ -226,7 +228,7 @@ class AvatarDisplay {
         };
 
         replaceColor(svgDoc.documentElement);
-        console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and mouth color to ${type}`);
+        console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color to ${type}`);
     }
 
     changeSkinTone(newTone) {
@@ -245,6 +247,12 @@ class AvatarDisplay {
             this.applySkinTone(this.layers['Eyes'], 'Eyes');
         }
         localStorage.setItem(`eyeColor_${this.username}`, newColor);
+    }
+
+    updateLipColor() {
+        if (this.layers['Mouth'] && this.layers['Mouth'].contentDocument) {
+            this.applySkinTone(this.layers['Mouth'], 'Mouth');
+        }
     }
 
     tryOnItem(item) {
@@ -313,8 +321,7 @@ class AvatarDisplay {
     isItemEquipped(item) {
         return this.equippedItems[item.type] === item.id;
     }
-
-    updateEquippedItems() {
+       updateEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
@@ -334,7 +341,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
-        window.avatarManager = window.avatarDisplay; // For compatibility with existing code
+        
+        // For compatibility with existing code
+        window.avatarManager = window.avatarDisplay;
+
+        // Add listener for lip color changes
+        if (window.avatarManager) {
+            Object.defineProperty(window.avatarManager, 'lipColor', {
+                set: function(newValue) {
+                    this._lipColor = newValue;
+                    if (window.avatarDisplay) {
+                        window.avatarDisplay.updateLipColor();
+                    }
+                },
+                get: function() {
+                    return this._lipColor;
+                }
+            });
+        }
     } else {
         console.error('No logged in user found');
     }
