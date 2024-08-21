@@ -17,28 +17,32 @@ class AvatarDisplay {
         this.hiddenEquippedItems = new Set();
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
-        this.skinTones = {
-            light: {
-                name: 'Light',
-                main: '#FEE2CA',
-                shadow: '#EFC1B7'
-            },
-            medium: {
-                name: 'Medium',
-                main: '#FFE0BD',
-                shadow: '#EFD0B1'
-            },
-            tan: {
-                name: 'Tan',
-                main: '#F1C27D',
-                shadow: '#E0B170'
-            },
-            dark: {
-                name: 'Dark',
-                main: '#8D5524',
-                shadow: '#7C4A1E'
-            }
-        };
+      this.skinTones = {
+    light: {
+        name: 'Light',
+        main: '#FEE2CA',
+        shadow: '#EFC1B7',
+        highlight: '#B37E78'  
+    },
+    medium: {
+        name: 'Medium',
+        main: '#FFE0BD',
+        shadow: '#EFD0B1',
+        highlight: '#C4A28A'  // New darker highlight tone
+    },
+    tan: {
+        name: 'Tan',
+        main: '#F1C27D',
+        shadow: '#E0B170',
+        highlight: '#B39059'  // New darker highlight tone
+    },
+    dark: {
+        name: 'Dark',
+        main: '#8D5524',
+        shadow: '#7C4A1E',
+        highlight: '#5E3919'  // New darker highlight tone
+    }
+};
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
