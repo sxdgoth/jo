@@ -17,7 +17,8 @@ class AvatarBody {
     { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
     { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
     { name: 'Nose', file: '', type: 'Nose', isBase: false },
-    { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false }
+    { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false },
+    { name: 'Hair', file: '', type: 'Hair', isBase: false }
 ];
         this.layers = {};
     }
