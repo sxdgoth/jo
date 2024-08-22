@@ -78,8 +78,14 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            this.tempEquippedItems = {...this.equippedItems};
+            // Filter out any null or undefined values
+            this.equippedItems = Object.fromEntries(
+                Object.entries(this.equippedItems).filter(([_, value]) => value != null)
+            );
+        } else {
+            this.equippedItems = {};
         }
+        this.syncTempEquippedItems();
 
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
@@ -97,22 +103,25 @@ class AvatarManager {
         }
     }
 
+    syncTempEquippedItems() {
+        this.tempEquippedItems = {...this.equippedItems};
+    }
+
     applyAvatar() {
         // Only keep items that are currently selected in tempEquippedItems
         this.equippedItems = {...this.tempEquippedItems};
         
         // Remove any null or undefined values
-        Object.keys(this.equippedItems).forEach(key => {
-            if (this.equippedItems[key] == null) {
-                delete this.equippedItems[key];
-            }
-        });
+        this.equippedItems = Object.fromEntries(
+            Object.entries(this.equippedItems).filter(([_, value]) => value != null)
+        );
 
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         
+        this.syncTempEquippedItems();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         alert('Avatar saved successfully!');
@@ -335,7 +344,7 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
+        
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -360,3 +369,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
+        
