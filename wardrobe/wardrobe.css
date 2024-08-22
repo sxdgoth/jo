@@ -268,3 +268,17 @@ main {
     border-radius: 50%;
     border: 2px solid #ddd;
 }
+
+
+
+
+
+.wardrobe-item.highlighted {
+    border: 2px solid #4CAF50; /* Green border */
+    box-shadow: 0 0 5px #4CAF50; /* Green glow */
+}
+
+
+
+
+
