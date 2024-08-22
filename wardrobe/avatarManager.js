@@ -126,30 +126,32 @@ class AvatarManager {
         }
     }
 
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-        }
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
+   toggleItem(item) {
+    if (this.tempEquippedItems[item.type] === item.id) {
+        delete this.tempEquippedItems[item.type];
+    } else {
+        this.tempEquippedItems[item.type] = item.id;
     }
+    this.updateItemVisuals();
+    this.updateTempAvatarDisplay();
+}
 
    updateItemVisuals() {
-    document.querySelectorAll('.item-image').forEach(itemImage => {
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
         const itemId = itemImage.dataset.id;
         const item = window.userInventory.getItems().find(i => i.id === itemId);
         if (item) {
-            if (this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('temp-equipped');
-            } else {
-                itemImage.classList.remove('temp-equipped');
-            }
             if (this.equippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
+                itemContainer.classList.add('equipped');
             } else {
-                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('equipped');
+            }
+            
+            if (this.tempEquippedItems[item.type] === item.id) {
+                itemContainer.classList.add('temp-equipped');
+            } else {
+                itemContainer.classList.remove('temp-equipped');
             }
         }
     });
