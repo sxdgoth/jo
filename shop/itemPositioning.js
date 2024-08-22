@@ -10,11 +10,26 @@ const itemPositions = {
         scale: 1.5
     },
     shirt: {
+        translateX: '0px',
+        translateY: '0px',
+        scale: 2.5
+    },
+    pants: {
         translateX: '10px',
         translateY: '0px',
         scale: 2.0
     },
-    pants: {
+      jacket: {
+        translateX: '10px',
+        translateY: '0px',
+        scale: 2.0
+    },
+      eyebrows: {
+        translateX: '10px',
+        translateY: '0px',
+        scale: 2.0
+    },
+      mouth: {
         translateX: '10px',
         translateY: '0px',
         scale: 2.0
