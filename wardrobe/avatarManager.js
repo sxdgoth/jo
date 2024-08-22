@@ -92,8 +92,10 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
+        // Call updateItemVisuals after loading equipped items
+        this.updateItemVisuals();
     }
-
+    
     applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
@@ -137,7 +139,7 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-    updateItemVisuals() {
+   updateItemVisuals() {
         document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
             const itemImage = itemContainer.querySelector('.item-image');
             const itemId = itemImage.dataset.id;
