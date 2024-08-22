@@ -29,7 +29,7 @@ class AvatarManager {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
-        this.updateItemVisuals(); // Add this line
+        this.updateItemVisuals();
     }
 
     setupApplyAvatarButton() {
@@ -78,14 +78,7 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Only include items that are not null or undefined
-            this.equippedItems = Object.fromEntries(
-                Object.entries(this.equippedItems).filter(([_, value]) => value != null)
-            );
             this.tempEquippedItems = {...this.equippedItems};
-        } else {
-            this.equippedItems = {};
-            this.tempEquippedItems = {};
         }
 
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
@@ -105,11 +98,21 @@ class AvatarManager {
     }
 
     applyAvatar() {
+        // Only keep items that are currently selected in tempEquippedItems
         this.equippedItems = {...this.tempEquippedItems};
+        
+        // Remove any null or undefined values
+        Object.keys(this.equippedItems).forEach(key => {
+            if (this.equippedItems[key] == null) {
+                delete this.equippedItems[key];
+            }
+        });
+
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+        
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         alert('Avatar saved successfully!');
