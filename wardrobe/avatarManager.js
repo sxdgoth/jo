@@ -118,6 +118,7 @@ class AvatarManager {
         const itemId = itemImage.dataset.id;
         const item = window.userInventory.getItems().find(i => i.id === itemId);
         if (item) {
+            console.log('Updating item:', item.type, item.id); // Debug log
             if (this.tempEquippedItems[item.type] === item.id) {
                 itemImage.classList.add('equipped');
                 itemContainer.classList.add('highlighted');
@@ -125,8 +126,12 @@ class AvatarManager {
                 itemImage.classList.remove('equipped');
                 itemContainer.classList.remove('highlighted');
             }
-            // Use the applyItemPosition function from itemPositioning.js
-            applyItemPosition(itemImage, item.type);
+            // Check if applyItemPosition function exists
+            if (typeof applyItemPosition === 'function') {
+                applyItemPosition(itemImage, item.type);
+            } else {
+                console.error('applyItemPosition function not found');
+            }
         }
     });
 }
