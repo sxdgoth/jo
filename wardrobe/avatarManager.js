@@ -78,8 +78,14 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            this.tempEquippedItems = {...this.equippedItems};
+            // Filter out any null, undefined, or false values
+            this.equippedItems = Object.fromEntries(
+                Object.entries(this.equippedItems).filter(([_, value]) => value)
+            );
+        } else {
+            this.equippedItems = {};
         }
+        this.tempEquippedItems = {...this.equippedItems};
 
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
@@ -98,21 +104,29 @@ class AvatarManager {
     }
 
     applyAvatar() {
-        this.equippedItems = {...this.tempEquippedItems};
+        // Clear all equipped items
+        this.equippedItems = {};
         
-        Object.keys(this.equippedItems).forEach(key => {
-            if (this.equippedItems[key] == null) {
-                delete this.equippedItems[key];
+        // Only keep items that are currently selected in tempEquippedItems
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                this.equippedItems[type] = itemId;
             }
         });
 
+        // Save to localStorage
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         
+        // Update the avatar display to reflect the changes
         this.updateAvatarDisplay();
         this.updateItemVisuals();
+        
+        // Reset tempEquippedItems to match equippedItems
+        this.tempEquippedItems = {...this.equippedItems};
+        
         alert('Avatar saved successfully!');
     }
 
@@ -142,8 +156,10 @@ class AvatarManager {
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
+            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
+            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
@@ -189,7 +205,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50);
+        }, 50); // 50ms debounce time
     }
 
     changeEyeColor(newColor) {
@@ -209,7 +225,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50);
+        }, 50); // 50ms debounce time
     }
 
     changeLipColor(newColor) {
@@ -266,7 +282,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -333,9 +349,10 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
+        
+        // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
-        for (let element of allElements) {
+          for (let element of allElements) {
             let style = element.getAttribute('style');
             if (style) {
                 originalLipColors.forEach((color, index) => {
@@ -347,15 +364,14 @@ class AvatarManager {
     }
 }
 
+// Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
         window.avatarManager = new AvatarManager(loggedInUser.username);
-          window.avatarManager.initialize();
+        window.avatarManager.initialize();
     } else {
         console.error('No logged in user found');
     }
 });
-
-
-
+        
