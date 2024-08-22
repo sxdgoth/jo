@@ -11,7 +11,7 @@ const itemPositions = {
     },
     shirt: {
         translateX: '10px',
-        translateY: '25px',
+        translateY: '0px',
         scale: 2.0
     },
     pants: {
