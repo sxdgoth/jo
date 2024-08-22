@@ -199,7 +199,12 @@ class AvatarManager {
 
     changeHairColor(colors) {
     console.log('Changing hair color:', colors);
-    const hairLayers = document.querySelectorAll('[id^="hair"]');
+    const avatar = document.querySelector('#avatar-display svg');
+    if (!avatar) {
+        console.error('Avatar SVG not found');
+        return;
+    }
+    const hairLayers = avatar.querySelectorAll('[id^="hair"]');
     console.log('Found hair layers:', hairLayers.length);
     hairLayers.forEach((layer, index) => {
         if (colors[index]) {
@@ -208,7 +213,7 @@ class AvatarManager {
         }
     });
     this.hairColors = colors;
-    this.updateTempAvatarDisplay();
+    this.saveHairColor(colors);
 }
 
     saveHairColor(colors) {
