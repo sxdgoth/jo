@@ -137,25 +137,25 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-    updateItemVisuals() {
-        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-            const itemImage = itemContainer.querySelector('img');
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                if (this.tempEquippedItems[item.type] === item.id) {
-                    itemContainer.classList.add('temp-equipped');
-                } else {
-                    itemContainer.classList.remove('temp-equipped');
-                }
-                if (this.equippedItems[item.type] === item.id) {
-                    itemContainer.classList.add('equipped');
-                } else {
-                    itemContainer.classList.remove('equipped');
-                }
+   updateItemVisuals() {
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('img');
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item) {
+            if (this.tempEquippedItems[item.type] === item.id) {
+                itemContainer.classList.add('temp-equipped');
+            } else {
+                itemContainer.classList.remove('temp-equipped');
             }
-        });
-    }
+            if (this.equippedItems[item.type] === item.id) {
+                itemContainer.classList.add('equipped');
+            } else {
+                itemContainer.classList.remove('equipped');
+            }
+        }
+    });
+}
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
