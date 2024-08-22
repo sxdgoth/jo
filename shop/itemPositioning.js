@@ -1,8 +1,8 @@
 const itemPositions = {
     eyes: {
-        translateX: '-10px',
-        translateY: '80px',
-        scale: 4.0
+        translateX: '-20px',
+        translateY: '100px',
+        scale: 5.0
     },
     face: {
         translateX: '0px',
