@@ -111,17 +111,20 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-    updateItemVisuals() {
-        document.querySelectorAll('.item-image').forEach(itemImage => {
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
-            } else {
-                itemImage.classList.remove('equipped');
-            }
-        });
-    }
+   updateItemVisuals() {
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item && this.tempEquippedItems[item.type] === item.id) {
+            itemImage.classList.add('equipped');
+            itemContainer.classList.add('highlighted');
+        } else {
+            itemImage.classList.remove('equipped');
+            itemContainer.classList.remove('highlighted');
+        }
+    });
+}
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
