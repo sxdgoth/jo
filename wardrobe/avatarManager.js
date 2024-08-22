@@ -93,16 +93,20 @@ class AvatarManager {
         }
     }
 
-    applyAvatar() {
-        this.equippedItems = {...this.tempEquippedItems};
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-        this.updateAvatarDisplay();
-        alert('Avatar saved successfully!');
-    }
-
+   applyAvatar() {
+    this.equippedItems = {...this.tempEquippedItems};
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+    localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+    localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+    localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+    
+    // Update tempEquippedItems to match equippedItems
+    this.tempEquippedItems = {...this.equippedItems};
+    
+    this.updateAvatarDisplay();
+    this.updateItemVisuals(); // Update the visual state of items
+    alert('Avatar saved successfully!');
+}
     clearAvatar() {
         this.tempEquippedItems = {};
         this.updateItemVisuals();
@@ -147,21 +151,23 @@ class AvatarManager {
         });
     }
 
-    updateTempAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    }
+   updateTempAvatarDisplay() {
+    if (window.avatarBody) {
+        window.avatarBody.clearAllLayers();
+        
+        this.applySkinTone();
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 }
-            });
-        }
+            }
+        });
+        
+        this.updateItemVisuals(); // Update the visual state of items
     }
+}
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
