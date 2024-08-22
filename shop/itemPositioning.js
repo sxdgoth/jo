@@ -36,7 +36,7 @@ const itemPositions = {
     },
        cheeks: {
         translateX: '-20px',
-        translateY: '100px',
+        translateY: '150px',
         scale: 5.0
     },
     // Add more item types as needed
