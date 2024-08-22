@@ -1,16 +1,3 @@
-function createLipPalette(baseColor) {
-    const rgb = parseInt(baseColor.slice(1), 16);
-    const r = (rgb >> 16) & 255;
-    const g = (rgb >> 8) & 255;
-    const b = rgb & 255;
-    
-    return [
-        `#${baseColor.slice(1)}`, // Main color
-        `#${Math.max(0, r - 40).toString(16).padStart(2, '0')}${Math.max(0, g - 40).toString(16).padStart(2, '0')}${Math.max(0, b - 40).toString(16).padStart(2, '0')}`, // Darker shade
-        `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
-    ];
-}
-
 class AvatarManager {
     constructor(username) {
         this.username = username;
@@ -18,7 +5,6 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
-        this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
     }
@@ -27,7 +13,6 @@ class AvatarManager {
         this.setupApplyAvatarButton();
         this.setupClearAvatarButton();
         this.setupEyeColorPicker();
-        this.setupLipColorPicker();
         this.updateAvatarDisplay();
     }
 
@@ -61,18 +46,6 @@ class AvatarManager {
         }
     }
 
-    setupLipColorPicker() {
-        const lipColorPicker = document.getElementById('lip-color-input');
-        if (lipColorPicker) {
-            lipColorPicker.value = this.lipColor;
-            lipColorPicker.addEventListener('input', (event) => {
-                this.debounceChangeLipColor(event.target.value);
-            });
-        } else {
-            console.error('Lip color picker not found');
-        }
-    }
-
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
@@ -87,10 +60,6 @@ class AvatarManager {
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
         }
-        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
-        if (savedLipColor) {
-            this.lipColor = savedLipColor;
-        }
     }
 
     applyAvatar() {
@@ -98,7 +67,6 @@ class AvatarManager {
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -188,28 +156,6 @@ class AvatarManager {
         });
     }
 
-    debounceChangeLipColor(newColor) {
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-        }
-        this.debounceTimer = setTimeout(() => {
-            this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
-    }
-
-    changeLipColor(newColor) {
-        this.lipColor = newColor;
-        const lipColorPicker = document.getElementById('lip-color-input');
-        if (lipColorPicker) {
-            lipColorPicker.value = newColor;
-        }
-        const lipPalette = createLipPalette(newColor);
-        console.log(`New lip color palette: ${lipPalette.join(', ')}`);
-        requestAnimationFrame(() => {
-            this.updateTempAvatarDisplay();
-        });
-    }
-
     applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -251,7 +197,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+        const preserveColors = ['#FFF4F2', '#FFD1CC', '#E6998F']; // Lip colors
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -306,16 +252,39 @@ class AvatarManager {
         });
     }
 
-    applyLipColorToSVG(svgDoc) {
-        const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
-        const lipPalette = createLipPalette(this.lipColor);
+    generateLipColors() {
+        const tone = window.skinToneManager.skinTones[this.skinTone];
+        const mainColor = tone.main;
+        const rgb = parseInt(mainColor.slice(1), 16);
+        const r = (rgb >> 16) & 255;
+        const g = (rgb >> 8) & 255;
+        const b = rgb & 255;
+        
+        // Make the lips slightly redder and darker than the skin tone
+        const lipR = Math.max(0, Math.min(255, r - 10));
+        const lipG = Math.max(0, Math.min(255, g - 30));
+        const lipB = Math.max(0, Math.min(255, b - 30));
+        
+        return {
+            light: `#${Math.min(255, lipR + 20).toString(16).padStart(2, '0')}${Math.min(255, lipG + 20).toString(16).padStart(2, '0')}${Math.min(255, lipB + 20).toString(16).padStart(2, '0')}`,
+            main: `#${lipR.toString(16).padStart(2, '0')}${lipG.toString(16).padStart(2, '0')}${lipB.toString(16).padStart(2, '0')}`,
+            dark: `#${Math.max(0, lipR - 20).toString(16).padStart(2, '0')}${Math.max(0, lipG - 20).toString(16).padStart(2, '0')}${Math.max(0, lipB - 20).toString(16).padStart(2, '0')}`
+        };
+    }
 
-        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
+    applyLipColorToSVG(svgDoc) {
+        const originalLipColors = ['#FFF4F2', '#FFD1CC', '#E6998F'];
+        const lipColors = this.generateLipColors();
+
+        const lipElements = svgDoc.querySelectorAll('path[fill="#FFF4F2"], path[fill="#FFD1CC"], path[fill="#E6998F"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
-            const index = originalLipColors.indexOf(currentColor);
-            if (index !== -1) {
-                element.setAttribute('fill', lipPalette[index]);
+            if (currentColor === '#FFF4F2') {
+                element.setAttribute('fill', lipColors.light);
+            } else if (currentColor === '#FFD1CC') {
+                element.setAttribute('fill', lipColors.main);
+            } else if (currentColor === '#E6998F') {
+                element.setAttribute('fill', lipColors.dark);
             }
         });
 
@@ -324,9 +293,9 @@ class AvatarManager {
         for (let element of allElements) {
             let style = element.getAttribute('style');
             if (style) {
-                originalLipColors.forEach((color, index) => {
-                    style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
-                });
+                style = style.replace(/#FFF4F2/gi, lipColors.light);
+                style = style.replace(/#FFD1CC/gi, lipColors.main);
+                style = style.replace(/#E6998F/gi, lipColors.dark);
                 element.setAttribute('style', style);
             }
         }
