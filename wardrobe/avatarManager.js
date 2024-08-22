@@ -78,14 +78,14 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null or undefined values
+            // Filter out any null, undefined, or false values
             this.equippedItems = Object.fromEntries(
-                Object.entries(this.equippedItems).filter(([_, value]) => value != null)
+                Object.entries(this.equippedItems).filter(([_, value]) => value)
             );
         } else {
             this.equippedItems = {};
         }
-        this.syncTempEquippedItems();
+        this.tempEquippedItems = {...this.equippedItems};
 
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
@@ -103,25 +103,20 @@ class AvatarManager {
         }
     }
 
-    syncTempEquippedItems() {
-        this.tempEquippedItems = {...this.equippedItems};
-    }
-
     applyAvatar() {
         // Only keep items that are currently selected in tempEquippedItems
-        this.equippedItems = {...this.tempEquippedItems};
-        
-        // Remove any null or undefined values
-        this.equippedItems = Object.fromEntries(
-            Object.entries(this.equippedItems).filter(([_, value]) => value != null)
-        );
+        this.equippedItems = {};
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                this.equippedItems[type] = itemId;
+            }
+        });
 
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         
-        this.syncTempEquippedItems();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         alert('Avatar saved successfully!');
@@ -344,7 +339,7 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-        
+
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -357,16 +352,3 @@ class AvatarManager {
             }
         }
     }
-}
-
-// Initialize the AvatarManager when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
-    } else {
-        console.error('No logged in user found');
-    }
-});
-        
