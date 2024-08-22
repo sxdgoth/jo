@@ -101,6 +101,7 @@ class AvatarManager {
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         this.updateAvatarDisplay();
+        this.updateItemVisuals();
         alert('Avatar saved successfully!');
     }
 
@@ -126,36 +127,30 @@ class AvatarManager {
         }
     }
 
-   toggleItem(item) {
-    if (this.tempEquippedItems[item.type] === item.id) {
-        delete this.tempEquippedItems[item.type];
-    } else {
-        this.tempEquippedItems[item.type] = item.id;
-    }
-    this.updateItemVisuals();
-    this.updateTempAvatarDisplay();
-}
-
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item) {
-            if (this.equippedItems[item.type] === item.id) {
-                itemContainer.classList.add('equipped');
-            } else {
-                itemContainer.classList.remove('equipped');
-            }
-            
-            if (this.tempEquippedItems[item.type] === item.id) {
-                itemContainer.classList.add('temp-equipped');
-            } else {
-                itemContainer.classList.remove('temp-equipped');
-            }
+    toggleItem(item) {
+        if (this.tempEquippedItems[item.type] === item.id) {
+            delete this.tempEquippedItems[item.type];
+        } else {
+            this.tempEquippedItems[item.type] = item.id;
         }
-    });
-}
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
+    }
+
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item) {
+                if (this.equippedItems[item.type] === item.id || this.tempEquippedItems[item.type] === item.id) {
+                    itemContainer.classList.add('highlighted');
+                } else {
+                    itemContainer.classList.remove('highlighted');
+                }
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -219,8 +214,7 @@ class AvatarManager {
             this.updateTempAvatarDisplay();
         });
     }
-
-    applySkinTone() {
+        applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
             window.skinToneManager.applySkinTone(tone);
@@ -328,8 +322,7 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
-        // Also update lip colors in style attributes
+       // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
