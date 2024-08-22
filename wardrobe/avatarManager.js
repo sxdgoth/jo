@@ -19,6 +19,7 @@ class AvatarManager {
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
         this.lipColor = '#E6998F'; // Default lip color
+        this.hairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#1E1E1E', '#787878']; // Default hair colors
         this.debounceTimer = null;
         this.loadEquippedItems();
     }
@@ -28,7 +29,8 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
+        this.loadAndApplyHighlights();
+        this.applyHairColor();
     }
 
     setupEyeColorPicker() {
@@ -82,6 +84,11 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
+
+        const savedHairColors = localStorage.getItem(`hairColors_${this.username}`);
+        if (savedHairColors) {
+            this.hairColors = JSON.parse(savedHairColors);
+        }
     }
 
     updateAvatarDisplay() {
@@ -112,20 +119,20 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+                itemContainer.classList.add('highlighted');
+            } else {
+                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('highlighted');
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -190,6 +197,22 @@ class AvatarManager {
         });
     }
 
+    changeHairColor(colors) {
+        const hairLayers = document.querySelectorAll('[id^="hair"]');
+        hairLayers.forEach((layer, index) => {
+            if (colors[index]) {
+                layer.style.fill = colors[index];
+            }
+        });
+        this.hairColors = colors;
+        this.updateTempAvatarDisplay();
+    }
+
+    saveHairColor(colors) {
+        this.hairColors = colors;
+        localStorage.setItem(`hairColors_${this.username}`, JSON.stringify(colors));
+    }
+
     applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -197,7 +220,11 @@ class AvatarManager {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
+    applyHairColor() {
+        this.changeHairColor(this.hairColors);
+    }
+
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -219,7 +246,7 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-     applySkinToneToSVG(svgDoc) {
+    applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -279,32 +306,27 @@ class AvatarManager {
         replaceColor(svgDoc.documentElement);
     }
 
-    applyEyeColorToSVG(svgDoc) {
+ applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
         });
     }
 
-
-
-loadAndApplyHighlights() {
-    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        if (highlightedItems.includes(itemId)) {
-            itemContainer.classList.add('highlighted');
-        }
-    });
-}
-
-
+    loadAndApplyHighlights() {
+        const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            if (highlightedItems.includes(itemId)) {
+                itemContainer.classList.add('highlighted');
+            }
+        });
+    }
     
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
-
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -313,7 +335,6 @@ loadAndApplyHighlights() {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -338,3 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
+
+
+
