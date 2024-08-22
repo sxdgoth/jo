@@ -27,5 +27,7 @@ function applyItemPosition(itemElement, itemType) {
     const position = itemPositions[itemType] || itemPositions.default;
     itemElement.style.objectPosition = position.objectPosition;
     itemElement.style.transform = position.transform;
-    console.log(`Applied position to ${itemType}:`, position.objectPosition, position.transform);
+    console.log(`Applied position to ${itemType}:`, 
+                `objectPosition: ${itemElement.style.objectPosition}`, 
+                `transform: ${itemElement.style.transform}`);
 }
