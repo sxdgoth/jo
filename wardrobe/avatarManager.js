@@ -29,6 +29,7 @@ class AvatarManager {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
+        this.updateItemVisuals();
     }
 
     setupApplyAvatarButton() {
@@ -100,6 +101,7 @@ class AvatarManager {
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         this.updateAvatarDisplay();
+        this.updateItemVisuals();
         alert('Avatar saved successfully!');
     }
 
@@ -139,10 +141,17 @@ class AvatarManager {
         document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
-            } else {
-                itemImage.classList.remove('equipped');
+            if (item) {
+                if (this.tempEquippedItems[item.type] === item.id) {
+                    itemImage.classList.add('temp-equipped');
+                } else {
+                    itemImage.classList.remove('temp-equipped');
+                }
+                if (this.equippedItems[item.type] === item.id) {
+                    itemImage.classList.add('equipped');
+                } else {
+                    itemImage.classList.remove('equipped');
+                }
             }
         });
     }
@@ -252,7 +261,6 @@ class AvatarManager {
             shadow: '#E6BBA8'
         };
         const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
-
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -309,7 +317,6 @@ class AvatarManager {
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
-
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -318,7 +325,6 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -339,6 +345,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loggedInUser) {
         window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
+
+        // Add event listeners for item selection
+        document.querySelectorAll('.item-image').forEach(itemImage => {
+            itemImage.addEventListener('click', () => {
+                const itemId = itemImage.dataset.id;
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    window.avatarManager.toggleItem(item);
+                }
+            });
+        });
     } else {
         console.error('No logged in user found');
     }
