@@ -19,8 +19,8 @@ function applyAvatar() {
         localStorage.setItem(`lipColor_${window.avatarManager.username}`, window.avatarManager.lipColor);
         
         // Save highlighted items
-        const highlightedItems = Object.values(window.avatarManager.equippedItems);
-        localStorage.setItem(`highlightedItems_${window.avatarManager.username}`, JSON.stringify(highlightedItems));
+        window.avatarManager.highlightedItems = Object.values(window.avatarManager.equippedItems);
+        localStorage.setItem(`highlightedItems_${window.avatarManager.username}`, JSON.stringify(window.avatarManager.highlightedItems));
 
         // Update the avatar display to reflect the changes
         window.avatarManager.updateAvatarDisplay();
@@ -39,11 +39,11 @@ function clearAvatar() {
     if (window.avatarManager) {
         window.avatarManager.tempEquippedItems = {};
         window.avatarManager.equippedItems = {};
+        window.avatarManager.highlightedItems = [];
         localStorage.setItem(`equippedItems_${window.avatarManager.username}`, JSON.stringify({}));
         localStorage.removeItem(`highlightedItems_${window.avatarManager.username}`);
         window.avatarManager.updateItemVisuals();
         window.avatarManager.updateTempAvatarDisplay();
-        document.querySelectorAll('.wardrobe-item').forEach(item => item.classList.remove('highlighted'));
     } else {
         console.error('Avatar manager not initialized');
     }
