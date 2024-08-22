@@ -21,7 +21,6 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
-        this.updateItemVisuals();
     }
 
     initialize() {
@@ -31,7 +30,6 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.setupItemClickListeners(); 
     }
 
     setupApplyAvatarButton() {
@@ -52,18 +50,6 @@ class AvatarManager {
         }
     }
 
-setupItemClickListeners() {
-    document.querySelectorAll('.item-image').forEach(itemImage => {
-        itemImage.addEventListener('click', () => {
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                this.toggleItem(item);
-            }
-        });
-    });
-}
-    
     setupEyeColorPicker() {
         const eyeColorPicker = document.getElementById('eye-color-input');
         if (eyeColorPicker) {
@@ -88,36 +74,35 @@ setupItemClickListeners() {
         }
     }
 
-   loadEquippedItems() {
-    const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-    if (savedItems) {
-        this.equippedItems = JSON.parse(savedItems);
-        this.tempEquippedItems = {...this.equippedItems};
-    }
-    const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-    if (savedSkinTone) {
-        this.skinTone = savedSkinTone;
-    }
-    const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
-    if (savedEyeColor) {
-        this.eyeColor = savedEyeColor;
-    }
-    const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
-    if (savedLipColor) {
-        this.lipColor = savedLipColor;
-    }
+    loadEquippedItems() {
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+            this.tempEquippedItems = {...this.equippedItems};
+        }
+        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+        if (savedSkinTone) {
+            this.skinTone = savedSkinTone;
+        }
+        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
+        if (savedEyeColor) {
+            this.eyeColor = savedEyeColor;
+        }
+        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
+        if (savedLipColor) {
+            this.lipColor = savedLipColor;
+        }
     }
 
-   applyAvatar() {
-    this.equippedItems = {...this.tempEquippedItems};
-    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-    localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-    localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-    localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-    this.updateAvatarDisplay();
-    this.updateItemVisuals(); // Add this line
-    alert('Avatar saved successfully!');
-}
+    applyAvatar() {
+        this.equippedItems = {...this.tempEquippedItems};
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+        this.updateAvatarDisplay();
+        alert('Avatar saved successfully!');
+    }
 
     clearAvatar() {
         this.tempEquippedItems = {};
@@ -141,30 +126,34 @@ setupItemClickListeners() {
         }
     }
 
- toggleItem(item) {
-    if (this.tempEquippedItems[item.type] === item.id) {
-        delete this.tempEquippedItems[item.type];
-    } else {
-        this.tempEquippedItems[item.type] = item.id;
+    toggleItem(item) {
+        if (this.tempEquippedItems[item.type] === item.id) {
+            delete this.tempEquippedItems[item.type];
+        } else {
+            this.tempEquippedItems[item.type] = item.id;
+        }
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
     }
-    this.updateItemVisuals();
-    this.updateTempAvatarDisplay();
-}
 
-  updateItemVisuals() {
+   updateItemVisuals() {
     document.querySelectorAll('.item-image').forEach(itemImage => {
         const itemId = itemImage.dataset.id;
         const item = window.userInventory.getItems().find(i => i.id === itemId);
         if (item) {
-            itemImage.classList.toggle('equipped', this.equippedItems[item.type] === item.id);
-            itemImage.classList.toggle('temp-equipped', this.tempEquippedItems[item.type] === item.id);
+            if (this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('temp-equipped');
+            } else {
+                itemImage.classList.remove('temp-equipped');
+            }
+            if (this.equippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+            } else {
+                itemImage.classList.remove('equipped');
+            }
         }
     });
 }
-
-
-
-
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -362,4 +351,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
-
