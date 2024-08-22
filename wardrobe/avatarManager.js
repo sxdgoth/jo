@@ -24,30 +24,10 @@ class AvatarManager {
     }
 
     initialize() {
-        this.setupApplyAvatarButton();
-        this.setupClearAvatarButton();
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-    }
-
-    setupApplyAvatarButton() {
-        const applyAvatarBtn = document.getElementById('apply-avatar-btn');
-        if (applyAvatarBtn) {
-            applyAvatarBtn.addEventListener('click', () => this.applyAvatar());
-        } else {
-            console.error('Apply Avatar button not found');
-        }
-    }
-
-    setupClearAvatarButton() {
-        const clearAvatarBtn = document.getElementById('clear-avatar-btn');
-        if (clearAvatarBtn) {
-            clearAvatarBtn.addEventListener('click', () => this.clearAvatar());
-        } else {
-            console.error('Clear Avatar button not found');
-        }
     }
 
     setupEyeColorPicker() {
@@ -101,41 +81,6 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
-    }
-
-    applyAvatar() {
-        // Clear all equipped items
-        this.equippedItems = {};
-        
-        // Only keep items that are currently selected in tempEquippedItems
-        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-            if (itemId) {
-                this.equippedItems[type] = itemId;
-            }
-        });
-
-        // Save to localStorage
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-        
-        // Update the avatar display to reflect the changes
-        this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        
-        // Reset tempEquippedItems to match equippedItems
-        this.tempEquippedItems = {...this.equippedItems};
-        
-        alert('Avatar saved successfully!');
-    }
-
-    clearAvatar() {
-        this.tempEquippedItems = {};
-        this.equippedItems = {};
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
     }
 
     updateAvatarDisplay() {
@@ -248,7 +193,7 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
+  updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
