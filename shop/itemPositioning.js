@@ -4,9 +4,9 @@ const itemPositions = {
         translateY: '150px',
         scale: 5.0
     },
-    face: {
+    accessories: {
         translateX: '-20px',
-        translateY: '250px',
+        translateY: '200px',
         scale: 3.5
     },
     shirt: {
