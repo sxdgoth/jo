@@ -40,6 +40,15 @@
             console.log('Total number of paths:', svg.getElementsByTagName('path').length);
         });
     </script>
+
+    <script>
+    const svg = document.getElementById('hair-svg');
+    const paths = svg.getElementsByTagName('path');
+    console.log('Path fill colors:');
+    for (let i = 0; i < paths.length; i++) {
+        console.log(`Path ${i}: ${paths[i].getAttribute('fill') || 'No fill attribute'}`);
+    }
+</script>
 </body>
 </html>
 
