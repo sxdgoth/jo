@@ -113,26 +113,16 @@ class AvatarManager {
     }
 
    updateItemVisuals() {
-    console.log('updateItemVisuals called');
     document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
         const itemImage = itemContainer.querySelector('.item-image');
         const itemId = itemImage.dataset.id;
         const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item) {
-            console.log('Processing item:', item);
-            if (this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
-                itemContainer.classList.add('highlighted');
-            } else {
-                itemImage.classList.remove('equipped');
-                itemContainer.classList.remove('highlighted');
-            }
-            if (typeof applyItemPosition === 'function') {
-                console.log('Calling applyItemPosition for:', item.type);
-                applyItemPosition(itemImage, item.type);
-            } else {
-                console.error('applyItemPosition function not found');
-            }
+        if (item && this.tempEquippedItems[item.type] === item.id) {
+            itemImage.classList.add('equipped');
+            itemContainer.classList.add('highlighted');
+        } else {
+            itemImage.classList.remove('equipped');
+            itemContainer.classList.remove('highlighted');
         }
     });
 }
