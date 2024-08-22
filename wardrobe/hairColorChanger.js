@@ -1,5 +1,3 @@
-// hairColorChanger.js
-
 class HairColorChanger {
     constructor() {
         this.colors = {
@@ -8,9 +6,8 @@ class HairColorChanger {
             darkGray: '#464646',
             gray: '#5A5A5A',
             lightGray: '#787878',
-            custom: '#1E1E1E'  // This will be updated when a custom color is chosen
+            custom: '#1E1E1E'
         };
-        this.hairTones = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#1E1E1E', '#787878'];
         this.setupColorButtons();
         this.setupCustomColorPicker();
     }
@@ -32,7 +29,7 @@ class HairColorChanger {
     }
 
     setupCustomColorPicker() {
-        const picker = document.getElementById('hair-color-picker');
+        const picker = document.getElementById('hair-color-input');
         if (!picker) {
             console.error("Hair color picker not found");
             return;
@@ -40,19 +37,18 @@ class HairColorChanger {
 
         picker.addEventListener('input', (event) => {
             const color = event.target.value;
-            this.colors.custom = color;
             this.changeHairColor(color);
         });
     }
 
-   changeHairColor(color) {
-    if (window.avatarManager) {
+    changeHairColor(color) {
         console.log('Changing to color:', color);
-        this.hairTones = this.hairTones.map(() => color);
-        window.avatarManager.changeHairColor(this.hairTones);
-        window.avatarManager.saveHairColor(this.hairTones);
-    } else {
-        console.error('AvatarManager not initialized');
+        if (window.avatarManager) {
+            const colors = Array(6).fill(color); // Create an array of 6 identical colors
+            window.avatarManager.changeHairColor(colors);
+        } else {
+            console.error('AvatarManager not initialized');
+        }
     }
 }
 
