@@ -22,10 +22,12 @@
         <input type="color" id="color-picker" value="#1E1E1E">
     </div>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const svg = document.getElementById('hair-svg');
             const colorPicker = document.getElementById('color-picker');
+            const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
             const originalColors = {};
 
             function hexToRgb(hex) {
@@ -74,12 +76,12 @@
                 const paths = svg.querySelectorAll('path');
                 paths.forEach((path, index) => {
                     const originalColor = originalColors[index];
-                    if (originalColor) {
+                    if (originalColor && defaultHairColors.includes(originalColor.toUpperCase())) {
                         const blendedColor = blendColors(originalColor, newColor, 0.7);
                         setPathColor(path, blendedColor);
                     }
                 });
-                console.log(`Color changed to ${newColor}. ${paths.length} paths updated.`);
+                console.log(`Color changed to ${newColor}. Affected paths updated.`);
             }
 
             // Store original colors
@@ -94,7 +96,7 @@
                 changeColor(e.target.value);
             });
 
-            // Debug: Log the number of paths found
+            // Debug: Log the number of paths found and their colors
             console.log('Total number of paths:', svg.querySelectorAll('path').length);
             console.log('Original colors:', originalColors);
         });
