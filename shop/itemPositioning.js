@@ -26,7 +26,7 @@ const itemPositions = {
     },
       eyebrows: {
         translateX: '-20px',
-        translateY: '200px',
+        translateY: '150px',
         scale: 5.0
     },
       mouth: {
