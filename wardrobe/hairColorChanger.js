@@ -47,6 +47,7 @@ class HairColorChanger {
 
    changeHairColor(color) {
     if (window.avatarManager) {
+        console.log('Changing to color:', color);
         this.hairTones = this.hairTones.map(() => color);
         window.avatarManager.changeHairColor(this.hairTones);
         window.avatarManager.saveHairColor(this.hairTones);
