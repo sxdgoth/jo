@@ -278,13 +278,11 @@ main {
 
 
 .wardrobe-item.equipped {
-    outline: 2px solid #4CAF50;
-    outline-offset: -2px;
+    outline: 2px solid #4CAF50; /* Green for equipped items */
 }
 
 .wardrobe-item.temp-equipped {
-    outline: 2px solid #3498db;
-    outline-offset: -2px;
+    outline: 2px solid #3498db; /* Blue for temporarily selected items */
 }
 
 .wardrobe-item.temp-equipped.equipped {
