@@ -172,10 +172,6 @@ main {
     opacity: 1;
 }
 
-.item-image.equipped {
-    box-shadow: 0 0 0 3px #4CAF50;
-}
-
 .wardrobe-item h3 {
     margin: 0.8rem 0 0.4rem;
     font-size: 1rem;
@@ -188,8 +184,9 @@ main {
     font-size: 0.9rem;
 }
 
-.item-image.pending {
-    box-shadow: 0 0 0 3px #ffc107;
+.wardrobe-item.highlighted {
+    outline: 2px solid #4CAF50;
+    outline-offset: -2px;
 }
 
 #skin-tone-buttons {
@@ -270,25 +267,4 @@ main {
 #eye-color-input::-moz-color-swatch {
     border-radius: 50%;
     border: 2px solid #ddd;
-}
-
-
-
-
-
-
-.wardrobe-item.equipped {
-    outline: 2px solid #4CAF50; /* Green for equipped items */
-}
-
-
-.wardrobe-item.temp-equipped.equipped {
-    outline: 2px solid #9b59b6;
-    outline-offset: -2px;
-}
-
-
-.wardrobe-item.highlighted {
-    outline: 2px solid #4CAF50;
-    outline-offset: -2px;
 }
