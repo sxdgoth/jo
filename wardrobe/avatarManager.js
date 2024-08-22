@@ -29,6 +29,7 @@ class AvatarManager {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
+        this.updateItemVisuals(); // Add this line
     }
 
     setupApplyAvatarButton() {
@@ -77,16 +78,26 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
+            // Only include items that are not null or undefined
+            this.equippedItems = Object.fromEntries(
+                Object.entries(this.equippedItems).filter(([_, value]) => value != null)
+            );
             this.tempEquippedItems = {...this.equippedItems};
+        } else {
+            this.equippedItems = {};
+            this.tempEquippedItems = {};
         }
+
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
+
         const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
         }
+
         const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
         if (savedLipColor) {
             this.lipColor = savedLipColor;
@@ -106,6 +117,8 @@ class AvatarManager {
 
     clearAvatar() {
         this.tempEquippedItems = {};
+        this.equippedItems = {};
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
@@ -239,7 +252,8 @@ class AvatarManager {
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
-  applySkinToneToSVG(svgDoc) {
+
+    applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
