@@ -304,3 +304,17 @@ main {
 
 
 
+
+
+.item-image.temp-equipped {
+    border: 2px solid blue;
+}
+
+.item-image.equipped {
+    border: 2px solid green;
+}
+
+.item-image.temp-equipped.equipped {
+    border: 2px solid purple;
+}
+
