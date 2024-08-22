@@ -30,13 +30,13 @@ const itemPositions = {
         scale: 5.0
     },
       mouth: {
-        translateX: '-20px',
+        translateX: '-10px',
         translateY: '100px',
-        scale: 5.0
+        scale: 6.0
     },
        cheeks: {
         translateX: '-20px',
-        translateY: '150px',
+        translateY: '120px',
         scale: 5.0
     },
     // Add more item types as needed
