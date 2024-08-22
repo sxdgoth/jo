@@ -103,56 +103,56 @@ class AvatarManager {
         }
     }
 
-    applyAvatar() {
-        // Clear all equipped items
-        this.equippedItems = {};
+   applyAvatar() {
+    // Clear all equipped items
+    this.equippedItems = {};
+    
+    // Only keep items that are currently selected in tempEquippedItems
+    Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+        if (itemId) {
+            this.equippedItems[type] = itemId;
+        }
+    });
+
+    // Save to localStorage
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+    localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+    localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+    localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+    
+    // Update the avatar display to reflect the changes
+    this.updateAvatarDisplay();
+    this.updateItemVisuals();
+    
+    // Reset tempEquippedItems to match equippedItems
+    this.tempEquippedItems = {...this.equippedItems};
+    
+    alert('Avatar saved successfully!');
+}
+
+  clearAvatar() {
+    this.tempEquippedItems = {};
+    this.equippedItems = {};
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
+    this.updateItemVisuals();
+    this.updateAvatarDisplay(); // Changed from updateTempAvatarDisplay
+}
+
+updateAvatarDisplay() {
+    if (window.avatarBody) {
+        window.avatarBody.clearAllLayers();
         
-        // Only keep items that are currently selected in tempEquippedItems
-        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+        this.applySkinTone();
+        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
             if (itemId) {
-                this.equippedItems[type] = itemId;
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                }
             }
         });
-
-        // Save to localStorage
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-        
-        // Update the avatar display to reflect the changes
-        this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        
-        // Reset tempEquippedItems to match equippedItems
-        this.tempEquippedItems = {...this.equippedItems};
-        
-        alert('Avatar saved successfully!');
     }
-
-    clearAvatar() {
-        this.tempEquippedItems = {};
-        this.equippedItems = {};
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
-    }
-
-    updateAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    }
-                }
-            });
-        }
-    }
+}
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
