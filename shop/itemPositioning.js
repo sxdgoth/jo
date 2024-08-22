@@ -5,7 +5,7 @@ const itemPositions = {
         scale: 5.0
     },
     accessories: {
-        translateX: '-20px',
+        translateX: '20px',
         translateY: '0px',
         scale: 1.5
     },
