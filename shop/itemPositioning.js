@@ -15,14 +15,14 @@ const itemPositions = {
         scale: 2.5
     },
     pants: {
-        translateX: '10px',
-        translateY: '0px',
+        translateX: '0px',
+        translateY: '-40px',
         scale: 2.0
     },
       jacket: {
-        translateX: '10px',
+        translateX: '0px',
         translateY: '0px',
-        scale: 2.0
+        scale: 2.5
     },
       eyebrows: {
         translateX: '10px',
