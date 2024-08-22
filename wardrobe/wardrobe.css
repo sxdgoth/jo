@@ -84,13 +84,11 @@ main {
     margin-bottom: 10px;
 }
 
-
 #avatar-display {
     width: 100%;
     height: calc(100% - 40px);
     position: relative;
 }
-
 
 .avatar-buttons {
     display: flex;
@@ -99,7 +97,6 @@ main {
     margin-top: 10px;
     width: 100%;
 }
-
 
 .avatar-buttons button {
     padding: 8px 16px;
@@ -141,18 +138,35 @@ main {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.wardrobe-item.temp-equipped {
-    border: 2px solid blue;
+.item-image {
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border-radius: 5px;
 }
 
-.wardrobe-item.equipped {
-    border: 2px solid green;
+.item-image img {
+    max-width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
 }
 
-.wardrobe-item.temp-equipped.equipped {
-    border: 2px solid purple;
+.item-image:hover img {
+    transform: scale(1.05);
 }
 
+.wardrobe-item h3 {
+    margin: 0.8rem 0 0.4rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.wardrobe-item p {
+    margin: 0.4rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
 
 #skin-tone-buttons {
     display: flex;
@@ -185,40 +199,35 @@ main {
         flex-direction: column;
         align-items: flex-start;
     }
-
     nav {
         margin-top: 1rem;
     }
-
     main {
         flex-direction: column;
     }
-
     .avatar-section {
         max-width: 100%;
     }
-
     .avatar-container {
         height: 300px;
     }
-
     .wardrobe-items {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
 
-#eye-color-picker {
+#eye-color-picker, #lip-color-picker {
     margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-#eye-color-picker label {
+#eye-color-picker label, #lip-color-picker label {
     margin-right: 10px;
 }
 
-#eye-color-input {
+#eye-color-input, #lip-color-input {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -229,16 +238,28 @@ main {
     cursor: pointer;
 }
 
-#eye-color-input::-webkit-color-swatch {
+#eye-color-input::-webkit-color-swatch, #lip-color-input::-webkit-color-swatch {
     border-radius: 50%;
     border: 2px solid #ddd;
 }
 
-#eye-color-input::-moz-color-swatch {
+#eye-color-input::-moz-color-swatch, #lip-color-input::-moz-color-swatch {
     border-radius: 50%;
     border: 2px solid #ddd;
 }
 
+.wardrobe-item.temp-equipped {
+    border: 2px solid blue;
+}
 
+.wardrobe-item.equipped {
+    border: 2px solid green;
+}
 
+.wardrobe-item.temp-equipped.equipped {
+    border: 2px solid purple;
+}
 
+.skin-tone-button.selected {
+    border: 2px solid black;
+}
