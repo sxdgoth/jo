@@ -20,6 +20,6 @@ const shopItems = [
     { id: 'babyfangs.svg', name: 'Baby Fangs', type: 'Mouth', price: 180, path: 'home/assets/mouth/' },
     { id: 'svgexport-5.svg', name: 'Coy Mouth', type: 'Mouth', price: 50, path: 'home/assets/mouth/' },
     { id: 'babynose.svg', name: 'Baby Nose', type: 'Nose', price: 50, path: 'home/assets/nose/' },
-    
+    { id: 'shorthairsnowflake.svg', name: 'Short Snowflake Hair', type: 'Hair', price: 150, path: 'home/assets/hair/' },
     // Add more items as needed
 ];
