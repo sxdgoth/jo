@@ -39,6 +39,11 @@ const itemPositions = {
         translateY: '120px',
         scale: 5.0
     },
+        nose: {
+        translateX: '-20px',
+        translateY: '150px',
+        scale: 5.0
+    },
     // Add more item types as needed
 };
 
