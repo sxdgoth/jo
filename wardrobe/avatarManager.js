@@ -17,8 +17,8 @@ class AvatarManager {
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.skinTone = 'light';
-        this.eyeColor = '#3FA2FF';
-        this.lipColor = '#E6998F';
+        this.eyeColor = '#3FA2FF'; // Default eye color
+        this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
     }
@@ -29,7 +29,6 @@ class AvatarManager {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
-        this.updateItemVisuals(); // This will highlight applied items on page load
     }
 
     setupApplyAvatarButton() {
@@ -78,7 +77,7 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            this.tempEquippedItems = {}; // Initialize as empty, not copying equippedItems
+            this.tempEquippedItems = {...this.equippedItems};
         }
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
@@ -92,28 +91,23 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
-        // Call updateItemVisuals after loading equipped items
-        this.updateItemVisuals();
     }
-    
-  applyAvatar() {
+
+    applyAvatar() {
         this.equippedItems = {...this.tempEquippedItems};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-         this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        this.tempEquippedItems = {}; // Clear temp selections after applying
+        this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
 
-      clearAvatar() {
+    clearAvatar() {
         this.tempEquippedItems = {};
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
-}
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
@@ -131,7 +125,7 @@ class AvatarManager {
         }
     }
 
-   toggleItem(item) {
+    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
         } else {
@@ -141,22 +135,14 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-   updateItemVisuals() {
-        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-            const itemImage = itemContainer.querySelector('.item-image');
+    updateItemVisuals() {
+        document.querySelectorAll('.item-image').forEach(itemImage => {
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                if (this.equippedItems[item.type] === item.id) {
-                    itemContainer.classList.add('equipped');
-                } else {
-                    itemContainer.classList.remove('equipped');
-                }
-                if (this.tempEquippedItems[item.type] === item.id) {
-                    itemContainer.classList.add('temp-equipped');
-                } else {
-                    itemContainer.classList.remove('temp-equipped');
-                }
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+            } else {
+                itemImage.classList.remove('equipped');
             }
         });
     }
@@ -223,7 +209,8 @@ class AvatarManager {
             this.updateTempAvatarDisplay();
         });
     }
-        applySkinTone() {
+
+    applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
             window.skinToneManager.applySkinTone(tone);
@@ -331,7 +318,8 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-       // Also update lip colors in style attributes
+
+        // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
