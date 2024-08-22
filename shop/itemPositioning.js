@@ -5,9 +5,9 @@ const itemPositions = {
         scale: 5.0
     },
     face: {
-        translateX: '0px',
-        translateY: '0px',
-        scale: 1.5
+        translateX: '-20px',
+        translateY: '150px',
+        scale: 3.5
     },
     shirt: {
         translateX: '0px',
