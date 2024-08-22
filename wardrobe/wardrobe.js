@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
             window.avatarBody.initializeAvatar(loggedInUser.username);
+            // Reapply all item positions after avatar initialization
+            reapplyAllItemPositions();
         }
         
         // Initialize SkinToneManager after avatar is rendered
@@ -49,8 +51,17 @@ function renderOwnedItems() {
             <p>Type: ${item.type}</p>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
-        // Add click event listener to the item image
+
+        // Apply item positioning
         const itemImage = itemElement.querySelector('.item-image');
+        if (typeof applyItemPosition === 'function') {
+            console.log('Applying position for:', item.type);
+            applyItemPosition(itemImage, item.type);
+        } else {
+            console.error('applyItemPosition function not found');
+        }
+
+        // Add click event listener to the item image
         itemImage.addEventListener('click', () => toggleItem(item));
     });
 }
@@ -58,9 +69,28 @@ function renderOwnedItems() {
 function toggleItem(item) {
     if (window.avatarManager) {
         window.avatarManager.toggleItem(item);
+        
+        // Reapply positioning after toggling
+        const itemImage = document.querySelector(`.item-image[data-id="${item.id}"]`);
+        if (itemImage && typeof applyItemPosition === 'function') {
+            console.log('Reapplying position after toggle for:', item.type);
+            applyItemPosition(itemImage, item.type);
+        }
     } else {
         console.error('AvatarManager not initialized');
     }
+}
+
+function reapplyAllItemPositions() {
+    const itemImages = document.querySelectorAll('.item-image');
+    itemImages.forEach(itemImage => {
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item && typeof applyItemPosition === 'function') {
+            console.log('Reapplying position for:', item.type);
+            applyItemPosition(itemImage, item.type);
+        }
+    });
 }
 
 function logout() {
