@@ -31,7 +31,7 @@ const itemPositions = {
     },
       mouth: {
         translateX: '-40px',
-        translateY: '180px',
+        translateY: '150px',
         scale: 7.0
     },
        cheeks: {
