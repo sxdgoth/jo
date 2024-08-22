@@ -29,6 +29,7 @@ class AvatarManager {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
+        this.updateItemVisuals();
     }
 
     setupApplyAvatarButton() {
@@ -93,15 +94,16 @@ class AvatarManager {
         }
     }
 
-    applyAvatar() {
-        this.equippedItems = {...this.tempEquippedItems};
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-        this.updateAvatarDisplay();
-        alert('Avatar saved successfully!');
-    }
+   applyAvatar() {
+    this.equippedItems = {...this.tempEquippedItems};
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+    localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+    localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+    localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+    this.updateAvatarDisplay();
+    this.updateItemVisuals(); // Add this line
+    alert('Avatar saved successfully!');
+}
 
     clearAvatar() {
         this.tempEquippedItems = {};
@@ -125,27 +127,38 @@ class AvatarManager {
         }
     }
 
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-        }
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
+  toggleItem(item) {
+    if (this.tempEquippedItems[item.type] === item.id) {
+        delete this.tempEquippedItems[item.type];
+    } else {
+        this.tempEquippedItems[item.type] = item.id;
     }
+    this.updateItemVisuals();
+    this.updateTempAvatarDisplay();
+}
 
-    updateItemVisuals() {
-        document.querySelectorAll('.item-image').forEach(itemImage => {
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.tempEquippedItems[item.type] === item.id) {
+   updateItemVisuals() {
+    document.querySelectorAll('.item-image').forEach(itemImage => {
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item) {
+            if (this.equippedItems[item.type] === item.id) {
                 itemImage.classList.add('equipped');
             } else {
                 itemImage.classList.remove('equipped');
             }
-        });
-    }
+            if (this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('temp-equipped');
+            } else {
+                itemImage.classList.remove('temp-equipped');
+            }
+        }
+    });
+}
+
+
+
+
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
