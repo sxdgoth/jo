@@ -21,6 +21,7 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
+        this.updateItemVisuals();
     }
 
     initialize() {
@@ -30,6 +31,7 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
+        this.setupItemClickListeners(); 
     }
 
     setupApplyAvatarButton() {
@@ -50,6 +52,18 @@ class AvatarManager {
         }
     }
 
+setupItemClickListeners() {
+    document.querySelectorAll('.item-image').forEach(itemImage => {
+        itemImage.addEventListener('click', () => {
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item) {
+                this.toggleItem(item);
+            }
+        });
+    });
+}
+    
     setupEyeColorPicker() {
         const eyeColorPicker = document.getElementById('eye-color-input');
         if (eyeColorPicker) {
@@ -127,7 +141,7 @@ class AvatarManager {
         }
     }
 
-  toggleItem(item) {
+ toggleItem(item) {
     if (this.tempEquippedItems[item.type] === item.id) {
         delete this.tempEquippedItems[item.type];
     } else {
@@ -137,21 +151,13 @@ class AvatarManager {
     this.updateTempAvatarDisplay();
 }
 
-   updateItemVisuals() {
+  updateItemVisuals() {
     document.querySelectorAll('.item-image').forEach(itemImage => {
         const itemId = itemImage.dataset.id;
         const item = window.userInventory.getItems().find(i => i.id === itemId);
         if (item) {
-            if (this.equippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
-            } else {
-                itemImage.classList.remove('equipped');
-            }
-            if (this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('temp-equipped');
-            } else {
-                itemImage.classList.remove('temp-equipped');
-            }
+            itemImage.classList.toggle('equipped', this.equippedItems[item.type] === item.id);
+            itemImage.classList.toggle('temp-equipped', this.tempEquippedItems[item.type] === item.id);
         }
     });
 }
