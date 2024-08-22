@@ -104,13 +104,13 @@ class AvatarManager {
     }
 
     applyAvatar() {
-        // Clear all equipped items
-        this.equippedItems = {};
+        // Update equippedItems to match tempEquippedItems
+        this.equippedItems = {...this.tempEquippedItems};
         
-        // Only keep items that are currently selected in tempEquippedItems
-        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-            if (itemId) {
-                this.equippedItems[type] = itemId;
+        // Remove any undefined or null values
+        Object.keys(this.equippedItems).forEach(key => {
+            if (this.equippedItems[key] === undefined || this.equippedItems[key] === null) {
+                delete this.equippedItems[key];
             }
         });
 
@@ -123,9 +123,6 @@ class AvatarManager {
         // Update the avatar display to reflect the changes
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        
-        // Reset tempEquippedItems to match equippedItems
-        this.tempEquippedItems = {...this.equippedItems};
         
         alert('Avatar saved successfully!');
     }
@@ -349,10 +346,10 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-        
-        // Also update lip colors in style attributes
+
+      // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
-          for (let element of allElements) {
+        for (let element of allElements) {
             let style = element.getAttribute('style');
             if (style) {
                 originalLipColors.forEach((color, index) => {
@@ -374,4 +371,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
-        
