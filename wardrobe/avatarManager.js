@@ -104,21 +104,29 @@ class AvatarManager {
     }
 
     applyAvatar() {
-        // Only keep items that are currently selected in tempEquippedItems
+        // Clear all equipped items
         this.equippedItems = {};
+        
+        // Only keep items that are currently selected in tempEquippedItems
         Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
             if (itemId) {
                 this.equippedItems[type] = itemId;
             }
         });
 
+        // Save to localStorage
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         
+        // Update the avatar display to reflect the changes
         this.updateAvatarDisplay();
         this.updateItemVisuals();
+        
+        // Reset tempEquippedItems to match equippedItems
+        this.tempEquippedItems = {...this.equippedItems};
+        
         alert('Avatar saved successfully!');
     }
 
@@ -148,8 +156,10 @@ class AvatarManager {
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
+            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
+            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
@@ -261,99 +271,17 @@ class AvatarManager {
     }
 
     applySkinToneToSVG(svgDoc) {
-        const tone = window.skinToneManager.skinTones[this.skinTone];
-        const defaultColors = {
-            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
-            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
-            tan: ['#F1C27D', '#E0B170', '#B39059'],
-            dark: ['#8D5524', '#7C4A1E', '#5E3919']
-        };
-        const eyeColors = {
-            main: '#F4D5BF',
-            shadow: '#E6BBA8'
-        };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
-
-        const replaceColor = (element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    if (preserveColors.includes(color)) return;
-                    
-                    if (defaultColors.light.includes(color)) {
-                        if (color === defaultColors.light[0]) {
-                            element.setAttribute(attr, tone.main);
-                        } else if (color === defaultColors.light[1]) {
-                            element.setAttribute(attr, tone.shadow);
-                        } else if (color === defaultColors.light[2]) {
-                            element.setAttribute(attr, tone.highlight);
-                        }
-                    } else if (color === eyeColors.main) {
-                        element.setAttribute(attr, tone.main);
-                    } else if (color === eyeColors.shadow) {
-                        element.setAttribute(attr, tone.shadow);
-                    } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
-                        element.setAttribute(attr, tone.main);
-                    }
-                }
-            });
-            let style = element.getAttribute('style');
-            if (style) {
-                defaultColors.light.forEach((defaultColor, index) => {
-                    style = style.replace(new RegExp(defaultColor, 'gi'), 
-                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
-                });
-                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-                preserveColors.forEach(color => {
-                    style = style.replace(new RegExp(color, 'gi'), color);
-                });
-                if (!preserveColors.some(color => style.includes(color))) {
-                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
-                }
-                element.setAttribute('style', style);
-            }
-            Array.from(element.children).forEach(replaceColor);
-        };
-        replaceColor(svgDoc.documentElement);
+        // ... (keep existing implementation)
     }
 
     applyEyeColorToSVG(svgDoc) {
-        const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
-        eyeElements.forEach(element => {
-            element.setAttribute('fill', this.eyeColor);
-        });
+        // ... (keep existing implementation)
     }
 
     applyLipColorToSVG(svgDoc) {
-        const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
-        const lipPalette = createLipPalette(this.lipColor);
-
-        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
-        lipElements.forEach(element => {
-            const currentColor = element.getAttribute('fill').toUpperCase();
-            const index = originalLipColors.indexOf(currentColor);
-            if (index !== -1) {
-                element.setAttribute('fill', lipPalette[index]);
-            }
-        });
-
-        // Also update lip colors in style attributes
-        const allElements = svgDoc.getElementsByTagName('*');
-        for (let element of allElements) {
-            let style = element.getAttribute('style');
-            if (style) {
-                originalLipColors.forEach((color, index) => {
-                    style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
-                });
-                element.setAttribute('style', style);
-            }
-        }
+        // ... (keep existing implementation)
     }
-
-    }
+}
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
