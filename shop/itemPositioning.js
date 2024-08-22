@@ -30,9 +30,9 @@ const itemPositions = {
         scale: 5.0
     },
       mouth: {
-        translateX: '-10px',
+        translateX: '-40px',
         translateY: '100px',
-        scale: 6.0
+        scale: 7.0
     },
        cheeks: {
         translateX: '-20px',
@@ -40,9 +40,9 @@ const itemPositions = {
         scale: 5.0
     },
         nose: {
-        translateX: '-20px',
+        translateX: '-40px',
         translateY: '150px',
-        scale: 5.0
+        scale: 7.0
     },
     // Add more item types as needed
 };
