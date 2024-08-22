@@ -138,19 +138,20 @@ class AvatarManager {
     }
 
     updateItemVisuals() {
-        document.querySelectorAll('.item-image').forEach(itemImage => {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('img');
             const itemId = itemImage.dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
             if (item) {
                 if (this.tempEquippedItems[item.type] === item.id) {
-                    itemImage.classList.add('temp-equipped');
+                    itemContainer.classList.add('temp-equipped');
                 } else {
-                    itemImage.classList.remove('temp-equipped');
+                    itemContainer.classList.remove('temp-equipped');
                 }
                 if (this.equippedItems[item.type] === item.id) {
-                    itemImage.classList.add('equipped');
+                    itemContainer.classList.add('equipped');
                 } else {
-                    itemImage.classList.remove('equipped');
+                    itemContainer.classList.remove('equipped');
                 }
             }
         });
@@ -306,8 +307,7 @@ class AvatarManager {
         };
         replaceColor(svgDoc.documentElement);
     }
-
-    applyEyeColorToSVG(svgDoc) {
+      applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
@@ -325,7 +325,7 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-        // Also update lip colors in style attributes
+         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
@@ -338,7 +338,6 @@ class AvatarManager {
         }
     }
 }
-
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
@@ -347,8 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.avatarManager.initialize();
 
         // Add event listeners for item selection
-        document.querySelectorAll('.item-image').forEach(itemImage => {
-            itemImage.addEventListener('click', () => {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            itemContainer.addEventListener('click', () => {
+                const itemImage = itemContainer.querySelector('img');
                 const itemId = itemImage.dataset.id;
                 const item = window.userInventory.getItems().find(i => i.id === itemId);
                 if (item) {
@@ -356,7 +356,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+
+        // Setup skin tone buttons
+        const skinToneButtons = document.querySelectorAll('.skin-tone-button');
+        skinToneButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const newTone = button.dataset.tone;
+                window.avatarManager.changeSkinTone(newTone);
+            });
+        });
+
+        // Highlight the current skin tone button
+        const currentSkinToneButton = document.querySelector(`.skin-tone-button[data-tone="${window.avatarManager.skinTone}"]`);
+        if (currentSkinToneButton) {
+            currentSkinToneButton.classList.add('selected');
+        }
+
+        // Update user info
+        const userNameElement = document.getElementById('user-name');
+        const userCoinsElement = document.getElementById('user-coins');
+        if (userNameElement) userNameElement.textContent = loggedInUser.username;
+        if (userCoinsElement) userCoinsElement.textContent = loggedInUser.coins;
+
     } else {
         console.error('No logged in user found');
     }
 });
+
+// Logout function
+function logout() {
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href = 'https://sxdgoth.github.io/jo/login/index.html';
+}
