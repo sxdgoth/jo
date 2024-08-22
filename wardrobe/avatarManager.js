@@ -82,11 +82,6 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
-
-    const savedHighlightedItems = localStorage.getItem(`highlightedItems_${this.username}`);
-        if (savedHighlightedItems) {
-            this.highlightedItems = JSON.parse(savedHighlightedItems);
-        }
     }
 
     updateAvatarDisplay() {
@@ -118,19 +113,19 @@ class AvatarManager {
     }
 
    updateItemVisuals() {
-        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-            const itemImage = itemContainer.querySelector('.item-image');
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && (this.tempEquippedItems[item.type] === item.id || this.highlightedItems.includes(item.id))) {
-                itemImage.classList.add('equipped');
-                itemContainer.classList.add('highlighted');
-            } else {
-                itemImage.classList.remove('equipped');
-                itemContainer.classList.remove('highlighted');
-            }
-        });
-    }
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item && this.tempEquippedItems[item.type] === item.id) {
+            itemImage.classList.add('equipped');
+            itemContainer.classList.add('highlighted');
+        } else {
+            itemImage.classList.remove('equipped');
+            itemContainer.classList.remove('highlighted');
+        }
+    });
+}
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
