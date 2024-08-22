@@ -18,10 +18,6 @@ function applyAvatar() {
         localStorage.setItem(`eyeColor_${window.avatarManager.username}`, window.avatarManager.eyeColor);
         localStorage.setItem(`lipColor_${window.avatarManager.username}`, window.avatarManager.lipColor);
         
-        // Save highlighted items
-        window.avatarManager.highlightedItems = Object.values(window.avatarManager.equippedItems);
-        localStorage.setItem(`highlightedItems_${window.avatarManager.username}`, JSON.stringify(window.avatarManager.highlightedItems));
-
         // Update the avatar display to reflect the changes
         window.avatarManager.updateAvatarDisplay();
         window.avatarManager.updateItemVisuals();
@@ -39,9 +35,7 @@ function clearAvatar() {
     if (window.avatarManager) {
         window.avatarManager.tempEquippedItems = {};
         window.avatarManager.equippedItems = {};
-        window.avatarManager.highlightedItems = [];
         localStorage.setItem(`equippedItems_${window.avatarManager.username}`, JSON.stringify({}));
-        localStorage.removeItem(`highlightedItems_${window.avatarManager.username}`);
         window.avatarManager.updateItemVisuals();
         window.avatarManager.updateTempAvatarDisplay();
     } else {
