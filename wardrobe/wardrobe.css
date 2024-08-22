@@ -272,6 +272,11 @@ main {
     border: 2px solid #ddd;
 }
 
+
+
+
+
+
 .wardrobe-item.equipped {
     outline: 2px solid #4CAF50;
     outline-offset: -2px;
@@ -287,3 +292,8 @@ main {
     outline-offset: -2px;
 }
 
+
+.wardrobe-item.highlighted {
+    outline: 2px solid #4CAF50;
+    outline-offset: -2px;
+}
