@@ -23,7 +23,7 @@
     </div>
 
 
-    <script>
+       <script>
         document.addEventListener('DOMContentLoaded', function() {
             const svg = document.getElementById('hair-svg');
             const colorPicker = document.getElementById('color-picker');
@@ -44,8 +44,20 @@
             function blendColors(color1, color2, ratio) {
                 const rgb1 = hexToRgb(color1);
                 const rgb2 = hexToRgb(color2);
+                const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
+                const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
+                
+                let blendRatio = ratio;
+                if (brightness2 > brightness1) {
+                    // For lighter colors, reduce the blend ratio to maintain highlights
+                    blendRatio = ratio * 0.7;
+                } else {
+                    // For darker colors, increase the blend ratio for a more dramatic change
+                    blendRatio = Math.min(ratio * 1.3, 1);
+                }
+
                 const blended = rgb1.map((channel, i) => 
-                    Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
+                    Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
                 );
                 return rgbToHex(...blended);
             }
