@@ -94,11 +94,27 @@ class AvatarManager {
     }
 
     applyAvatar() {
-        this.equippedItems = {...this.tempEquippedItems};
+        // Only update equippedItems with non-null values from tempEquippedItems
+        Object.keys(this.tempEquippedItems).forEach(key => {
+            if (this.tempEquippedItems[key]) {
+                this.equippedItems[key] = this.tempEquippedItems[key];
+            } else {
+                delete this.equippedItems[key];
+            }
+        });
+
+        // Remove any equipped items that are not in tempEquippedItems
+        Object.keys(this.equippedItems).forEach(key => {
+            if (!(key in this.tempEquippedItems)) {
+                delete this.equippedItems[key];
+            }
+        });
+
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+
         this.updateAvatarDisplay();
         alert('Avatar saved successfully!');
     }
@@ -135,7 +151,7 @@ class AvatarManager {
         this.updateTempAvatarDisplay();
     }
 
-     updateItemVisuals() {
+    updateItemVisuals() {
         document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
             const itemId = itemContainer.querySelector('.item-image').dataset.id;
             const item = window.userInventory.getItems().find(i => i.id === itemId);
@@ -252,7 +268,6 @@ class AvatarManager {
             shadow: '#E6BBA8'
         };
         const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
-
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -305,11 +320,10 @@ class AvatarManager {
             element.setAttribute('fill', this.eyeColor);
         });
     }
-
+    
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
-
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -318,7 +332,6 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -332,7 +345,6 @@ class AvatarManager {
         }
     }
 }
-
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
@@ -341,5 +353,83 @@ document.addEventListener('DOMContentLoaded', () => {
         window.avatarManager.initialize();
     } else {
         console.error('No logged in user found');
+    }
+});
+
+// Add event listeners for skin tone buttons
+document.querySelectorAll('.skin-tone-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const newTone = this.dataset.tone;
+        if (window.avatarManager) {
+            window.avatarManager.changeSkinTone(newTone);
+            // Update button styles
+            document.querySelectorAll('.skin-tone-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        }
+    });
+});
+
+// Add event listener for wardrobe items
+document.addEventListener('click', function(event) {
+    const itemImage = event.target.closest('.item-image');
+    if (itemImage && window.avatarManager) {
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item) {
+            window.avatarManager.toggleItem(item);
+        }
+    }
+});
+
+// Function to update the user's coin display
+function updateCoinDisplay(coins) {
+    const coinDisplay = document.getElementById('user-coins');
+    if (coinDisplay) {
+        coinDisplay.textContent = coins;
+    }
+}
+
+// Function to handle item purchase
+function purchaseItem(itemId, price) {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser && loggedInUser.coins >= price) {
+        // Deduct coins and update the display
+        loggedInUser.coins -= price;
+        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        updateCoinDisplay(loggedInUser.coins);
+
+        // Add item to inventory (you'll need to implement this part)
+        // window.userInventory.addItem(itemId);
+
+        // Update the UI to show the item as owned
+        const itemElement = document.querySelector(`.item-image[data-id="${itemId}"]`);
+        if (itemElement) {
+            itemElement.classList.remove('locked');
+            itemElement.classList.add('owned');
+        }
+
+        alert('Item purchased successfully!');
+    } else {
+        alert('Not enough coins to purchase this item.');
+    }
+}
+
+// Add event listeners for purchase buttons
+document.querySelectorAll('.purchase-button').forEach(button => {
+    button.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent triggering the item toggle
+        const itemId = this.closest('.wardrobe-item').querySelector('.item-image').dataset.id;
+        const price = parseInt(this.dataset.price, 10);
+        purchaseItem(itemId, price);
+    });
+});
+
+// Initialize coin display
+document.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        updateCoinDisplay(loggedInUser.coins);
     }
 });
