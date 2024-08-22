@@ -46,7 +46,7 @@ const itemPositions = {
     },
         hair: {
         translateX: '0px',
-        translateY: '0px',
+        translateY: '50px',
         scale: 2.0
     },
     // Add more item types as needed
