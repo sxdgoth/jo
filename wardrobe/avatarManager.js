@@ -78,10 +78,6 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
-            this.equippedItems = Object.fromEntries(
-                Object.entries(this.equippedItems).filter(([_, value]) => value)
-            );
         } else {
             this.equippedItems = {};
         }
@@ -104,13 +100,13 @@ class AvatarManager {
     }
 
     applyAvatar() {
-        // Update equippedItems to match tempEquippedItems
-        this.equippedItems = {...this.tempEquippedItems};
+        // Clear all equipped items
+        this.equippedItems = {};
         
-        // Remove any undefined or null values
-        Object.keys(this.equippedItems).forEach(key => {
-            if (this.equippedItems[key] === undefined || this.equippedItems[key] === null) {
-                delete this.equippedItems[key];
+        // Only keep items that are currently selected in tempEquippedItems
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                this.equippedItems[type] = itemId;
             }
         });
 
@@ -132,7 +128,7 @@ class AvatarManager {
         this.equippedItems = {};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
         this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
+        this.updateAvatarDisplay();
     }
 
     updateAvatarDisplay() {
@@ -202,7 +198,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeEyeColor(newColor) {
@@ -222,7 +218,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeLipColor(newColor) {
@@ -279,7 +275,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -347,15 +343,14 @@ class AvatarManager {
             }
         });
 
-      // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
             if (style) {
                 originalLipColors.forEach((color, index) => {
                     style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
-                });
-                element.setAttribute('style', style);
+                   });
+                             element.setAttribute('style', style);
             }
         }
     }
