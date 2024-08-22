@@ -198,21 +198,36 @@ class AvatarManager {
     }
 
     changeHairColor(colors) {
-        const hairLayers = document.querySelectorAll('[id^="hair"]');
-        hairLayers.forEach((layer, index) => {
-            if (colors[index]) {
-                layer.style.fill = colors[index];
-            }
-        });
-        this.hairColors = colors;
-        this.updateTempAvatarDisplay();
-    }
+    console.log('Changing hair color:', colors);
+    const hairLayers = document.querySelectorAll('[id^="hair"]');
+    console.log('Found hair layers:', hairLayers.length);
+    hairLayers.forEach((layer, index) => {
+        if (colors[index]) {
+            console.log(`Changing layer ${layer.id} to color ${colors[index]}`);
+            layer.style.fill = colors[index];
+        }
+    });
+    this.hairColors = colors;
+    this.updateTempAvatarDisplay();
+}
 
     saveHairColor(colors) {
         this.hairColors = colors;
         localStorage.setItem(`hairColors_${this.username}`, JSON.stringify(colors));
     }
 
+applyHairColorToSVG(svgDoc) {
+    const hairLayers = svgDoc.querySelectorAll('[id^="hair"]');
+    console.log('Applying hair color to SVG, found layers:', hairLayers.length);
+    hairLayers.forEach((layer, index) => {
+        if (this.hairColors[index]) {
+            console.log(`Changing SVG layer ${layer.id} to color ${this.hairColors[index]}`);
+            layer.setAttribute('fill', this.hairColors[index]);
+        }
+    });
+}
+
+    
     applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -224,27 +239,28 @@ class AvatarManager {
         this.changeHairColor(this.hairColors);
     }
 
-    updateLayerWithSkinTone(type, src) {
-        fetch(src)
-            .then(response => response.text())
-            .then(svgText => {
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                
-                this.applySkinToneToSVG(svgDoc);
-                this.applyEyeColorToSVG(svgDoc);
-                this.applyLipColorToSVG(svgDoc);
-                const serializer = new XMLSerializer();
-                const modifiedSvgString = serializer.serializeToString(svgDoc);
-                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                
-                requestAnimationFrame(() => {
-                    window.avatarBody.updateLayer(type, url);
-                });
-            })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
-    }
+   updateLayerWithSkinTone(type, src) {
+    fetch(src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            this.applySkinToneToSVG(svgDoc);
+            this.applyEyeColorToSVG(svgDoc);
+            this.applyLipColorToSVG(svgDoc);
+            this.applyHairColorToSVG(svgDoc); // Add this line
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            requestAnimationFrame(() => {
+                window.avatarBody.updateLayer(type, url);
+            });
+        })
+        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+}
 
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
