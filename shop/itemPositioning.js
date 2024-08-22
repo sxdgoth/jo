@@ -6,7 +6,7 @@ const itemPositions = {
     },
     face: {
         translateX: '-20px',
-        translateY: '200px',
+        translateY: '250px',
         scale: 3.5
     },
     shirt: {
