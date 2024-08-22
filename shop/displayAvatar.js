@@ -108,7 +108,8 @@ class AvatarDisplay {
             { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
             { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
             { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false },
-            { name: 'Accessories', file: '', type: 'Accessories', isBase: false }
+            { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
+            { name: 'Hair', file: '', type: 'Hair', isBase: false }
         ];
 
         bodyParts.forEach(part => {
