@@ -25,19 +25,19 @@ const itemPositions = {
         scale: 2.5
     },
       eyebrows: {
-        translateX: '10px',
-        translateY: '0px',
-        scale: 2.0
+        translateX: '-20px',
+        translateY: '200px',
+        scale: 5.0
     },
       mouth: {
-        translateX: '10px',
-        translateY: '0px',
-        scale: 2.0
+        translateX: '-20px',
+        translateY: '100px',
+        scale: 5.0
     },
        cheeks: {
-        translateX: '10px',
-        translateY: '0px',
-        scale: 2.0
+        translateX: '-20px',
+        translateY: '100px',
+        scale: 5.0
     },
     // Add more item types as needed
 };
