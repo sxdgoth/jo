@@ -352,3 +352,16 @@ class AvatarManager {
             }
         }
     }
+
+    }
+
+// Initialize the AvatarManager when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
+    } else {
+        console.error('No logged in user found');
+    }
+});
