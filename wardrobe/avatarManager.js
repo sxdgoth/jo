@@ -28,6 +28,7 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
+        this.loadAndApplyHighlights(); 
     }
 
     setupEyeColorPicker() {
@@ -285,6 +286,21 @@ class AvatarManager {
         });
     }
 
+
+
+loadAndApplyHighlights() {
+    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
+        const itemId = itemImage.dataset.id;
+        if (highlightedItems.includes(itemId)) {
+            itemContainer.classList.add('highlighted');
+        }
+    });
+}
+
+
+    
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
