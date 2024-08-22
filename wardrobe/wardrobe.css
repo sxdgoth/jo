@@ -248,18 +248,43 @@ main {
     border: 2px solid #ddd;
 }
 
-.wardrobe-item.temp-equipped {
-    border: 2px solid blue;
+.wardrobe-item {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative; /* Add this */
 }
 
-.wardrobe-item.equipped {
-    border: 2px solid green;
+.wardrobe-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.wardrobe-item.temp-equipped.equipped {
-    border: 2px solid purple;
+.wardrobe-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 3px solid transparent;
+    border-radius: 8px;
+    pointer-events: none;
+    transition: border-color 0.3s ease;
 }
 
-.skin-tone-button.selected {
-    border: 2px solid black;
+.wardrobe-item.temp-equipped::after {
+    border-color: blue;
+}
+
+.wardrobe-item.equipped::after {
+    border-color: green;
+}
+
+.wardrobe-item.temp-equipped.equipped::after {
+    border-color: purple;
 }
