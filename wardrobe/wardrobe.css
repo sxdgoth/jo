@@ -272,17 +272,18 @@ main {
     border: 2px solid #ddd;
 }
 
-.item-image.temp-equipped {
+.wardrobe-item.equipped {
     outline: 2px solid #4CAF50;
     outline-offset: -2px;
 }
 
-.item-image.equipped {
-    outline: 2px solid #4CAF50;
+.wardrobe-item.temp-equipped {
+    outline: 2px solid #3498db;
     outline-offset: -2px;
 }
 
-.item-image.temp-equipped.equipped {
-    outline: 2px solid #4CAF50;
+.wardrobe-item.temp-equipped.equipped {
+    outline: 2px solid #9b59b6;
     outline-offset: -2px;
 }
+
