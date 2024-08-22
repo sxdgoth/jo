@@ -1,8 +1,8 @@
 const itemPositions = {
     eyes: {
-        translateX: '10px',
-        translateY: '40px',
-        scale: 2.0
+        translateX: '00px',
+        translateY: '60px',
+        scale: 3.5
     },
     face: {
         translateX: '0px',
@@ -15,8 +15,8 @@ const itemPositions = {
         scale: 2.0
     },
     pants: {
-        translateX: '0px',
-        translateY: '25px',
+        translateX: '10px',
+        translateY: '0px',
         scale: 2.0
     },
     // Add more item types as needed
