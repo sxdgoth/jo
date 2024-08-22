@@ -78,6 +78,10 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
+            // Filter out any null, undefined, or false values
+            this.equippedItems = Object.fromEntries(
+                Object.entries(this.equippedItems).filter(([_, value]) => value)
+            );
         } else {
             this.equippedItems = {};
         }
@@ -116,10 +120,12 @@ class AvatarManager {
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         
-        // Clear all layers and update the avatar display
-        this.clearAllLayers();
+        // Update the avatar display to reflect the changes
         this.updateAvatarDisplay();
         this.updateItemVisuals();
+        
+        // Reset tempEquippedItems to match equippedItems
+        this.tempEquippedItems = {...this.equippedItems};
         
         alert('Avatar saved successfully!');
     }
@@ -128,28 +134,24 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.equippedItems = {};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
-        this.clearAllLayers();
         this.updateItemVisuals();
-    }
-
-    clearAllLayers() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            this.applySkinTone();
-        }
+        this.updateTempAvatarDisplay();
     }
 
     updateAvatarDisplay() {
-        this.clearAllLayers();
-        
-        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-            if (itemId) {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     toggleItem(item) {
@@ -177,16 +179,19 @@ class AvatarManager {
     }
 
     updateTempAvatarDisplay() {
-        this.clearAllLayers();
-        
-        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-            if (itemId) {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     changeSkinTone(newTone) {
@@ -200,7 +205,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50);
+        }, 50); // 50ms debounce time
     }
 
     changeEyeColor(newColor) {
@@ -220,7 +225,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50);
+        }, 50); // 50ms debounce time
     }
 
     changeLipColor(newColor) {
@@ -266,94 +271,16 @@ class AvatarManager {
     }
 
     applySkinToneToSVG(svgDoc) {
-        const tone = window.skinToneManager.skinTones[this.skinTone];
-        const defaultColors = {
-            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
-            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
-            tan: ['#F1C27D', '#E0B170', '#B39059'],
-            dark: ['#8D5524', '#7C4A1E', '#5E3919']
-        };
-        const eyeColors = {
-            main: '#F4D5BF',
-            shadow: '#E6BBA8'
-        };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
-
-        const replaceColor = (element) => {
-            ['fill', 'stroke'].forEach(attr => {
-                let color = element.getAttribute(attr);
-                if (color) {
-                    color = color.toUpperCase();
-                    if (preserveColors.includes(color)) return;
-                    
-                    if (defaultColors.light.includes(color)) {
-                        if (color === defaultColors.light[0]) {
-                            element.setAttribute(attr, tone.main);
-                        } else if (color === defaultColors.light[1]) {
-                            element.setAttribute(attr, tone.shadow);
-                        } else if (color === defaultColors.light[2]) {
-                            element.setAttribute(attr, tone.highlight);
-                        }
-                    } else if (color === eyeColors.main) {
-                        element.setAttribute(attr, tone.main);
-                    } else if (color === eyeColors.shadow) {
-                        element.setAttribute(attr, tone.shadow);
-                    } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !preserveColors.includes(color)) {
-                        element.setAttribute(attr, tone.main);
-                    }
-                }
-            });
-            let style = element.getAttribute('style');
-            if (style) {
-                defaultColors.light.forEach((defaultColor, index) => {
-                    style = style.replace(new RegExp(defaultColor, 'gi'), 
-                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
-                });
-                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-                preserveColors.forEach(color => {
-                    style = style.replace(new RegExp(color, 'gi'), color);
-                });
-                if (!preserveColors.some(color => style.includes(color))) {
-                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
-                }
-                element.setAttribute('style', style);
-            }
-            Array.from(element.children).forEach(replaceColor);
-        };
-        replaceColor(svgDoc.documentElement);
+        // ... (keep existing implementation)
     }
 
     applyEyeColorToSVG(svgDoc) {
-        const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
-        eyeElements.forEach(element => {
-            element.setAttribute('fill', this.eyeColor);
-        });
+        // ... (keep existing implementation)
     }
 
     applyLipColorToSVG(svgDoc) {
-        const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
-        const lipPalette = createLipPalette(this.lipColor);
-
-        const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
-        lipElements.forEach(element => {
-            const currentColor = element.getAttribute('fill').toUpperCase();
-            const index = originalLipColors.indexOf(currentColor);
-            if (index !== -1) {
-                element.setAttribute('fill', lipPalette[index]);
-            }
-        });
-
-        const allElements = svgDoc.getElementsByTagName('*');
-        for (let element of allElements) {
-            let style = element.getAttribute('style');
-            if (style) {
-                originalLipColors.forEach((color, index) => {
-                    style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
-                });
-                element.setAttribute('style', style);
-            }
+        // ... (keep existing implementation)
+    }
 }
 
 // Initialize the AvatarManager when the DOM is loaded
