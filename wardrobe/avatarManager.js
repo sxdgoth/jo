@@ -74,24 +74,24 @@ class AvatarManager {
         }
     }
 
-    loadEquippedItems() {
-        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
-            this.tempEquippedItems = {...this.equippedItems};
-        }
-        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
-            this.skinTone = savedSkinTone;
-        }
-        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
-        if (savedEyeColor) {
-            this.eyeColor = savedEyeColor;
-        }
-        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
-        if (savedLipColor) {
-            this.lipColor = savedLipColor;
-        }
+   loadEquippedItems() {
+    const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+    if (savedItems) {
+        this.equippedItems = JSON.parse(savedItems);
+        this.tempEquippedItems = {...this.equippedItems};
+    }
+    const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+    if (savedSkinTone) {
+        this.skinTone = savedSkinTone;
+    }
+    const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
+    if (savedEyeColor) {
+        this.eyeColor = savedEyeColor;
+    }
+    const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
+    if (savedLipColor) {
+        this.lipColor = savedLipColor;
+    }
     }
 
    applyAvatar() {
@@ -356,3 +356,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
+
