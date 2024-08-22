@@ -6,7 +6,7 @@ const itemPositions = {
     },
     accessories: {
         translateX: '-20px',
-        translateY: '200px',
+        translateY: '0px',
         scale: 1.5
     },
     shirt: {
