@@ -116,7 +116,8 @@ class AvatarManager {
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
         
-        // Update the avatar display to reflect the changes
+        // Clear all layers and update the avatar display
+        this.clearAllLayers();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         
@@ -127,24 +128,28 @@ class AvatarManager {
         this.tempEquippedItems = {};
         this.equippedItems = {};
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
+        this.clearAllLayers();
         this.updateItemVisuals();
-        this.updateAvatarDisplay();
+    }
+
+    clearAllLayers() {
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            this.applySkinTone();
+        }
     }
 
     updateAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    }
+        this.clearAllLayers();
+        
+        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 }
-            });
-        }
+            }
+        });
     }
 
     toggleItem(item) {
@@ -172,19 +177,16 @@ class AvatarManager {
     }
 
     updateTempAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    }
+        this.clearAllLayers();
+        
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 }
-            });
-        }
+            }
+        });
     }
 
     changeSkinTone(newTone) {
@@ -349,11 +351,9 @@ class AvatarManager {
             if (style) {
                 originalLipColors.forEach((color, index) => {
                     style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
-                   });
-                             element.setAttribute('style', style);
+                });
+                element.setAttribute('style', style);
             }
-        }
-    }
 }
 
 // Initialize the AvatarManager when the DOM is loaded
