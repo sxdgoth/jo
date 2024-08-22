@@ -23,7 +23,7 @@
     </div>
 
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const svg = document.getElementById('hair-svg');
             const colorPicker = document.getElementById('color-picker');
@@ -105,7 +105,21 @@
                     const originalColor = originalColors[index];
                     if (originalColor && defaultHairColors.includes(originalColor.toUpperCase())) {
                         const originalHsl = hexToHsl(originalColor);
-                        const newShade = hslToHex(newHsl[0], newHsl[1], originalHsl[2]);
+                        let newH = newHsl[0];
+                        let newS = newHsl[1];
+                        let newL = originalHsl[2];
+
+                        // Special handling for very light colors (platinum blonde)
+                        if (newHsl[2] > 0.8) {  // If the new color is very light
+                            newH = 0.11;  // Slight yellow tint
+                            newS = 0.15;  // Low saturation
+                            newL = Math.min(newL + 0.3, 0.95);  // Lighten, but not pure white
+                        } else {
+                            // For darker colors, adjust saturation based on lightness
+                            newS = Math.min(newS, 1 - newL);
+                        }
+
+                        const newShade = hslToHex(newH, newS, newL);
                         setPathColor(path, newShade);
                     }
                 });
@@ -131,3 +145,6 @@
     </script>
 </body>
 </html>
+
+
+
