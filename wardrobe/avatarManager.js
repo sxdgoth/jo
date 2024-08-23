@@ -84,24 +84,54 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
+
+     const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
+    if (savedHairColor) {
+        this.hairColorChanger.hairColor = savedHairColor;
     }
 
+
     updateAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
+    if (window.avatarBody) {
+        window.avatarBody.clearAllLayers();
+        
+        this.applySkinTone();
+        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    if (type === 'Hair') {
+                        this.hairColorChanger.updateHairColor();
+                    } else {
                         this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                     }
                 }
-            });
-        }
+            }
+        });
+    }
+}
+        
+
+applyChanges() {
+    this.equippedItems = {...this.tempEquippedItems};
+    
+    // Save the hair color if a hair item is equipped
+    if (this.equippedItems['Hair']) {
+        localStorage.setItem(`hairColor_${this.username}`, this.hairColorChanger.hairColor);
     }
 
+    // Save equipped items to localStorage
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+
+    // Save other properties
+    localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+    localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+    localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+
+    // Update the avatar display with the applied changes
+    this.updateAvatarDisplay();
+}
+        
    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
@@ -340,12 +370,19 @@ loadAndApplyHighlights() {
     }
 }
 
-// Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
         window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
+
+        // Add event listener for the "Apply" button
+        const applyButton = document.getElementById('apply-avatar-btn');
+        if (applyButton) {
+            applyButton.addEventListener('click', () => {
+                window.avatarManager.applyChanges();
+            });
+        }
     } else {
         console.error('No logged in user found');
     }
