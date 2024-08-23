@@ -1,5 +1,3 @@
-// shopManager.js
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing shop');
     const shopItemsContainer = document.querySelector('.shop-items');
@@ -48,44 +46,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   function toggleItem(itemId) {
-    console.log('toggleItem called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        if (selectedItems[item.type] === itemId) {
-            // Unselect the item
-            console.log('Unselecting item');
-            delete selectedItems[item.type];
-            if (window.avatarDisplay) {
-                if (typeof window.avatarDisplay.removeItem === 'function') {
+    function toggleItem(itemId) {
+        console.log('toggleItem called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            // Check if an item of the same type is already selected
+            const currentSelectedItemId = selectedItems[item.type];
+            
+            if (currentSelectedItemId === itemId) {
+                // Unselect the item if it's already selected
+                console.log('Unselecting item');
+                delete selectedItems[item.type];
+                if (window.avatarDisplay && typeof window.avatarDisplay.removeItem === 'function') {
                     console.log('Calling avatarDisplay.removeItem');
                     window.avatarDisplay.removeItem(item.type);
-                } else {
-                    console.warn('avatarDisplay.removeItem is not a function. Falling back to updateAvatarDisplay');
-                    // Instead of resetting all items, just update the specific item type
-                    window.avatarDisplay.updateAvatarDisplay(item.type, null);
                 }
             } else {
-                console.error('avatarDisplay not found');
+                // Select the new item, replacing any existing item of the same type
+                console.log('Selecting new item');
+                selectedItems[item.type] = itemId;
+                if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+                    console.log('Calling avatarDisplay.tryOnItem');
+                    window.avatarDisplay.tryOnItem(item);
+                }
             }
+            
+            console.log('Current selectedItems:', selectedItems);
+            updateSelectedItems();
         } else {
-            // Select the item
-            console.log('Selecting item');
-            selectedItems[item.type] = itemId;
-            if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-                console.log('Calling avatarDisplay.tryOnItem');
-                window.avatarDisplay.tryOnItem(item);
-            } else {
-                console.error('avatarDisplay not found or tryOnItem is not a function');
-            }
+            console.error('Item not found for id:', itemId);
         }
-        console.log('Current selectedItems:', selectedItems);
-        updateSelectedItems();
-    } else {
-        console.error('Item not found for id:', itemId);
     }
-}
 
     function updateSelectedItems() {
         console.log('Updating selected items');
@@ -191,7 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAvatarDisplay,
         filterItemsByCategory
     };
-  // Initialize the shop
+
+    // Initialize the shop
     renderShopItems();
 
     // Log avatarDisplay for debugging
