@@ -20,8 +20,8 @@ class AvatarManager {
         this.eyeColor = '#3FA2FF'; // Default eye color
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
-        this.hairColorChanger.setupHairColorPicker();
-        this.setupHairColorApplyButton();
+        this.loadEquippedItems();
+        this.hairColorChanger = new HairColorChanger(this); // Make sure this line is present
     }
     
 
