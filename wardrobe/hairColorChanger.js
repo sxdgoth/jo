@@ -5,13 +5,12 @@ class HairColorChanger {
         this.avatarManager = avatarManager;
         this.colorInput = document.getElementById('hair-color-input');
         this.defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
-        this.originalColors = {};
-
         this.initialize();
     }
 
     initialize() {
         if (this.colorInput) {
+            this.colorInput.value = this.avatarManager.hairColor;
             this.colorInput.addEventListener('input', (e) => {
                 this.changeColor(e.target.value);
             });
@@ -20,54 +19,30 @@ class HairColorChanger {
         }
     }
 
-    hexToRgb(hex) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return [r, g, b];
-    }
-
-    rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-
-    blendColors(color1, color2, ratio) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
-        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
-        
-        let blendRatio = ratio;
-        if (brightness2 > brightness1) {
-            blendRatio = ratio * 0.7;
-        } else {
-            blendRatio = Math.min(ratio * 1.3, 1);
-        }
-
-        const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
-        );
-        return this.rgbToHex(...blended);
-    }
-
     changeColor(newColor) {
+        this.avatarManager.hairColor = newColor;
+        localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
+        this.updateHairColor();
+    }
+
+    updateHairColor() {
         const equippedHair = this.avatarManager.equippedItems['Hair'];
         if (equippedHair) {
             const hairItem = window.userInventory.getItems().find(i => i.id === equippedHair);
             if (hairItem) {
-                this.updateHairColor(hairItem, newColor);
+                this.applyHairColor(hairItem);
             }
         }
     }
 
-    updateHairColor(hairItem, newColor) {
+    applyHairColor(hairItem) {
         fetch(`https://sxdgoth.github.io/jo/${hairItem.path}${hairItem.id}`)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                this.applyHairColor(svgDoc, newColor);
+                this.applyHairColorToSVG(svgDoc);
 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -81,12 +56,12 @@ class HairColorChanger {
             .catch(error => console.error('Error updating hair color:', error));
     }
 
-    applyHairColor(svgDoc, newColor) {
+    applyHairColorToSVG(svgDoc) {
         const paths = svgDoc.querySelectorAll('path');
         paths.forEach((path) => {
             const currentColor = this.getPathColor(path);
             if (currentColor && this.defaultHairColors.includes(currentColor.toUpperCase())) {
-                const blendedColor = this.blendColors(currentColor, newColor, 0.7);
+                const blendedColor = this.blendColors(currentColor, this.avatarManager.hairColor, 0.7);
                 this.setPathColor(path, blendedColor);
             }
         });
@@ -112,6 +87,26 @@ class HairColorChanger {
             style = style.replace(/fill:[^;]+;?/, `fill:${color};`);
             path.setAttribute('style', style);
         }
+    }
+
+    blendColors(color1, color2, ratio) {
+        const rgb1 = this.hexToRgb(color1);
+        const rgb2 = this.hexToRgb(color2);
+        const blended = rgb1.map((channel, i) => 
+            Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
+        );
+        return this.rgbToHex(...blended);
+    }
+
+    hexToRgb(hex) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return [r, g, b];
+    }
+
+    rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 }
 
