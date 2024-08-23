@@ -56,7 +56,7 @@ class HairColorChanger {
                 const url = URL.createObjectURL(blob);
                 
                 requestAnimationFrame(() => {
-                    window.avatarBody.updateLayer(type, url);
+                    this.avatarManager.updateTempLayer(type, url);
                 });
             })
             .catch(error => console.error(`Error updating hair color:`, error));
