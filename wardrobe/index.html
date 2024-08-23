@@ -79,6 +79,20 @@
 
 <script src="https://sxdgoth.github.io/jo/wardrobe/hairColorChanger.js"></script>    
     
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
+        
+        // Initialize HairColorChanger
+        window.hairColorChanger = new HairColorChanger(window.avatarManager);
+    } else {
+        console.error('No logged in user found');
+    }
+});
+</script>
     
 </body>
 </html>
