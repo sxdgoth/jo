@@ -81,15 +81,26 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
-        
-        // Initialize HairColorChanger
-        window.hairColorChanger = new HairColorChanger(window.avatarManager);
-    } else {
-        console.error('No logged in user found');
+    // Initialize HairColorChanger
+    window.hairColorChanger = new HairColorChanger(window.avatarManager);
+
+    // Add event listeners to hair items
+    document.querySelectorAll('.wardrobe-item[data-type="Hair"]').forEach(item => {
+        item.addEventListener('click', (event) => {
+            const hairId = event.currentTarget.querySelector('.item-image').dataset.id;
+            window.hairColorChanger.setSelectedHair(hairId);
+        });
+    });
+
+    // Add apply button event listener
+    const applyButton = document.getElementById('apply-button'); // Make sure you have this button in your HTML
+    if (applyButton) {
+        applyButton.addEventListener('click', () => {
+            if (window.hairColorChanger.selectedHairId) {
+                window.avatarManager.equippedItems['Hair'] = window.hairColorChanger.selectedHairId;
+                window.avatarManager.updateAvatarDisplay();
+            }
+        });
     }
 });
 </script>
