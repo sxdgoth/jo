@@ -134,13 +134,12 @@ class AvatarManager {
     });
 }
 
-    
-    updateAvatarDisplay() {
+    updateTempAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
             
             this.applySkinTone();
-            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
                     if (item) {
@@ -154,7 +153,6 @@ class AvatarManager {
             });
         }
     }
-
 
     
     changeSkinTone(newTone) {
@@ -233,28 +231,6 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-
-  applyChanges() {
-        this.equippedItems = {...this.tempEquippedItems};
-        
-        // Save the hair color if a hair item is equipped
-        if (this.equippedItems['Hair']) {
-            localStorage.setItem(`hairColor_${this.username}`, this.hairColorChanger.hairColor);
-        }
-
-        // Save equipped items to localStorage
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-
-        // Save other properties
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-
-        // Update the avatar display with the applied changes
-        this.updateAvatarDisplay();
-    }
-
-    
      applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
