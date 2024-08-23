@@ -25,21 +25,13 @@ class AvatarManager {
     }
     
 
-    initialize() {
+     initialize() {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
+        this.setupHairColorPicker(); // Add this line
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
-        if (this.hairColorChanger) {
-            this.hairColorChanger.setupHairColorPicker();
-            // Use setTimeout to ensure the DOM is loaded
-            setTimeout(() => {
-                this.setupHairColorApplyButton();
-            }, 0);
-        } else {
-            console.error('HairColorChanger not initialized');
-        }
+        this.loadAndApplyHighlights();
     }
 
     setupEyeColorPicker() {
@@ -66,21 +58,18 @@ class AvatarManager {
         }
     }
 
-     setupHairColorApplyButton() {
-        const applyHairColorButton = document.getElementById('apply-hair-color');
-        if (applyHairColorButton) {
-            applyHairColorButton.addEventListener('click', () => {
-                if (this.hairColorChanger) {
-                    this.hairColorChanger.applyHairColor();
-                    this.updateAvatarDisplay();
-                } else {
-                    console.error('HairColorChanger not initialized');
-                }
+      setupHairColorPicker() {
+        const hairColorPicker = document.getElementById('color-picker');
+        if (hairColorPicker) {
+            hairColorPicker.value = this.hairColorChanger.hairColor;
+            hairColorPicker.addEventListener('input', (event) => {
+                this.hairColorChanger.changeHairColor(event.target.value);
             });
         } else {
-            console.error('Apply hair color button not found');
+            console.error('Hair color picker not found');
         }
     }
+
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
@@ -135,8 +124,9 @@ class AvatarManager {
             }
         } else {
             this.tempEquippedItems[item.type] = item.id;
-            if (item.type === 'Hair') {
-                this.hairColorChanger.setSelectedHair(item.id);
+             if (item.type === 'Hair') {
+            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+        
             }
         }
         
@@ -180,7 +170,7 @@ class AvatarManager {
             });
         }
     }
-
+}
     
     changeSkinTone(newTone) {
         this.skinTone = newTone;
