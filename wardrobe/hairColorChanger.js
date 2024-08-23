@@ -5,6 +5,16 @@ class HairColorChanger {
         this.selectedHairId = null;
     }
 
+     applyHairColor() {
+        if (this.selectedHairId) {
+            this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
+            localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
+            this.updateHairColor();
+        } else {
+            console.warn('No hair item selected to apply color');
+        }
+    }
+
     setupHairColorPicker() {
         const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
