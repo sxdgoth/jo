@@ -1,3 +1,5 @@
+// avatarActions.js
+
 function applyAvatar() {
     if (window.avatarManager) {
         // Clear all equipped items
@@ -16,9 +18,6 @@ function applyAvatar() {
         localStorage.setItem(`eyeColor_${window.avatarManager.username}`, window.avatarManager.eyeColor);
         localStorage.setItem(`lipColor_${window.avatarManager.username}`, window.avatarManager.lipColor);
         
-        // Add this line to save the hair color
-        localStorage.setItem(`hairColor_${window.avatarManager.username}`, window.avatarManager.hairColorChanger.hairColor);
-        
         // Update the avatar display to reflect the changes
         window.avatarManager.updateAvatarDisplay();
         window.avatarManager.updateItemVisuals();
@@ -34,7 +33,11 @@ function applyAvatar() {
 
 function clearAvatar() {
     if (window.avatarManager) {
-        window.avatarManager.clearAvatar();
+        window.avatarManager.tempEquippedItems = {};
+        window.avatarManager.equippedItems = {};
+        localStorage.setItem(`equippedItems_${window.avatarManager.username}`, JSON.stringify({}));
+        window.avatarManager.updateItemVisuals();
+        window.avatarManager.updateTempAvatarDisplay();
     } else {
         console.error('Avatar manager not initialized');
     }
