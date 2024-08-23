@@ -1,9 +1,7 @@
-// itemSelector.js
-
 class ItemSelector {
-    constructor(avatarBody) {
-        console.log('ItemSelector: Initializing with avatarBody:', avatarBody);
-        this.avatarBody = avatarBody;
+    constructor(avatarDisplay) {
+        console.log('ItemSelector: Initializing with avatarDisplay');
+        this.avatarDisplay = avatarDisplay;
         this.selectedItems = {};
     }
 
@@ -27,40 +25,30 @@ class ItemSelector {
     selectItem(item) {
         console.log(`ItemSelector: Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         if (this.selectedItems[item.type]) {
-            this.avatarBody.removeItem(item.type);
+            this.avatarDisplay.removeItem(item.type);
         }
         this.selectedItems[item.type] = item.id;
-        this.avatarBody.tryOnItem(item);
+        this.avatarDisplay.tryOnItem(item);
     }
 
     deselectItem(type) {
         console.log(`ItemSelector: Deselecting item of type: ${type}`);
         delete this.selectedItems[type];
-        this.avatarBody.removeItem(type);
+        this.avatarDisplay.removeItem(type);
     }
 
-
     updateShopDisplay() {
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const itemId = shopItem.querySelector('.item-image').dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (this.selectedItems[item.type] === item.id) {
-                shopItem.classList.add('highlighted');
-            } else {
-                shopItem.classList.remove('highlighted');
-            }
-        });
+        if (window.shopManager) {
+            window.shopManager.renderShopItems();
+        }
     }
 
     resetSelection() {
         console.log('Resetting all selections');
         Object.keys(this.selectedItems).forEach(type => {
-            this.avatarBody.removeItem(type);
+            this.avatarDisplay.removeItem(type);
         });
         this.selectedItems = {};
         this.updateShopDisplay();
     }
 }
-
-// The initialization of ItemSelector is now handled in avatarTemplate.js
