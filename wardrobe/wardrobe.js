@@ -1,5 +1,3 @@
-// wardrobe.js
-
 document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
@@ -49,21 +47,15 @@ function renderOwnedItems() {
             <p>Type: ${item.type}</p>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
+        
         // Add click event listener to the item image
         const itemImage = itemElement.querySelector('.item-image');
-        itemImage.addEventListener('click', () => toggleItem(item));
+        itemImage.addEventListener('click', () => {
+            if (window.avatarManager) {
+                window.avatarManager.toggleItem(item);
+            } else {
+                console.error('AvatarManager not initialized');
+            }
+        });
     });
-}
-
-function toggleItem(item) {
-    if (window.avatarManager) {
-        window.avatarManager.toggleItem(item);
-    } else {
-        console.error('AvatarManager not initialized');
-    }
-}
-
-function logout() {
-    sessionStorage.removeItem('loggedInUser');
-    window.location.href = '../index.html';
 }
