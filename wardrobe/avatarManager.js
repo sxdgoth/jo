@@ -91,27 +91,26 @@ class AvatarManager {
     }
 }
 
-   updateAvatarDisplay() {
-    if (window.avatarBody) {
-        window.avatarBody.clearAllLayers();
-        
-        this.applySkinTone();
-        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-            if (itemId) {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    if (type === 'Hair') {
-                        this.hairColorChanger.setSelectedHair(itemId);
-                        this.hairColorChanger.updateHairColorPreview();
-                    } else {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+  updateAvatarDisplay() {
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        if (type === 'Hair') {
+                            this.hairColorChanger.setSelectedHair(itemId);
+                            this.hairColorChanger.updateHairColorPreview();
+                        } else {
+                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
-}
-
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
