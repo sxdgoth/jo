@@ -352,13 +352,13 @@ loadAndApplyHighlights() {
 }
 
 
-applyItemPosition(itemElement, itemType) {
-    if (typeof applyItemPosition === 'function') {
-        applyItemPosition(itemElement, itemType);
-    } else {
-        console.warn('applyItemPosition function not found');
+ applyItemPosition(element, itemType) {
+        if (typeof applyItemPosition === 'function') {
+            applyItemPosition(element, itemType);
+        } else {
+            console.warn('applyItemPosition function not found');
+        }
     }
-}
 
 
 // Initialize the AvatarManager when the DOM is loaded
