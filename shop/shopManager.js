@@ -46,22 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleTryOn(itemId) {
-        console.log('toggleTryOn called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            if (window.avatarDisplay) {
-                window.avatarDisplay.tryOnItem(item);
-            } else {
-                console.error('window.avatarDisplay is not defined');
-            }
-            
-            updateItemImages();
-        } else {
-            console.error('Item not found for id:', itemId);
-        }
+    console.log('toggleTryOn called with itemId:', itemId);
+    if (window.itemSelector) {
+        window.itemSelector.toggleItem(itemId);
+    } else {
+        console.error('window.itemSelector is not defined');
     }
+}
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
