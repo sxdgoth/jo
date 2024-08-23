@@ -1,54 +1,92 @@
-// haircolormanager.js
+// hairColorChanger.js
 
-export class HairColorManager {
+class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
+        this.colorPicker = document.getElementById('hair-color-picker');
         this.defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         this.originalColors = {};
-        this.currentHairColor = '#1E1E1E'; // Default hair color
+
+        this.initialize();
     }
 
     initialize() {
-        this.setupColorPicker();
-        this.storeOriginalColors();
-    }
-
-    setupColorPicker() {
-        const colorPicker = document.getElementById('color-picker');
-        if (colorPicker) {
-            colorPicker.value = this.currentHairColor;
-            colorPicker.addEventListener('input', (e) => {
-                this.changeHairColor(e.target.value);
+        if (this.colorPicker) {
+            this.colorPicker.addEventListener('input', (e) => {
+                this.changeColor(e.target.value);
             });
         } else {
             console.error('Hair color picker not found');
         }
     }
 
-    storeOriginalColors() {
-        const hairSvg = document.getElementById('hair-svg');
-        if (hairSvg) {
-            const hairPaths = hairSvg.querySelectorAll('path');
-            hairPaths.forEach((path, index) => {
-                const color = this.getPathColor(path);
-                if (color && this.defaultHairColors.includes(color.toUpperCase())) {
-                    this.originalColors[index] = color;
-                }
-            });
+    hexToRgb(hex) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return [r, g, b];
+    }
+
+    rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    blendColors(color1, color2, ratio) {
+        const rgb1 = this.hexToRgb(color1);
+        const rgb2 = this.hexToRgb(color2);
+        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
+        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
+        
+        let blendRatio = ratio;
+        if (brightness2 > brightness1) {
+            blendRatio = ratio * 0.7;
+        } else {
+            blendRatio = Math.min(ratio * 1.3, 1);
+        }
+
+        const blended = rgb1.map((channel, i) => 
+            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
+        );
+        return this.rgbToHex(...blended);
+    }
+
+    changeColor(newColor) {
+        const equippedHair = this.avatarManager.equippedItems['Hair'];
+        if (equippedHair) {
+            const hairItem = window.userInventory.getItems().find(i => i.id === equippedHair);
+            if (hairItem) {
+                this.updateHairColor(hairItem, newColor);
+            }
         }
     }
 
-    changeHairColor(newColor) {
-        this.currentHairColor = newColor;
-        this.avatarManager.updateTempAvatarDisplay();
+    updateHairColor(hairItem, newColor) {
+        fetch(`https://sxdgoth.github.io/jo/${hairItem.path}${hairItem.id}`)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                this.applyHairColor(svgDoc, newColor);
+
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                
+                requestAnimationFrame(() => {
+                    window.avatarBody.updateLayer('Hair', url);
+                });
+            })
+            .catch(error => console.error('Error updating hair color:', error));
     }
 
-    applyHairColor(svgDoc) {
-        const hairPaths = svgDoc.querySelectorAll('path');
-        hairPaths.forEach((path, index) => {
-            const originalColor = this.originalColors[index];
-            if (originalColor) {
-                const blendedColor = this.blendColors(originalColor, this.currentHairColor, 0.7);
+    applyHairColor(svgDoc, newColor) {
+        const paths = svgDoc.querySelectorAll('path');
+        paths.forEach((path) => {
+            const currentColor = this.getPathColor(path);
+            if (currentColor && this.defaultHairColors.includes(currentColor.toUpperCase())) {
+                const blendedColor = this.blendColors(currentColor, newColor, 0.7);
                 this.setPathColor(path, blendedColor);
             }
         });
@@ -65,35 +103,6 @@ export class HairColorManager {
         return null;
     }
 
-    blendColors(color1, color2, ratio) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
-        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
-        
-        let blendRatio = ratio;
-        if (brightness2 > brightness1) {
-            blendRatio = ratio * 0.7;
-        } else {
-            blendRatio = Math.min(ratio * 1.3, 1);
-        }
-        const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
-        );
-        return this.rgbToHex(...blended);
-    }
-
-    hexToRgb(hex) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return [r, g, b];
-    }
-
-    rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-
     setPathColor(path, color) {
         if (path.hasAttribute('fill')) {
             path.setAttribute('fill', color);
@@ -104,28 +113,13 @@ export class HairColorManager {
             path.setAttribute('style', style);
         }
     }
-
-    saveHairColor() {
-        localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.currentHairColor);
-    }
-
-    loadHairColor() {
-        const savedColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`);
-        if (savedColor) {
-            this.currentHairColor = savedColor;
-            const colorPicker = document.getElementById('color-picker');
-            if (colorPicker) {
-                colorPicker.value = savedColor;
-            }
-        }
-    }
-
-    resetHairColor() {
-        this.currentHairColor = '#1E1E1E'; // Reset to default
-        const colorPicker = document.getElementById('color-picker');
-        if (colorPicker) {
-            colorPicker.value = this.currentHairColor;
-        }
-        this.avatarManager.updateTempAvatarDisplay();
-    }
 }
+
+// Initialize the HairColorChanger when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.avatarManager) {
+        window.hairColorChanger = new HairColorChanger(window.avatarManager);
+    } else {
+        console.error('AvatarManager not found');
+    }
+});
