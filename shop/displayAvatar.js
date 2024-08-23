@@ -374,22 +374,37 @@ rgbToHex(r, g, b) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-   tryOnItem(item) {
+
+   toggleItem(item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
+            this.removeItem(item.type);
+        } else {
+            this.tryOnItem(item);
+        }
+    }
+
+    
+    tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        if (!this.currentItems) this.currentItems = {};
-        this.currentItems[item.type] = item;
+        this.triedOnItems[item.type] = item;
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
-    
+
+     isItemTrjedOn(item) {
+        return this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id;
+    }
+
    
-    removeItem(type) {
+     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
-        if (this.currentItems) {
-            delete this.currentItems[type];
-        }
+        delete this.triedOnItems[type];
         this.updateAvatarDisplay(type, null);
     }
+
+
     
     updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
@@ -405,11 +420,21 @@ rgbToHex(r, g, b) {
                 };
             } else {
                 this.layers[type].style.display = 'none';
+                this.layers[type].data = '';
             }
         } else {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
+
+    resetTriedOnItems() {
+        this.triedOnItems = {};
+        Object.keys(this.layers).forEach(type => {
+            this.updateAvatarDisplay(type, null);
+        });
+    }
+
+    
    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
@@ -440,13 +465,7 @@ rgbToHex(r, g, b) {
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
-    resetTriedOnItems() {
-        this.currentItems = {};
-        Object.keys(this.layers).forEach(type => {
-            this.updateAvatarDisplay(type, null);
-        });
-    }
-}
+
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
