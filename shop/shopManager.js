@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Rendering item:', item.name);
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-            itemElement.style.border = '2px solid red'; // Temporary style for visibility
             const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
@@ -37,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         updateCategoryButtons();
+        updateItemImages();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -45,6 +45,38 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = true;
             button.classList.add('owned');
         }
+    }
+
+    function toggleTryOn(itemId) {
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            if (window.avatarDisplay) {
+                window.avatarDisplay.tryOnItem(item);
+            } else {
+                console.error('window.avatarDisplay is not defined');
+            }
+            updateItemImages();
+        } else {
+            console.error('Item not found for id:', itemId);
+        }
+    }
+
+    function updateItemImages() {
+        document.querySelectorAll('.shop-item').forEach(shopItem => {
+            const image = shopItem.querySelector('.item-image');
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            
+            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
+                window.avatarDisplay.currentItems[item.type] && 
+                window.avatarDisplay.currentItems[item.type].id === item.id) {
+                shopItem.classList.add('highlighted');
+            } else {
+                shopItem.classList.remove('highlighted');
+            }
+        });
     }
 
     function buyItem(itemId) {
@@ -84,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Resetting avatar display');
         if (window.avatarDisplay) {
             window.avatarDisplay.resetTriedOnItems();
-            renderShopItems();
+            updateItemImages();
         }
     }
 
@@ -106,21 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
             coinsDisplay.textContent = newCoins;
         }
     }
-
-       // Event listener for clicks
+    // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         console.log('Click event triggered');
         if (e.target.closest('.item-image')) {
             const itemId = e.target.closest('.item-image').dataset.id;
             console.log('ShopManager: Item clicked:', itemId);
-            if (window.itemSelector) {
-                window.itemSelector.toggleItem(itemId);
-            } else {
-                console.error('ShopManager: window.itemSelector is not defined');
-                // Log the current state
-                console.log('window.avatarDisplay:', window.avatarDisplay);
-                console.log('window.itemSelector:', window.itemSelector);
-            }
+            toggleTryOn(itemId);
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
@@ -130,8 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Assign shopManager to window object
     window.shopManager = {
+        toggleTryOn,
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
@@ -140,4 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the shop
     renderShopItems();
-});                    
+});
+
+
+
