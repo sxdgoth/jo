@@ -1,5 +1,3 @@
-// AvatarManager.js
-
 function createLipPalette(baseColor) {
     const rgb = parseInt(baseColor.slice(1), 16);
     const r = (rgb >> 16) & 255;
@@ -64,7 +62,7 @@ class AvatarManager {
         if (hairColorPicker) {
             hairColorPicker.value = this.hairColor;
             hairColorPicker.addEventListener('input', (event) => {
-                this.debounceChangeHairColor(event.target.value);
+                this.changeHairColor(event.target.value);
             });
         } else {
             console.error('Hair color picker not found');
@@ -211,15 +209,6 @@ class AvatarManager {
         });
     }
 
-    debounceChangeHairColor(newColor) {
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-        }
-        this.debounceTimer = setTimeout(() => {
-            this.changeHairColor(newColor);
-        }, 50); // 50ms debounce time
-    }
-
     changeHairColor(newColor) {
         this.hairColor = newColor;
         const hairColorPicker = document.getElementById('hair-color-picker');
@@ -262,6 +251,7 @@ class AvatarManager {
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
+
 
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -307,7 +297,7 @@ class AvatarManager {
                     style = style.replace(new RegExp(defaultColor, 'gi'), 
                         index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
                 });
-                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+                   style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
                 style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
                 preserveColors.forEach(color => {
                     style = style.replace(new RegExp(color, 'gi'), color);
@@ -323,7 +313,7 @@ class AvatarManager {
         replaceColor(svgDoc.documentElement);
     }
 
-    applyEyeColorToSVG(svgDoc) {
+  applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
@@ -353,18 +343,18 @@ class AvatarManager {
             }
         }
     }
-applyHairColorToSVG(svgDoc) {
+ applyHairColorToSVG(svgDoc) {
         const hairPaths = svgDoc.querySelectorAll('path');
         hairPaths.forEach(path => {
             const currentColor = path.getAttribute('fill');
             if (currentColor && currentColor.match(/#[0-9A-Fa-f]{6}/)) {
-                const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
+                const blendedColor = this.blendColors(currentColor, this.hairColor, 1.0);
                 path.setAttribute('fill', blendedColor);
             }
             let style = path.getAttribute('style');
             if (style) {
                 style = style.replace(/fill:(#[0-9A-Fa-f]{6})/g, (match, color) => {
-                    const blendedColor = this.blendColors(color, this.hairColor, 0.7);
+                    const blendedColor = this.blendColors(color, this.hairColor, 1.0);
                     return `fill:${blendedColor}`;
                 });
                 path.setAttribute('style', style);
@@ -375,17 +365,8 @@ applyHairColorToSVG(svgDoc) {
     blendColors(color1, color2, ratio) {
         const rgb1 = this.hexToRgb(color1);
         const rgb2 = this.hexToRgb(color2);
-        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
-        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
-        
-        let blendRatio = ratio;
-        if (brightness2 > brightness1) {
-            blendRatio = ratio * 0.7;
-        } else {
-            blendRatio = Math.min(ratio * 1.3, 1);
-        }
         const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
+            Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
         );
         return this.rgbToHex(...blended);
     }
@@ -446,6 +427,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
-
-
-
+    
