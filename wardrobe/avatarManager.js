@@ -1,3 +1,5 @@
+// avatarManager.js
+
 function createLipPalette(baseColor) {
     const rgb = parseInt(baseColor.slice(1), 16);
     const r = (rgb >> 16) & 255;
@@ -17,11 +19,11 @@ class AvatarManager {
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.skinTone = 'light';
-        this.eyeColor = '#3FA2FF'; // Default eye color
-        this.lipColor = '#E6998F'; // Default lip color
+        this.eyeColor = '#3FA2FF';
+        this.lipColor = '#E6998F';
+        this.hairColor = '#1E1E1E'; // New property for hair color
         this.debounceTimer = null;
         this.loadEquippedItems();
-        this.hairColor = '#1E1E1E'; 
     }
 
     initialize() {
@@ -29,8 +31,7 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
-        this.setupHairColorPicker();
+        this.loadAndApplyHighlights();
     }
 
     setupEyeColorPicker() {
@@ -57,42 +58,10 @@ class AvatarManager {
         }
     }
 
-setupHairColorPicker() {
-    const hairColorPicker = document.getElementById('hair-color-input');
-    if (hairColorPicker) {
-        hairColorPicker.value = this.hairColor;
-        hairColorPicker.addEventListener('input', (event) => {
-            this.debounceChangeHairColor(event.target.value);
-        });
-    } else {
-        console.error('Hair color picker not found');
-    }
-
-debounceChangeHairColor(newColor) {
-    if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer);
-    }
-    this.debounceTimer = setTimeout(() => {
-        this.changeHairColor(newColor);
-    }, 50); // 50ms debounce time
-}
-
-changeHairColor(newColor) {
-    this.hairColor = newColor;
-    const hairColorPicker = document.getElementById('hair-color-input');
-    if (hairColorPicker) {
-        hairColorPicker.value = newColor;
-    }
-    requestAnimationFrame(() => {
-        this.updateTempAvatarDisplay();
-    });
-}
-    
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
             this.equippedItems = Object.fromEntries(
                 Object.entries(this.equippedItems).filter(([_, value]) => value)
             );
@@ -115,12 +84,12 @@ changeHairColor(newColor) {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
+
+        const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
+        if (savedHairColor) {
+            this.hairColor = savedHairColor;
+        }
     }
-     const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
-    if (savedHairColor) {
-        this.hairColor = savedHairColor;
-    }
-}
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
@@ -140,30 +109,28 @@ changeHairColor(newColor) {
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
-            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
-            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
 
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+                itemContainer.classList.add('highlighted');
+            } else {
+                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('highlighted');
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -192,7 +159,7 @@ changeHairColor(newColor) {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeEyeColor(newColor) {
@@ -212,7 +179,7 @@ changeHairColor(newColor) {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeLipColor(newColor) {
@@ -235,86 +202,31 @@ changeHairColor(newColor) {
         }
     }
 
-applyHairColorToSVG(svgDoc) {
-    const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
-    const hairElements = svgDoc.querySelectorAll('path');
-    hairElements.forEach(element => {
-        const currentColor = this.getElementColor(element);
-        if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
-            const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
-            this.setElementColor(element, blendedColor);
-        }
-    });
-}
-
-getElementColor(element) {
-    if (element.hasAttribute('fill')) {
-        return element.getAttribute('fill');
+    updateLayerWithSkinTone(type, src) {
+        fetch(src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                this.applySkinToneToSVG(svgDoc);
+                this.applyEyeColorToSVG(svgDoc);
+                this.applyLipColorToSVG(svgDoc);
+                // Note: Hair color is handled by HairColorChanger
+                
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                
+                requestAnimationFrame(() => {
+                    window.avatarBody.updateLayer(type, url);
+                });
+            })
+            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
-    if (element.hasAttribute('style')) {
-        const match = element.getAttribute('style').match(/fill:\s*(#[A-Fa-f0-9]{6})/);
-        if (match) return match[1];
-    }
-    return null;
-}
 
-setElementColor(element, color) {
-    if (element.hasAttribute('fill')) {
-        element.setAttribute('fill', color);
-    }
-    if (element.hasAttribute('style')) {
-        let style = element.getAttribute('style');
-        style = style.replace(/fill:[^;]+;?/, `fill:${color};`);
-        element.setAttribute('style', style);
-    }
-}
-
-blendColors(color1, color2, ratio) {
-    const rgb1 = this.hexToRgb(color1);
-    const rgb2 = this.hexToRgb(color2);
-    const blended = rgb1.map((channel, i) => 
-        Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
-    );
-    return this.rgbToHex(...blended);
-}
-
-hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return [r, g, b];
-}
-
-rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
-
-    
-  updateLayerWithSkinTone(type, src) {
-    fetch(src)
-        .then(response => response.text())
-        .then(svgText => {
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-            
-            this.applySkinToneToSVG(svgDoc);
-            this.applyEyeColorToSVG(svgDoc);
-            this.applyLipColorToSVG(svgDoc);
-            this.applyHairColorToSVG(svgDoc); // Add this line
-
-            const serializer = new XMLSerializer();
-            const modifiedSvgString = serializer.serializeToString(svgDoc);
-            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            
-            requestAnimationFrame(() => {
-                window.avatarBody.updateLayer(type, url);
-            });
-        })
-        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
-}
-
-     applySkinToneToSVG(svgDoc) {
+    applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -322,12 +234,11 @@ rgbToHex(r, g, b) {
             tan: ['#F1C27D', '#E0B170', '#B39059'],
             dark: ['#8D5524', '#7C4A1E', '#5E3919']
         };
-        const eyeColors = {
+         const eyeColors = {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
-
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -352,7 +263,7 @@ rgbToHex(r, g, b) {
                     }
                 }
             });
-            let style = element.getAttribute('style');
+              let style = element.getAttribute('style');
             if (style) {
                 defaultColors.light.forEach((defaultColor, index) => {
                     style = style.replace(new RegExp(defaultColor, 'gi'), 
@@ -381,25 +292,9 @@ rgbToHex(r, g, b) {
         });
     }
 
-
-
-loadAndApplyHighlights() {
-    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        if (highlightedItems.includes(itemId)) {
-            itemContainer.classList.add('highlighted');
-        }
-    });
-}
-
-
-    
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
-
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -408,8 +303,6 @@ loadAndApplyHighlights() {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
-        // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
@@ -421,8 +314,18 @@ loadAndApplyHighlights() {
             }
         }
     }
-}
 
+    loadAndApplyHighlights() {
+        const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            if (highlightedItems.includes(itemId)) {
+                itemContainer.classList.add('highlighted');
+            }
+        });
+    }
+}
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
@@ -433,3 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
+
+
+
+
+
+
