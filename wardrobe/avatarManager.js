@@ -19,8 +19,8 @@ class AvatarManager {
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
         this.lipColor = '#E6998F'; // Default lip color
-        this.hairColor = '#000000'; // Default hair color
         this.debounceTimer = null;
+        this.hairColorManager = new HairColorManager();
         this.loadEquippedItems();
     }
 
@@ -60,7 +60,7 @@ class AvatarManager {
     setupHairColorPicker() {
         const hairColorPicker = document.getElementById('hair-color-picker');
         if (hairColorPicker) {
-            hairColorPicker.value = this.hairColor;
+            hairColorPicker.value = this.hairColorManager.getCurrentColor();
             hairColorPicker.addEventListener('input', (event) => {
                 this.changeHairColor(event.target.value);
             });
@@ -73,7 +73,6 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
             this.equippedItems = Object.fromEntries(
                 Object.entries(this.equippedItems).filter(([_, value]) => value)
             );
@@ -99,7 +98,7 @@ class AvatarManager {
 
         const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
         if (savedHairColor) {
-            this.hairColor = savedHairColor;
+            this.hairColorManager.setColor(savedHairColor);
         }
     }
 
@@ -121,10 +120,8 @@ class AvatarManager {
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
-            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
-            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
@@ -173,7 +170,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeEyeColor(newColor) {
@@ -193,7 +190,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeLipColor(newColor) {
@@ -210,7 +207,7 @@ class AvatarManager {
     }
 
     changeHairColor(newColor) {
-        this.hairColor = newColor;
+        this.hairColorManager.setColor(newColor);
         const hairColorPicker = document.getElementById('hair-color-picker');
         if (hairColorPicker) {
             hairColorPicker.value = newColor;
@@ -238,7 +235,7 @@ class AvatarManager {
                 this.applyEyeColorToSVG(svgDoc);
                 this.applyLipColorToSVG(svgDoc);
                 if (type === 'Hair') {
-                    this.applyHairColorToSVG(svgDoc);
+                    this.hairColorManager.applyColorToSVG(svgDoc);
                 }
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -252,7 +249,6 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
@@ -265,7 +261,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
@@ -297,7 +293,7 @@ class AvatarManager {
                     style = style.replace(new RegExp(defaultColor, 'gi'), 
                         index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
                 });
-                   style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
                 style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
                 preserveColors.forEach(color => {
                     style = style.replace(new RegExp(color, 'gi'), color);
@@ -313,7 +309,7 @@ class AvatarManager {
         replaceColor(svgDoc.documentElement);
     }
 
-  applyEyeColorToSVG(svgDoc) {
+    applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
@@ -331,7 +327,6 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-        // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
@@ -342,44 +337,6 @@ class AvatarManager {
                 element.setAttribute('style', style);
             }
         }
-    }
- applyHairColorToSVG(svgDoc) {
-        const hairPaths = svgDoc.querySelectorAll('path');
-        hairPaths.forEach(path => {
-            const currentColor = path.getAttribute('fill');
-            if (currentColor && currentColor.match(/#[0-9A-Fa-f]{6}/)) {
-                const blendedColor = this.blendColors(currentColor, this.hairColor, 1.0);
-                path.setAttribute('fill', blendedColor);
-            }
-            let style = path.getAttribute('style');
-            if (style) {
-                style = style.replace(/fill:(#[0-9A-Fa-f]{6})/g, (match, color) => {
-                    const blendedColor = this.blendColors(color, this.hairColor, 1.0);
-                    return `fill:${blendedColor}`;
-                });
-                path.setAttribute('style', style);
-            }
-        });
-    }
-
-    blendColors(color1, color2, ratio) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
-        );
-        return this.rgbToHex(...blended);
-    }
-
-    hexToRgb(hex) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return [r, g, b];
-    }
-
-    rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 
     loadAndApplyHighlights() {
@@ -392,13 +349,12 @@ class AvatarManager {
             }
         });
     }
-
-    saveAvatarState() {
+     saveAvatarState() {
         localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.tempEquippedItems));
         localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
         localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
         localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-        localStorage.setItem(`hairColor_${this.username}`, this.hairColor);
+        localStorage.setItem(`hairColor_${this.username}`, this.hairColorManager.getCurrentColor());
         this.equippedItems = {...this.tempEquippedItems};
         console.log('Avatar state saved');
     }
@@ -427,4 +383,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
-    
