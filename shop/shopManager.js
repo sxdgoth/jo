@@ -3,9 +3,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
+    let selectedItem = null;
 
     function renderShopItems() {
         shopItemsContainer.innerHTML = '';
+
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
@@ -23,8 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
+
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
+
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
@@ -42,35 +46,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-function toggleTryOn(itemId) {
-    console.log('toggleTryOn called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item && window.avatarDisplay) {
-        console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        window.avatarDisplay.tryOnItem(item);
-        updateItemImages();
-    } else {
-        console.error('Item not found or avatarDisplay is not defined');
+    function toggleTryOn(itemId) {
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item && window.avatarDisplay) {
+            if (selectedItem === itemId) {
+                // Unselect the item
+                console.log(`Unselecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+                window.avatarDisplay.removeItem(item.type);
+                selectedItem = null;
+            } else {
+                // Select the item
+                console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+                window.avatarDisplay.tryOnItem(item);
+                selectedItem = itemId;
+            }
+            updateItemImages();
+        } else {
+            console.error('Item not found or avatarDisplay is not defined');
+        }
     }
-}
 
     function updateItemImages() {
-    document.querySelectorAll('.shop-item').forEach(shopItem => {
-        const image = shopItem.querySelector('.item-image');
-        const itemId = image.dataset.id;
-        const item = shopItems.find(i => i.id === itemId);
-        
-        if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-            window.avatarDisplay.currentItems[item.type] && 
-            window.avatarDisplay.currentItems[item.type].id === item.id) {
-            shopItem.classList.add('highlighted');
-        } else {
-            shopItem.classList.remove('highlighted');
-        }
-    });
-}
-    
+        document.querySelectorAll('.shop-item').forEach(shopItem => {
+            const image = shopItem.querySelector('.item-image');
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            
+            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
+                window.avatarDisplay.currentItems[item.type] && 
+                window.avatarDisplay.currentItems[item.type].id === item.id) {
+                shopItem.classList.add('highlighted');
+            } else {
+                shopItem.classList.remove('highlighted');
+            }
+        });
+    }
+
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
@@ -106,6 +118,7 @@ function toggleTryOn(itemId) {
     function resetAvatarDisplay() {
         if (window.avatarDisplay) {
             window.avatarDisplay.resetTriedOnItems();
+            selectedItem = null;
             updateItemImages();
         }
     }
