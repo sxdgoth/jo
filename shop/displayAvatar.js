@@ -374,20 +374,16 @@ rgbToHex(r, g, b) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-     tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // If the same item is clicked again, remove it
-        this.removeItem(item.type);
-    } else {
-        // Update with the new item
+    tryOnItem(item) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        // Always update with the new item
         this.currentItems[item.type] = item;
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+
+        this.reorderLayers();
     }
 
-    this.reorderLayers();
-}
     
 removeItem(type) {
     console.log(`Removing item of type: ${type}`);
@@ -398,10 +394,9 @@ removeItem(type) {
     }
 }
 
-updateAvatarDisplay(type, src) {
-    console.log(`Updating avatar display for ${type} with src: ${src}`);
-    if (this.layers[type]) {
-        if (src) {
+ updateAvatarDisplay(type, src) {
+        console.log(`Updating avatar display for ${type} with src: ${src}`);
+        if (this.layers[type]) {
             this.layers[type].data = src;
             this.layers[type].style.display = 'block';
             this.layers[type].onload = () => {
@@ -411,12 +406,9 @@ updateAvatarDisplay(type, src) {
                 }
             };
         } else {
-            this.removeItem(type);
+            console.warn(`Layer not found for type: ${type}`);
         }
-    } else {
-        console.warn(`Layer not found for type: ${type}`);
     }
-}
 
 
    toggleEquippedItem(type) {
