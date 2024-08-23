@@ -368,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loggedInUser) {
         window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
+        window.AvatarManager = AvatarManager;
     } else {
         console.error('No logged in user found');
     }
