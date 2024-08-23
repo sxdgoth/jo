@@ -20,9 +20,10 @@ class AvatarManager {
         this.eyeColor = '#3FA2FF'; // Default eye color
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
-        this.loadEquippedItems();
-        this.hairColorChanger = new HairColorChanger(this);
+        this.hairColorChanger.setupHairColorPicker();
+        this.setupHairColorApplyButton();
     }
+    
 
     initialize() {
         this.setupEyeColorPicker();
@@ -59,11 +60,12 @@ class AvatarManager {
         }
     }
 
-    setupHairColorApplyButton() {
+      setupHairColorApplyButton() {
         const applyHairColorButton = document.getElementById('apply-hair-color');
         if (applyHairColorButton) {
             applyHairColorButton.addEventListener('click', () => {
                 this.hairColorChanger.applyHairColor();
+                this.updateAvatarDisplay(); // Make sure to update the avatar display
             });
         } else {
             console.error('Apply hair color button not found');
@@ -122,7 +124,6 @@ class AvatarManager {
             this.tempEquippedItems[item.type] = item.id;
         }
         
-        // If the item is a hair item, update the HairColorChanger
         if (item.type === 'Hair') {
             this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
         }
