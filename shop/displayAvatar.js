@@ -467,7 +467,8 @@ rgbToHex(r, g, b) {
 
 
 
-// Initialize the avatar display when the DOM is loaded
+
+// At the end of the file:
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
@@ -475,6 +476,9 @@ document.addEventListener('DOMContentLoaded', function() {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
         console.log("AvatarDisplay initialized:", window.avatarDisplay);
+        
+        // Dispatch a custom event when avatarDisplay is ready
+        window.dispatchEvent(new Event('avatarDisplayReady'));
     } else {
         console.error('No logged in user found');
     }
