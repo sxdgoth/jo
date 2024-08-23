@@ -3,9 +3,8 @@ class HairColorChanger {
         this.avatarManager = avatarManager;
         this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || '#1E1E1E';
         this.selectedHairId = null;
-        console.log('HairColorChanger initialized with color:', this.hairColor);
     }
-
+    
     setupHairColorPicker() {
         const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
