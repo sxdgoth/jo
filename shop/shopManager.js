@@ -1,7 +1,6 @@
 // shopManager.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('ShopManager: DOM loaded');
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
 
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+                const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
                     <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
@@ -33,10 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
+
         updateCategoryButtons();
-        if (window.itemSelector) {
-            window.itemSelector.updateShopDisplay();
-        }
+        updateItemImages();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -45,6 +43,40 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = true;
             button.classList.add('owned');
         }
+    }
+
+    function toggleTryOn(itemId) {
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            if (window.avatarDisplay) {
+                window.avatarDisplay.tryOnItem(item);
+            } else {
+                console.error('window.avatarDisplay is not defined');
+            }
+            
+            updateItemImages();
+        } else {
+            console.error('Item not found for id:', itemId);
+        }
+    }
+
+    function updateItemImages() {
+        document.querySelectorAll('.shop-item').forEach(shopItem => {
+            const image = shopItem.querySelector('.item-image');
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            
+            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
+                window.avatarDisplay.currentItems[item.type] && 
+                window.avatarDisplay.currentItems[item.type].id === item.id) {
+                shopItem.classList.add('highlighted');
+            } else {
+                shopItem.classList.remove('highlighted');
+            }
+        });
     }
 
     function buyItem(itemId) {
@@ -80,8 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetAvatarDisplay() {
-        if (window.itemSelector) {
-            window.itemSelector.resetSelection();
+        if (window.avatarDisplay) {
+            window.avatarDisplay.resetTriedOnItems();
+            updateItemImages();
         }
     }
 
@@ -103,16 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /  // Event delegation for item clicks
+    // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
             const itemId = e.target.closest('.item-image').dataset.id;
-            console.log('ShopManager: Item clicked:', itemId);
-            if (window.itemSelector) {
-                window.itemSelector.toggleItem(itemId);
-            } else {
-                console.error('ShopManager: ItemSelector not found');
-            }
+            console.log('Item clicked:', itemId);
+            toggleTryOn(itemId);
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
@@ -121,15 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
             filterItemsByCategory(category);
         }
     });
-    
+
     window.shopManager = {
+        toggleTryOn,
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
         filterItemsByCategory
     };
 
-  // Initialize the shop
+    // Initialize the shop
     renderShopItems();
-    console.log('ShopManager: Shop initialized');
 });
+ 
