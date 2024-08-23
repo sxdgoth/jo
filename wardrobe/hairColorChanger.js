@@ -4,7 +4,6 @@ class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
         this.hairColor = '#1E1E1E'; // Default hair color
-        this.selectedHairId = null;
         this.setupHairColorPicker();
     }
 
@@ -21,11 +20,6 @@ class HairColorChanger {
         }
     }
 
-    setSelectedHair(hairId) {
-        this.selectedHairId = hairId;
-        this.updateHairColor();
-    }
-
     changeHairColor(newColor) {
         this.hairColor = newColor;
         localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
@@ -33,8 +27,9 @@ class HairColorChanger {
     }
 
     updateHairColor() {
-        if (this.selectedHairId) {
-            const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
+        const hairItem = this.avatarManager.equippedItems['Hair'];
+        if (hairItem) {
+            const item = window.userInventory.getItems().find(i => i.id === hairItem);
             if (item) {
                 this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
             }
@@ -56,7 +51,7 @@ class HairColorChanger {
                 const url = URL.createObjectURL(blob);
                 
                 requestAnimationFrame(() => {
-                    this.avatarManager.updateTempLayer(type, url);
+                    window.avatarBody.updateLayer(type, url);
                 });
             })
             .catch(error => console.error(`Error updating hair color:`, error));
