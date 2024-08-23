@@ -102,7 +102,7 @@ class AvatarManager {
         }
     }
 
-   toggleItem(item) {
+    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
         } else {
@@ -117,22 +117,21 @@ class AvatarManager {
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
-    
 
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+                itemContainer.classList.add('highlighted');
+            } else {
+                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('highlighted');
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -154,7 +153,6 @@ class AvatarManager {
         }
     }
 
-    
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
@@ -189,6 +187,7 @@ class AvatarManager {
         }, 50); // 50ms debounce time
     }
 
+
     changeLipColor(newColor) {
         this.lipColor = newColor;
         const lipColorPicker = document.getElementById('lip-color-input');
@@ -209,7 +208,7 @@ class AvatarManager {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -230,8 +229,7 @@ class AvatarManager {
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
-
-     applySkinToneToSVG(svgDoc) {
+ applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -290,29 +288,24 @@ class AvatarManager {
         };
         replaceColor(svgDoc.documentElement);
     }
-
-    applyEyeColorToSVG(svgDoc) {
+  applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
         });
     }
 
+    loadAndApplyHighlights() {
+        const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            if (highlightedItems.includes(itemId)) {
+                itemContainer.classList.add('highlighted');
+            }
+        });
+    }
 
-
-loadAndApplyHighlights() {
-    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        if (highlightedItems.includes(itemId)) {
-            itemContainer.classList.add('highlighted');
-        }
-    });
-}
-
-
-    
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
@@ -338,6 +331,24 @@ loadAndApplyHighlights() {
             }
         }
     }
+
+    // New methods for avatar actions
+    applyAvatar() {
+        this.equippedItems = {...this.tempEquippedItems};
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+        this.updateAvatarDisplay();
+        this.updateItemVisuals();
+    }
+     clearAvatar() {
+        this.tempEquippedItems = {};
+        this.equippedItems = {};
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify({}));
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
+    }
 }
 
 // Initialize the AvatarManager when the DOM is loaded
@@ -350,3 +361,5 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No logged in user found');
     }
 });
+    
+    
