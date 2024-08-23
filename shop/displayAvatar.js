@@ -388,26 +388,33 @@ rgbToHex(r, g, b) {
 
         this.reorderLayers();
     }
+    
 
-removeItem(type) {
+    removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
 
-  updateAvatarDisplay(type, src) {
+ updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
-                this.layers[type].data = src;
-                this.layers[type].style.display = 'block';
-                this.layers[type].onload = () => {
+                const img = new Image();
+                img.onload = () => {
+                    this.layers[type].data = src;
+                    this.layers[type].style.display = 'block';
                     this.applySkinTone(this.layers[type], type);
                     if (type === 'Eyes') {
                         setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
                     }
                 };
+                img.onerror = () => {
+                    console.error(`Failed to load image: ${src}`);
+                    this.layers[type].style.display = 'none';
+                };
+                img.src = src;
             } else {
                 this.layers[type].style.display = 'none';
                 this.layers[type].data = ''; // Clear the source
