@@ -6,54 +6,32 @@ class HairColorChanger {
     }
 
     setSelectedHair(hairId) {
-        console.log('Setting selected hair ID:', hairId);
         this.selectedHairId = hairId;
+        this.updateHairColor();
     }
 
-    applyHairColor() {
-        console.log('Applying hair color...');
-        console.log('Current hair color:', this.hairColor);
-        console.log('Selected hair ID:', this.selectedHairId);
-        
-        if (!this.selectedHairId) {
-            console.warn('No hair item selected. Please select a hair item first.');
-            return;
-        }
-
-        this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
-        localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
-        localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
+    changeHairColor(newColor) {
+        this.hairColor = newColor;
+        localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
         this.updateHairColor();
     }
 
     updateHairColor() {
-        console.log('Updating hair color...');
-        console.log('Current hair color:', this.hairColor);
-        console.log('Selected hair ID:', this.selectedHairId);
-
-        if (!this.selectedHairId) {
-            console.warn('No hair selected to update color. Please select a hair item first.');
-            return;
-        }
-
-        const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
-        if (item) {
-            console.log('Updating layer with hair color...');
-            this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-        } else {
-            console.error('Hair item not found in inventory');
+        if (this.selectedHairId) {
+            const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
+            if (item) {
+                this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            }
         }
     }
 
     updateLayerWithHairColor(type, src) {
-        console.log('Fetching SVG from:', src);
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                console.log('Applying hair color to SVG...');
                 this.applyHairColorToSVG(svgDoc);
                 
                 const serializer = new XMLSerializer();
@@ -61,7 +39,6 @@ class HairColorChanger {
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
                 const url = URL.createObjectURL(blob);
                 
-                console.log('Updating avatar layer with modified SVG...');
                 requestAnimationFrame(() => {
                     window.avatarBody.updateLayer(type, url);
                 });
@@ -70,21 +47,17 @@ class HairColorChanger {
     }
 
     applyHairColorToSVG(svgDoc) {
-        console.log('Applying hair color to SVG elements...');
         const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         const paths = svgDoc.querySelectorAll('path');
-        let colorApplied = false;
         paths.forEach(path => {
             const currentColor = this.getPathColor(path);
             if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
                 const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
                 this.setPathColor(path, blendedColor);
-                colorApplied = true;
             }
         });
-        console.log('Hair color applied to SVG:', colorApplied);
     }
-
+    
     getPathColor(path) {
         if (path.hasAttribute('fill')) {
             return path.getAttribute('fill');
