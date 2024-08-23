@@ -274,6 +274,21 @@ class AvatarDisplay {
         console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
     }
 
+removeItem(type) {
+    console.log(`Removing item of type: ${type}`);
+    if (this.layers[type]) {
+        this.layers[type].style.display = 'none';
+        delete this.currentItems[type];
+    }
+    // Ensure base parts are always visible
+    this.baseParts.forEach(basePart => {
+        if (this.layers[basePart]) {
+            this.layers[basePart].style.display = 'block';
+        }
+    });
+}
+
+    
    applyHairColor(obj) {
     const svgDoc = obj.contentDocument;
     if (!svgDoc) return;
