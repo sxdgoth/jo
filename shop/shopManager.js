@@ -162,14 +162,8 @@ function initializeShopManager() {
     renderShopItems();
 }
 
-// Wait for the avatarDisplayReady event before initializing
-window.addEventListener('avatarDisplayReady', initializeShopManager);
 
-// Also initialize on DOMContentLoaded in case the event was missed
+// Initialize the shop manager when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.avatarDisplay) {
-        initializeShopManager();
-    } else {
-        console.log('Waiting for avatarDisplay to be ready...');
-    }
+    setTimeout(initializeShopManager, 100);
 });
