@@ -1,8 +1,7 @@
 // hairColorChanger.js
 
 class HairColorChanger {
-    constructor(avatarManager) {
-        this.avatarManager = avatarManager;
+    constructor() {
         this.hairColor = '#1E1E1E'; // Default hair color
         this.selectedHairId = null;
         this.setupHairColorPicker();
@@ -11,7 +10,7 @@ class HairColorChanger {
     setupHairColorPicker() {
         const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
-            this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || this.hairColor;
+            this.hairColor = localStorage.getItem('hairColor') || this.hairColor;
             hairColorPicker.value = this.hairColor;
             hairColorPicker.addEventListener('input', (event) => {
                 this.changeHairColor(event.target.value);
@@ -28,7 +27,7 @@ class HairColorChanger {
 
     changeHairColor(newColor) {
         this.hairColor = newColor;
-        localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
+        localStorage.setItem('hairColor', newColor);
         this.updateHairColor();
     }
 
@@ -66,67 +65,37 @@ class HairColorChanger {
         const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         const paths = svgDoc.querySelectorAll('path');
         paths.forEach(path => {
-            const currentColor = this.getPathColor(path);
+            const currentColor = path.getAttribute('fill');
             if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
                 const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
-                this.setPathColor(path, blendedColor);
+                path.setAttribute('fill', blendedColor);
             }
         });
     }
 
-    getPathColor(path) {
-        if (path.hasAttribute('fill')) {
-            return path.getAttribute('fill');
-        }
-        if (path.hasAttribute('style')) {
-            const match = path.getAttribute('style').match(/fill:\s*(#[A-Fa-f0-9]{6})/);
-            if (match) return match[1];
-        }
-        return null;
-    }
-
-    setPathColor(path, color) {
-        if (path.hasAttribute('fill')) {
-            path.setAttribute('fill', color);
-        }
-        if (path.hasAttribute('style')) {
-            let style = path.getAttribute('style');
-            style = style.replace(/fill:\s*(#[A-Fa-f0-9]{6})/, `fill: ${color}`);
-            path.setAttribute('style', style);
-        }
-    }
-
-    rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-
-    hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? [
-            parseInt(result[1], 16),
-            parseInt(result[2], 16),
-            parseInt(result[3], 16)
-        ] : null;
-    }
-
     blendColors(color1, color2, ratio) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
-        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
+        const hex = (x) => {
+            x = x.toString(16);
+            return (x.length === 1) ? '0' + x : x;
+        };
         
-        let blendRatio = ratio;
-        if (brightness2 > brightness1) {
-            // For lighter colors, reduce the blend ratio to maintain highlights
-            blendRatio = ratio * 0.7;
-        } else {
-            // For darker colors, increase the blend ratio for a more dramatic change
-            blendRatio = Math.min(ratio * 1.3, 1);
-        }
-
-        const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
-        );
-        return this.rgbToHex(...blended);
+        const r1 = parseInt(color1.substring(1, 3), 16);
+        const g1 = parseInt(color1.substring(3, 5), 16);
+        const b1 = parseInt(color1.substring(5, 7), 16);
+        
+        const r2 = parseInt(color2.substring(1, 3), 16);
+        const g2 = parseInt(color2.substring(3, 5), 16);
+        const b2 = parseInt(color2.substring(5, 7), 16);
+        
+        const r = Math.round(r1 * (1 - ratio) + r2 * ratio);
+        const g = Math.round(g1 * (1 - ratio) + g2 * ratio);
+        const b = Math.round(b1 * (1 - ratio) + b2 * ratio);
+        
+        return `#${hex(r)}${hex(g)}${hex(b)}`;
     }
 }
+
+// Initialize the HairColorChanger when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.hairColorChanger = new HairColorChanger();
+});
