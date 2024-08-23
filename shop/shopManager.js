@@ -1,6 +1,8 @@
 // shopManager.js
 
-document.addEventListener('DOMContentLoaded', () => {
+console.log('shopManager.js loaded');
+
+function initializeShopManager() {
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
 
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-                const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
                     <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
@@ -46,21 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleTryOn(itemId) {
-    console.log('toggleTryOn called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        if (window.avatarDisplay) {
-            window.avatarDisplay.toggleItem(item);
-            updateItemImages();
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            if (window.avatarDisplay) {
+                window.avatarDisplay.toggleItem(item);
+                updateItemImages();
+            } else {
+                console.error('window.avatarDisplay is not defined. Make sure it is initialized before calling toggleTryOn.');
+            }
         } else {
-            console.error('window.avatarDisplay is not defined. Make sure it is initialized before calling toggleTryOn.');
+            console.error('Item not found for id:', itemId);
         }
-    } else {
-        console.error('Item not found for id:', itemId);
     }
-}
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -68,9 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             
-            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-                window.avatarDisplay.currentItems[item.type] && 
-                window.avatarDisplay.currentItems[item.type].id === item.id) {
+            if (window.avatarDisplay && window.avatarDisplay.isItemTriedOn(item)) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
@@ -160,5 +160,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the shop
     renderShopItems();
+}
+
+// Wait for the avatarDisplayReady event before initializing
+window.addEventListener('avatarDisplayReady', initializeShopManager);
+
+// Also initialize on DOMContentLoaded in case the event was missed
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.avatarDisplay) {
+        initializeShopManager();
+    } else {
+        console.log('Waiting for avatarDisplay to be ready...');
+    }
 });
- 
