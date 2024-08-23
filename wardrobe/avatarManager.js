@@ -222,13 +222,19 @@ class AvatarManager {
         });
     }
 
-    changeHairColor(newColor) {
+     changeHairColor(newColor) {
         this.hairColor = newColor;
         localStorage.setItem(`hairColor_${this.username}`, newColor);
-        if (window.hairColorChanger) {
-            window.hairColorChanger.updateHairColor();
-        } else {
-            console.error('HairColorChanger not found');
+        this.updateHairColor();
+    }
+
+     updateHairColor() {
+        const hairItem = this.equippedItems['Hair'];
+        if (hairItem) {
+            const item = window.userInventory.getItems().find(i => i.id === hairItem);
+            if (item) {
+                this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            }
         }
     }
 
@@ -238,16 +244,15 @@ class AvatarManager {
             window.skinToneManager.applySkinTone(tone);
         }
     }
-   updateLayerWithSkinTone(type, src) {
+    
+    updateLayerWithHairColor(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                this.applySkinToneToSVG(svgDoc);
-                this.applyEyeColorToSVG(svgDoc);
-                this.applyLipColorToSVG(svgDoc);
+                this.applyHairColorToSVG(svgDoc);
                 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -258,9 +263,42 @@ class AvatarManager {
                     window.avatarBody.updateLayer(type, url);
                 });
             })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+            .catch(error => console.error(`Error updating hair color:`, error));
     }
 
+  applyHairColorToSVG(svgDoc) {
+        const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
+        const paths = svgDoc.querySelectorAll('path');
+        paths.forEach(path => {
+            const currentColor = path.getAttribute('fill');
+            if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
+                const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
+                path.setAttribute('fill', blendedColor);
+            }
+        });
+    }
+
+    blendColors(color1, color2, ratio) {
+        const hex = (x) => {
+            x = x.toString(16);
+            return (x.length === 1) ? '0' + x : x;
+        };
+        
+        const r1 = parseInt(color1.substring(1, 3), 16);
+        const g1 = parseInt(color1.substring(3, 5), 16);
+        const b1 = parseInt(color1.substring(5, 7), 16);
+        
+        const r2 = parseInt(color2.substring(1, 3), 16);
+        const g2 = parseInt(color2.substring(3, 5), 16);
+        const b2 = parseInt(color2.substring(5, 7), 16);
+        
+        const r = Math.round(r1 * (1 - ratio) + r2 * ratio);
+        const g = Math.round(g1 * (1 - ratio) + g2 * ratio);
+        const b = Math.round(b1 * (1 - ratio) + b2 * ratio);
+        
+        return `#${hex(r)}${hex(g)}${hex(b)}`;
+    }
+    
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
