@@ -45,11 +45,13 @@ class HairColorChanger {
         }
     }
 
-    applyHairColor() {
+     applyHairColor() {
+        console.log("Applying hair color", this.tempHairColor);
         this.hairColor = this.tempHairColor;
         localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
         this.updateHairColorPreview();
     }
+
 
     updateLayerWithHairColor(type, src, color) {
         fetch(src)
