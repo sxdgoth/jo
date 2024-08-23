@@ -55,21 +55,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
     
-    function updateItemImages() {
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-                window.avatarDisplay.currentItems[item.type] && 
-                window.avatarDisplay.currentItems[item.type].id === item.id) {
-                shopItem.classList.add('highlighted');
-            } else {
-                shopItem.classList.remove('highlighted');
-            }
-        });
-    }
+  function updateItemImages() {
+    document.querySelectorAll('.shop-item').forEach(shopItem => {
+        const image = shopItem.querySelector('.item-image');
+        const itemId = image.dataset.id;
+        const item = shopItems.find(i => i.id === itemId);
+        
+        if (window.avatarDisplay && window.avatarDisplay.currentItems && 
+            window.avatarDisplay.currentItems[item.type] && 
+            window.avatarDisplay.currentItems[item.type].id === item.id) {
+            shopItem.classList.add('highlighted');
+        } else {
+            shopItem.classList.remove('highlighted');
+        }
+    });
+}
 
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
