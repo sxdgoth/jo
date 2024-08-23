@@ -2,6 +2,7 @@ class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
         this.hairColor = '#1E1E1E'; // Default hair color
+        this.tempHairColor = '#1E1E1E'; // Temporary hair color for preview
         this.selectedHairId = null;
     }
 
@@ -9,9 +10,10 @@ class HairColorChanger {
         const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
             this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || this.hairColor;
+            this.tempHairColor = this.hairColor;
             hairColorPicker.value = this.hairColor;
             hairColorPicker.addEventListener('input', (event) => {
-                this.changeHairColor(event.target.value);
+                this.changeHairColorPreview(event.target.value);
             });
         } else {
             console.error('Hair color picker not found');
@@ -20,22 +22,21 @@ class HairColorChanger {
 
     setSelectedHair(hairId) {
         this.selectedHairId = hairId;
-        this.updateHairColor();
+        this.updateHairColorPreview();
     }
 
-    changeHairColor(newColor) {
-        this.hairColor = newColor;
-        localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
-        this.updateHairColor();
+    changeHairColorPreview(newColor) {
+        this.tempHairColor = newColor;
+        this.updateHairColorPreview();
     }
 
-    updateHairColor() {
-        console.log("Updating hair color", this.selectedHairId, this.hairColor);
+    updateHairColorPreview() {
+        console.log("Updating hair color preview", this.selectedHairId, this.tempHairColor);
         if (this.selectedHairId) {
             const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
             if (item) {
                 console.log("Found hair item", item);
-                this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`, this.tempHairColor);
             } else {
                 console.log("Hair item not found");
             }
@@ -44,14 +45,20 @@ class HairColorChanger {
         }
     }
 
-    updateLayerWithHairColor(type, src) {
+    applyHairColor() {
+        this.hairColor = this.tempHairColor;
+        localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
+        this.updateHairColorPreview();
+    }
+
+    updateLayerWithHairColor(type, src, color) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                this.applyHairColorToSVG(svgDoc);
+                this.applyHairColorToSVG(svgDoc, color);
                 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -64,14 +71,13 @@ class HairColorChanger {
             })
             .catch(error => console.error(`Error updating hair color:`, error));
     }
-
-    applyHairColorToSVG(svgDoc) {
+  applyHairColorToSVG(svgDoc, color) {
         const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         const paths = svgDoc.querySelectorAll('path');
         paths.forEach(path => {
             const currentColor = this.getPathColor(path);
             if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
-                const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
+                const blendedColor = this.blendColors(currentColor, color, 0.7);
                 this.setPathColor(path, blendedColor);
             }
         });
@@ -112,7 +118,7 @@ class HairColorChanger {
         ] : null;
     }
 
-   blendColors(color1, color2, ratio) {
+    blendColors(color1, color2, ratio) {
         const rgb1 = this.hexToRgb(color1);
         const rgb2 = this.hexToRgb(color2);
         const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
@@ -126,7 +132,7 @@ class HairColorChanger {
             // For darker colors, increase the blend ratio for a more dramatic change
             blendRatio = Math.min(ratio * 1.3, 1);
         }
-        const blended = rgb1.map((channel, i) => 
+         const blended = rgb1.map((channel, i) => 
             Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
         );
         return this.rgbToHex(...blended);
