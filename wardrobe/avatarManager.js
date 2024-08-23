@@ -27,11 +27,12 @@ class AvatarManager {
     }
 
     initialize() {
-        this.setupEyeColorPicker();
-        this.setupLipColorPicker();
-        this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        this.loadAndApplyHighlights();
+     this.setupEyeColorPicker();
+    this.setupLipColorPicker();
+    this.setupHairColorPicker(); // Add this line
+    this.updateAvatarDisplay();
+    this.updateItemVisuals();
+    this.loadAndApplyHighlights();
     }
 
     setupEyeColorPicker() {
@@ -326,6 +327,30 @@ class AvatarManager {
         });
     }
 }
+
+setupHairColorPicker() {
+    const hairColorPicker = document.getElementById('hair-color-input');
+    if (hairColorPicker) {
+        hairColorPicker.value = this.hairColor;
+        hairColorPicker.addEventListener('input', (event) => {
+            this.changeHairColor(event.target.value);
+        });
+    } else {
+        console.error('Hair color picker not found');
+    }
+}
+
+changeHairColor(newColor) {
+    this.hairColor = newColor;
+    localStorage.setItem(`hairColor_${this.username}`, newColor);
+    if (window.hairColorChanger) {
+        window.hairColorChanger.updateHairColor();
+    } else {
+        console.error('HairColorChanger not found');
+    }
+}
+
+
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
