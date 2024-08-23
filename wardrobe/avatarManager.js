@@ -85,54 +85,33 @@ class AvatarManager {
             this.lipColor = savedLipColor;
         }
 
-     const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
-    if (savedHairColor) {
-        this.hairColorChanger.hairColor = savedHairColor;
+        const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
+        if (savedHairColor) {
+            this.hairColorChanger.hairColor = savedHairColor;
+        }
     }
-
 
     updateAvatarDisplay() {
-    if (window.avatarBody) {
-        window.avatarBody.clearAllLayers();
-        
-        this.applySkinTone();
-        Object.entries(this.equippedItems).forEach(([type, itemId]) => {
-            if (itemId) {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
-                if (item) {
-                    if (type === 'Hair') {
-                        this.hairColorChanger.updateHairColor();
-                    } else {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        if (type === 'Hair') {
+                            this.hairColorChanger.updateHairColor();
+                        } else {
+                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                        }
                     }
                 }
-            }
-        });
-    }
-}
-        
-
-applyChanges() {
-   this.equippedItems = {...this.tempEquippedItems};
-    
-    // Save the hair color if a hair item is equipped
-    if (this.equippedItems['Hair']) {
-        localStorage.setItem(`hairColor_${this.username}`, this.hairColorChanger.hairColor);
+            });
+        }
     }
 
-    // Save equipped items to localStorage
-    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-
-    // Save other properties
-    localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-    localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-    localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-
-    // Update the avatar display with the applied changes
-    this.updateAvatarDisplay();
-}
-        
-   toggleItem(item) {
+    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
         } else {
@@ -148,21 +127,20 @@ applyChanges() {
         this.updateTempAvatarDisplay();
     }
     
-
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+                itemContainer.classList.add('highlighted');
+            } else {
+                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('highlighted');
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -183,7 +161,6 @@ applyChanges() {
             });
         }
     }
-
     
     changeSkinTone(newTone) {
         this.skinTone = newTone;
@@ -239,7 +216,7 @@ applyChanges() {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -260,8 +237,7 @@ applyChanges() {
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
-
-     applySkinToneToSVG(svgDoc) {
+  applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -320,33 +296,27 @@ applyChanges() {
         };
         replaceColor(svgDoc.documentElement);
     }
-
-    applyEyeColorToSVG(svgDoc) {
+  applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
             element.setAttribute('fill', this.eyeColor);
         });
     }
 
-
-
-loadAndApplyHighlights() {
-    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        if (highlightedItems.includes(itemId)) {
-            itemContainer.classList.add('highlighted');
-        }
-    });
-}
-
-
+    loadAndApplyHighlights() {
+        const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            if (highlightedItems.includes(itemId)) {
+                itemContainer.classList.add('highlighted');
+            }
+        });
+    }
     
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
-
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -355,7 +325,6 @@ loadAndApplyHighlights() {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -367,6 +336,65 @@ loadAndApplyHighlights() {
                 element.setAttribute('style', style);
             }
         }
+    }
+
+   saveChanges() {
+        this.equippedItems = {...this.tempEquippedItems};
+        
+        // Save the hair color if a hair item is equipped
+        if (this.equippedItems['Hair']) {
+            localStorage.setItem(`hairColor_${this.username}`, this.hairColorChanger.hairColor);
+        }
+
+        // Save equipped items to localStorage
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+
+        // Save other properties
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+
+        // Update the avatar display with the applied changes
+        this.updateAvatarDisplay();
+    }
+
+    clearAvatar() {
+        // Get the user's owned items
+        const ownedItems = window.userInventory.getItems();
+
+        // Clear only equipped items that are not the user's default items
+        this.tempEquippedItems = {};
+        
+        // Re-equip default items if they exist in the user's inventory
+        ownedItems.forEach(item => {
+            if (item.isDefault) {
+                this.tempEquippedItems[item.type] = item.id;
+            }
+        });
+
+        // Reset to default appearance settings
+        this.skinTone = 'light'; // Reset to default skin tone
+        this.eyeColor = '#3FA2FF'; // Reset to default eye color
+        this.lipColor = '#E6998F'; // Reset to default lip color
+        this.hairColorChanger.resetHairColor(); // Assuming there's a reset method in HairColorChanger
+
+        // Update the avatar display
+        this.updateTempAvatarDisplay();
+        this.updateItemVisuals();
+
+        // Reset color pickers
+        const eyeColorPicker = document.getElementById('eye-color-input');
+        if (eyeColorPicker) {
+            eyeColorPicker.value = this.eyeColor;
+        }
+
+        const lipColorPicker = document.getElementById('lip-color-input');
+        if (lipColorPicker) {
+            lipColorPicker.value = this.lipColor;
+        }
+
+        // You might want to reset skin tone selector if you have one
+        // this.updateSkinToneSelector();
     }
 }
 
@@ -381,7 +409,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const applyButton = document.getElementById('apply-avatar-btn');
         if (applyButton) {
             applyButton.addEventListener('click', () => {
-                window.avatarManager.applyChanges();
+                window.avatarManager.saveChanges();
+            });
+        }
+
+        // Add event listener for the "Clear" button
+        const clearButton = document.getElementById('clear-avatar-btn');
+        if (clearButton) {
+            clearButton.addEventListener('click', () => {
+                window.avatarManager.clearAvatar();
             });
         }
     } else {
