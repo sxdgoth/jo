@@ -81,26 +81,39 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize HairColorChanger
-    window.hairColorChanger = new HairColorChanger(window.avatarManager);
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        // Initialize AvatarManager
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
 
-    // Add event listeners to hair items
-    document.querySelectorAll('.wardrobe-item[data-type="Hair"]').forEach(item => {
-        item.addEventListener('click', (event) => {
-            const hairId = event.currentTarget.querySelector('.item-image').dataset.id;
-            window.hairColorChanger.setSelectedHair(hairId);
+        // Initialize HairColorChanger
+        window.hairColorChanger = new HairColorChanger(window.avatarManager);
+
+        // Add event listeners to hair items
+        document.querySelectorAll('.wardrobe-item[data-type="Hair"]').forEach(item => {
+            item.addEventListener('click', (event) => {
+                const hairId = event.currentTarget.querySelector('.item-image').dataset.id;
+                window.hairColorChanger.setSelectedHair(hairId);
+                // Update tempEquippedItems in AvatarManager
+                window.avatarManager.tempEquippedItems['Hair'] = hairId;
+                window.avatarManager.updateTempAvatarDisplay();
+            });
         });
-    });
 
-    // Add apply button event listener
-    const applyButton = document.getElementById('apply-button'); // Make sure you have this button in your HTML
-    if (applyButton) {
-        applyButton.addEventListener('click', () => {
+        // Modify the existing apply changes function or add a new one
+        window.applyChanges = () => {
+            // Apply other changes from AvatarManager
+            window.avatarManager.applyChanges();
+
+            // Apply hair color changes
             if (window.hairColorChanger.selectedHairId) {
                 window.avatarManager.equippedItems['Hair'] = window.hairColorChanger.selectedHairId;
-                window.avatarManager.updateAvatarDisplay();
             }
-        });
+            window.avatarManager.updateAvatarDisplay();
+        };
+    } else {
+        console.error('No logged in user found');
     }
 });
 </script>
