@@ -31,7 +31,9 @@ class AvatarManager {
         this.updateItemVisuals();
         this.loadAndApplyHighlights(); 
         this.hairColorChanger.setupHairColorPicker();
+        this.setupHairColorApplyButton(); // Add this line
     }
+
 
     setupEyeColorPicker() {
         const eyeColorPicker = document.getElementById('eye-color-input');
@@ -54,6 +56,17 @@ class AvatarManager {
             });
         } else {
             console.error('Lip color picker not found');
+        }
+    }
+
+    setupHairColorApplyButton() {
+        const applyHairColorButton = document.getElementById('apply-hair-color');
+        if (applyHairColorButton) {
+            applyHairColorButton.addEventListener('click', () => {
+                this.hairColorChanger.applyHairColor();
+            });
+        } else {
+            console.error('Apply hair color button not found');
         }
     }
 
