@@ -1,11 +1,8 @@
-// hairColorChanger.js
-
 class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
         this.hairColor = '#1E1E1E'; // Default hair color
         this.selectedHairId = null;
-        this.setupHairColorPicker();
     }
 
     setupHairColorPicker() {
