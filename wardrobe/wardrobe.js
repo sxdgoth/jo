@@ -11,12 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createUserInventory(loggedInUser.username);
         
         // Initialize AvatarManager
-        if (window.AvatarManager) {
-            window.avatarManager = new window.AvatarManager(loggedInUser.username);
-            window.avatarManager.initialize();
-        } else {
-            console.error('AvatarManager class not found');
-        }
+        window.avatarManager = new AvatarManager(loggedInUser.username);
+        window.avatarManager.initialize();
         
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
@@ -30,9 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Render owned items
         renderOwnedItems();
-        
-        // Attach button listeners
-        attachButtonListeners();
     } else {
         window.location.href = '../index.html';
     }
@@ -56,9 +49,9 @@ function renderOwnedItems() {
             <p>Type: ${item.type}</p>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
-        
-        // Add click event listener to the entire item element
-        itemElement.addEventListener('click', () => toggleItem(item));
+        // Add click event listener to the item image
+        const itemImage = itemElement.querySelector('.item-image');
+        itemImage.addEventListener('click', () => toggleItem(item));
     });
 }
 
@@ -70,64 +63,7 @@ function toggleItem(item) {
     }
 }
 
-function attachButtonListeners() {
-    const applyAvatarBtn = document.getElementById('apply-avatar-btn');
-    if (applyAvatarBtn) {
-        applyAvatarBtn.addEventListener('click', applyAvatar);
-    }
-
-    const clearAvatarBtn = document.getElementById('clear-avatar-btn');
-    if (clearAvatarBtn) {
-        clearAvatarBtn.addEventListener('click', clearAvatar);
-    }
-
-    // Add more button listeners here if needed
+function logout() {
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href = '../index.html';
 }
-
-function applyAvatar() {
-    if (window.avatarManager) {
-        window.avatarManager.applyAvatar();
-        console.log("Avatar changes applied");
-        alert('Avatar saved successfully!');
-    } else {
-        console.error('AvatarManager not initialized');
-    }
-}
-
-function clearAvatar() {
-    if (window.avatarManager) {
-        window.avatarManager.clearAvatar();
-        console.log("Avatar cleared");
-        renderOwnedItems(); // Re-render items to update visual state
-    } else {
-        console.error('AvatarManager not initialized');
-    }
-}
-
-// Function to update highlights based on equipped items
-function updateHighlights() {
-    if (window.avatarManager) {
-        const equippedItems = window.avatarManager.getEquippedItems();
-        document.querySelectorAll('.wardrobe-item').forEach(itemElement => {
-            const itemId = itemElement.querySelector('.item-image').dataset.id;
-            if (Object.values(equippedItems).includes(itemId)) {
-                itemElement.classList.add('highlighted');
-            } else {
-                itemElement.classList.remove('highlighted');
-            }
-        });
-    }
-}
-
-// Call this function after toggling items and applying avatar
-function updateWardrobeDisplay() {
-    renderOwnedItems();
-    updateHighlights();
-}
-
-// You might want to call this function after certain actions
-// For example, after applying avatar changes:
-// applyAvatar() {
-//     // ... existing code ...
-//     updateWardrobeDisplay();
-// }
