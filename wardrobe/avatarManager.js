@@ -84,13 +84,57 @@ class AvatarManager {
         if (savedLipColor) {
             this.lipColor = savedLipColor;
         }
+    }
 
-        const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
-        if (savedHairColor) {
-            this.hairColorChanger.hairColor = savedHairColor;
+    updateAvatarDisplay() {
+        if (window.avatarBody) {
+            window.avatarBody.clearAllLayers();
+            
+            this.applySkinTone();
+            Object.entries(this.equippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = window.userInventory.getItems().find(i => i.id === itemId);
+                    if (item) {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                }
+            });
         }
     }
 
+   toggleItem(item) {
+        if (this.tempEquippedItems[item.type] === item.id) {
+            delete this.tempEquippedItems[item.type];
+        } else {
+            this.tempEquippedItems[item.type] = item.id;
+        }
+        
+        // If the item is a hair item, update the HairColorChanger
+        if (item.type === 'Hair') {
+            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+        }
+        
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
+    }
+    
+
+   updateItemVisuals() {
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
+        const itemId = itemImage.dataset.id;
+        const item = window.userInventory.getItems().find(i => i.id === itemId);
+        if (item && this.tempEquippedItems[item.type] === item.id) {
+            itemImage.classList.add('equipped');
+            itemContainer.classList.add('highlighted');
+        } else {
+            itemImage.classList.remove('equipped');
+            itemContainer.classList.remove('highlighted');
+        }
+    });
+}
+
+    
     updateAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
@@ -111,58 +155,7 @@ class AvatarManager {
         }
     }
 
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-        }
-        
-        // If the item is a hair item, update the HairColorChanger
-        if (item.type === 'Hair') {
-            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
-        }
-        
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
-    }
-    
-    updateItemVisuals() {
-        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-            const itemImage = itemContainer.querySelector('.item-image');
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
-                itemContainer.classList.add('highlighted');
-            } else {
-                itemImage.classList.remove('equipped');
-                itemContainer.classList.remove('highlighted');
-            }
-        });
-    }
 
-
-    
-    updateTempAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        if (type === 'Hair') {
-                            this.hairColorChanger.updateHairColor();
-                        } else {
-                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                        }
-                    }
-                }
-            });
-        }
-    }
     
     changeSkinTone(newTone) {
         this.skinTone = newTone;
@@ -218,7 +211,7 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
+  updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -240,7 +233,29 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-    applySkinToneToSVG(svgDoc) {
+
+  applyChanges() {
+        this.equippedItems = {...this.tempEquippedItems};
+        
+        // Save the hair color if a hair item is equipped
+        if (this.equippedItems['Hair']) {
+            localStorage.setItem(`hairColor_${this.username}`, this.hairColorChanger.hairColor);
+        }
+
+        // Save equipped items to localStorage
+        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+
+        // Save other properties
+        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
+        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
+        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
+
+        // Update the avatar display with the applied changes
+        this.updateAvatarDisplay();
+    }
+
+    
+     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -307,20 +322,25 @@ class AvatarManager {
         });
     }
 
-    loadAndApplyHighlights() {
-        const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
-        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-            const itemImage = itemContainer.querySelector('.item-image');
-            const itemId = itemImage.dataset.id;
-            if (highlightedItems.includes(itemId)) {
-                itemContainer.classList.add('highlighted');
-            }
-        });
-    }
+
+
+loadAndApplyHighlights() {
+    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
+        const itemId = itemImage.dataset.id;
+        if (highlightedItems.includes(itemId)) {
+            itemContainer.classList.add('highlighted');
+        }
+    });
+}
+
+
     
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
+
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -329,6 +349,7 @@ class AvatarManager {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
+
         // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
@@ -341,25 +362,6 @@ class AvatarManager {
             }
         }
     }
- applyChanges() {
-        this.equippedItems = {...this.tempEquippedItems};
-        
-        // Save the hair color if a hair item is equipped
-        if (this.equippedItems['Hair']) {
-            localStorage.setItem(`hairColor_${this.username}`, this.hairColorChanger.hairColor);
-        }
-
-        // Save equipped items to localStorage
-        localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-
-        // Save other properties
-        localStorage.setItem(`skinTone_${this.username}`, this.skinTone);
-        localStorage.setItem(`eyeColor_${this.username}`, this.eyeColor);
-        localStorage.setItem(`lipColor_${this.username}`, this.lipColor);
-
-        // Update the avatar display with the applied changes
-        this.updateAvatarDisplay();
-    }
 }
 
 // Initialize the AvatarManager when the DOM is loaded
@@ -368,22 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loggedInUser) {
         window.avatarManager = new AvatarManager(loggedInUser.username);
         window.avatarManager.initialize();
-
-        // Add event listener for the "Apply" button
-        const applyButton = document.getElementById('apply-avatar-btn');
-        if (applyButton) {
-            applyButton.addEventListener('click', () => {
-                window.avatarManager.applyChanges();
-            });
-        }
-
-        // Add event listener for the "Clear" button
-        const clearButton = document.getElementById('clear-avatar-btn');
-        if (clearButton) {
-            clearButton.addEventListener('click', () => {
-                window.avatarManager.clearAvatar();
-            });
-        }
     } else {
         console.error('No logged in user found');
     }
