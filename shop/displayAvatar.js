@@ -374,15 +374,14 @@ rgbToHex(r, g, b) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-    tryOnItem(item) {
+     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        if (!this.triedOnItems) this.triedOnItems = {};
-        if (!this.currentItems) this.currentItems = {};
-
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            // If the same item is clicked again, remove it
             this.removeItem(item.type);
         } else {
+            // Otherwise, update or add the new item
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
@@ -390,14 +389,15 @@ rgbToHex(r, g, b) {
         this.reorderLayers();
     }
 
+
     
-    removeItem(type) {
+   removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-      updateAvatarDisplay(type, src) {
+updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
