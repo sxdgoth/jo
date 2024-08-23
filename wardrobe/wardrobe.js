@@ -52,18 +52,11 @@ function renderOwnedItems() {
         
         // Apply positioning to the preview image
         const itemImage = itemElement.querySelector('.item-image img');
-        const position = window.itemPositions[item.type.toLowerCase()] || window.itemPositions.default;
-        if (position) {
-            itemImage.style.transform = `
-                translateX(${position.translateX})
-                translateY(${position.translateY})
-                scale(${position.scale})
-            `;
-            itemImage.style.transformOrigin = 'center';
-            console.log(`Applied position to ${item.type}:`, itemImage.style.transform);
+        if (typeof window.applyItemPosition === 'function') {
+            window.applyItemPosition(itemImage, item.type);
         }
         
-        // Add click event listener to the item image
+        // Add click event listener to the item element
         itemElement.addEventListener('click', () => toggleItem(item));
     });
 }
