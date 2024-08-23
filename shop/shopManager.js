@@ -9,11 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
-
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-                const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
                     <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
@@ -23,18 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
-
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
-
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
-
         updateCategoryButtons();
-        updateItemImages();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -43,31 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
             button.disabled = true;
             button.classList.add('owned');
         }
-    }
-
-    function toggleTryOn(itemId) {
-    console.log('toggleTryOn called with itemId:', itemId);
-    if (window.itemSelector) {
-        window.itemSelector.toggleItem(itemId);
-    } else {
-        console.error('window.itemSelector is not defined');
-    }
-}
-
-    function updateItemImages() {
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-                window.avatarDisplay.currentItems[item.type] && 
-                window.avatarDisplay.currentItems[item.type].id === item.id) {
-                shopItem.classList.add('highlighted');
-            } else {
-                shopItem.classList.remove('highlighted');
-            }
-        });
     }
 
     function buyItem(itemId) {
@@ -105,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetAvatarDisplay() {
         if (window.avatarDisplay) {
             window.avatarDisplay.resetTriedOnItems();
-            updateItemImages();
+            renderShopItems();
         }
     }
 
@@ -132,7 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.closest('.item-image')) {
             const itemId = e.target.closest('.item-image').dataset.id;
             console.log('Item clicked:', itemId);
-            toggleTryOn(itemId);
+            if (window.itemSelector) {
+                window.itemSelector.toggleItem(itemId);
+            } else {
+                console.error('window.itemSelector is not defined');
+            }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
@@ -143,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.shopManager = {
-        toggleTryOn,
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
@@ -153,4 +126,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the shop
     renderShopItems();
 });
- 
