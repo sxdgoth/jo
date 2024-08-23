@@ -29,7 +29,7 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
+        this.loadAndApplyHighlights();
         this.hairColorChanger.setupHairColorPicker();
     }
 
@@ -61,7 +61,6 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
             this.equippedItems = Object.fromEntries(
                 Object.entries(this.equippedItems).filter(([_, value]) => value)
             );
@@ -69,17 +68,14 @@ class AvatarManager {
             this.equippedItems = {};
         }
         this.tempEquippedItems = {...this.equippedItems};
-
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
-
         const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
         }
-
         const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
         if (savedLipColor) {
             this.lipColor = savedLipColor;
@@ -102,7 +98,7 @@ class AvatarManager {
         }
     }
 
-   toggleItem(item) {
+    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
         } else {
@@ -117,22 +113,21 @@ class AvatarManager {
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
-    
 
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+                itemContainer.classList.add('highlighted');
+            } else {
+                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('highlighted');
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -154,7 +149,6 @@ class AvatarManager {
         }
     }
 
-    
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
@@ -166,7 +160,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeEyeColor(newColor) {
@@ -186,7 +180,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeLipColor(newColor) {
@@ -209,7 +203,7 @@ class AvatarManager {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -339,6 +333,7 @@ loadAndApplyHighlights() {
         }
     }
 }
+
 
 // Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
