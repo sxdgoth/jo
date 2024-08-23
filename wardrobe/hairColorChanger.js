@@ -8,8 +8,9 @@ class HairColorChanger {
     }
 
     setupHairColorPicker() {
-        const hairColorPicker = document.getElementById('hair-color-input');
+        const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
+            this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || this.hairColor;
             hairColorPicker.value = this.hairColor;
             hairColorPicker.addEventListener('input', (event) => {
                 this.changeHairColor(event.target.value);
