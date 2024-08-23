@@ -41,13 +41,12 @@ class HairColorChanger {
             localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
             localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
             this.updateHairColor();
-            this.avatarManager.updateAvatarDisplay();
             console.log('Hair color applied:', this.hairColor);
         } else {
             console.warn('No hair item selected to apply color');
         }
     }
-
+    
     updateHairColor() {
         console.log('Updating hair color...');
         console.log('Current hair color:', this.hairColor);
