@@ -59,6 +59,7 @@ function renderOwnedItems() {
         // Add click event listener to the item image
         itemImage.addEventListener('click', () => toggleItem(item));
     });
+}
 
 function toggleItem(item) {
     if (window.avatarManager) {
