@@ -106,24 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event delegation for item clicks
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.item-image')) {
-            const itemId = e.target.closest('.item-image').dataset.id;
-            console.log('ShopManager: Item clicked:', itemId);
-            if (window.itemSelector) {
+   // In the click event listener in shopManager.js
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.item-image')) {
+        const itemId = e.target.closest('.item-image').dataset.id;
+        console.log('ShopManager: Item clicked:', itemId);
+        if (window.itemSelector) {
+            window.itemSelector.toggleItem(itemId);
+        } else {
+            console.error('ShopManager: window.itemSelector is not defined');
+            // Attempt to initialize itemSelector if it's not defined
+            if (window.avatarDisplay) {
+                window.itemSelector = new ItemSelector(window.avatarDisplay);
                 window.itemSelector.toggleItem(itemId);
             } else {
-                console.error('ShopManager: window.itemSelector is not defined');
+                console.error('ShopManager: window.avatarDisplay is not defined');
             }
-        } else if (e.target.classList.contains('buy-btn')) {
-            const itemId = e.target.dataset.id;
-            buyItem(itemId);
-        } else if (e.target.classList.contains('category-btn')) {
-            const category = e.target.dataset.category;
-            filterItemsByCategory(category);
         }
-    });
+    }
 
     window.shopManager = {
         buyItem,
