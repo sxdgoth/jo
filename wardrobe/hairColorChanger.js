@@ -1,25 +1,13 @@
 class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
-        this.hairColor = '#1E1E1E'; // Default hair color
+        this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || '#1E1E1E';
         this.selectedHairId = null;
-    }
-
-    applyHairColor() {
-        if (this.selectedHairId) {
-            this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
-            localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
-            this.updateHairColor();
-            this.avatarManager.updateAvatarDisplay(); // Update the avatar display
-        } else {
-            console.warn('No hair item selected to apply color');
-        }
     }
 
     setupHairColorPicker() {
         const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
-            this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || this.hairColor;
             hairColorPicker.value = this.hairColor;
             hairColorPicker.addEventListener('input', (event) => {
                 this.changeHairColor(event.target.value);
@@ -38,6 +26,19 @@ class HairColorChanger {
         this.hairColor = newColor;
         localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
         this.updateHairColor();
+    }
+
+    applyHairColor() {
+        if (this.selectedHairId) {
+            this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
+            localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
+            localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
+            this.updateHairColor();
+            this.avatarManager.updateAvatarDisplay();
+            console.log(`Applied hair color: ${this.hairColor} to hair ID: ${this.selectedHairId}`);
+        } else {
+            console.warn('No hair item selected to apply color');
+        }
     }
 
     updateHairColor() {
