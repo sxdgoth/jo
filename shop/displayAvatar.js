@@ -189,7 +189,7 @@ class AvatarDisplay {
             shadow: '#E6BBA8'
         };
         
-        const preserveColors = ['#E6958A'];  // Add colors here to prevent changes
+        const preserveColors = ['#E6958A', '#F4F4F4'];  // Add colors here to prevent changes
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         
         // Function to create a lip color palette
