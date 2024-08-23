@@ -47,38 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleItem(itemId) {
-        console.log('toggleItem called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            // Check if an item of the same type is already selected
-            const currentSelectedItemId = selectedItems[item.type];
-            
-            if (currentSelectedItemId === itemId) {
-                // Unselect the item if it's already selected
-                console.log('Unselecting item');
-                delete selectedItems[item.type];
-                if (window.avatarDisplay && typeof window.avatarDisplay.removeItem === 'function') {
-                    console.log('Calling avatarDisplay.removeItem');
-                    window.avatarDisplay.removeItem(item.type);
-                }
-            } else {
-                // Select the new item, replacing any existing item of the same type
-                console.log('Selecting new item');
-                selectedItems[item.type] = itemId;
-                if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-                    console.log('Calling avatarDisplay.tryOnItem');
-                    window.avatarDisplay.tryOnItem(item);
-                }
-            }
-            
-            console.log('Current selectedItems:', selectedItems);
-            updateSelectedItems();
+    console.log('toggleItem called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            console.log('Calling avatarDisplay.tryOnItem');
+            window.avatarDisplay.tryOnItem(item);
         } else {
-            console.error('Item not found for id:', itemId);
+            console.error('avatarDisplay not found or tryOnItem is not a function');
         }
+        updateSelectedItems();
+    } else {
+        console.error('Item not found for id:', itemId);
     }
+}
 
     function updateSelectedItems() {
         console.log('Updating selected items');
