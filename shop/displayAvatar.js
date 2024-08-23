@@ -18,6 +18,7 @@ class AvatarDisplay {
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
         this.lipColor = '#E6998F'; // Default lip color
+        this.hairColor = '#1E1E1E'; // Default hair color
         this.skinTones = {
             light: {
                 name: 'Light',
@@ -51,6 +52,7 @@ class AvatarDisplay {
         this.loadSkinTone();
         this.loadEyeColor();
         this.loadLipColor();
+        this.loadHairColor();
         this.loadEquippedItems();
     }
 
@@ -75,6 +77,13 @@ class AvatarDisplay {
         }
     }
 
+    loadHairColor() {
+        const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
+        if (savedHairColor) {
+            this.hairColor = savedHairColor;
+        }
+    }
+
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
@@ -89,6 +98,7 @@ class AvatarDisplay {
         this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
         this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
         this.lipColor = localStorage.getItem(`lipColor_${this.username}`) || '#E6998F';
+        this.hairColor = localStorage.getItem(`hairColor_${this.username}`) || '#1E1E1E';
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
@@ -164,99 +174,150 @@ class AvatarDisplay {
         });
     }
 
-applySkinTone(obj, type) {
-    const svgDoc = obj.contentDocument;
-    if (!svgDoc || !this.skinTones[this.skinTone]) return;
+    applySkinTone(obj, type) {
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc || !this.skinTones[this.skinTone]) return;
 
-    const tone = this.skinTones[this.skinTone];
-    const defaultColors = {
-        light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
-        medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
-        tan: ['#F1C27D', '#E0B170', '#B39059'],
-        dark: ['#8D5524', '#7C4A1E', '#5E3919']
-    };
-    const eyeColors = {
-        main: '#F4D5BF',
-        shadow: '#E6BBA8'
-    };
-    
-    const preserveColors = ['#E6958A'];  // Add colors here to prevent changes
-    const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
-    
-    // Function to create a lip color palette
-    const createLipPalette = (baseColor) => {
-        const rgb = parseInt(baseColor.slice(1), 16);
-        const r = (rgb >> 16) & 255;
-        const g = (rgb >> 8) & 255;
-        const b = rgb & 255;
+        const tone = this.skinTones[this.skinTone];
+        const defaultColors = {
+            light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
+            medium: ['#FFE0BD', '#EFD0B1', '#C4A28A'],
+            tan: ['#F1C27D', '#E0B170', '#B39059'],
+            dark: ['#8D5524', '#7C4A1E', '#5E3919']
+        };
+        const eyeColors = {
+            main: '#F4D5BF',
+            shadow: '#E6BBA8'
+        };
         
-        return [
-            `#${baseColor.slice(1)}`, // Main color
-            `#${Math.max(0, r - 40).toString(16).padStart(2, '0')}${Math.max(0, g - 40).toString(16).padStart(2, '0')}${Math.max(0, b - 40).toString(16).padStart(2, '0')}`, // Darker shade
-            `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
-        ];
-    };
+        const preserveColors = ['#E6958A'];  // Add colors here to prevent changes
+        const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
+        
+           // Function to create a lip color palette
+        const createLipPalette = (baseColor) => {
+            const rgb = parseInt(baseColor.slice(1), 16);
+            const r = (rgb >> 16) & 255;
+            const g = (rgb >> 8) & 255;
+            const b = rgb & 255;
+            
+            return [
+                `#${baseColor.slice(1)}`, // Main color
+                `#${Math.max(0, r - 40).toString(16).padStart(2, '0')}${Math.max(0, g - 40).toString(16).padStart(2, '0')}${Math.max(0, b - 40).toString(16).padStart(2, '0')}`, // Darker shade
+                `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
+            ];
+        };
 
-    const lipPalette = createLipPalette(this.lipColor);
-    
-    const replaceColor = (element) => {
-        ['fill', 'stroke'].forEach(attr => {
-            let color = element.getAttribute(attr);
-            if (color) {
-                color = color.toUpperCase();
-                
-                if (preserveColors.includes(color)) {
-                    return; // Skip preserved colors
-                } else if (originalLipColors.includes(color)) {
-                    const index = originalLipColors.indexOf(color);
-                    element.setAttribute(attr, lipPalette[index]);
-                } else if (defaultColors.light.includes(color)) {
-                    if (color === defaultColors.light[0]) {
+        const lipPalette = createLipPalette(this.lipColor);
+        
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color) {
+                    color = color.toUpperCase();
+                    
+                    if (preserveColors.includes(color)) {
+                        return; // Skip preserved colors
+                    } else if (originalLipColors.includes(color)) {
+                        const index = originalLipColors.indexOf(color);
+                        element.setAttribute(attr, lipPalette[index]);
+                    } else if (defaultColors.light.includes(color)) {
+                        if (color === defaultColors.light[0]) {
+                            element.setAttribute(attr, tone.main);
+                        } else if (color === defaultColors.light[1]) {
+                            element.setAttribute(attr, tone.shadow);
+                        } else if (color === defaultColors.light[2]) {
+                            element.setAttribute(attr, tone.highlight);
+                        }
+                    } else if (color === eyeColors.main) {
                         element.setAttribute(attr, tone.main);
-                    } else if (color === defaultColors.light[1]) {
+                    } else if (color === eyeColors.shadow) {
                         element.setAttribute(attr, tone.shadow);
-                    } else if (color === defaultColors.light[2]) {
-                        element.setAttribute(attr, tone.highlight);
+                    } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !originalLipColors.includes(color)) {
+                        element.setAttribute(attr, tone.main);
+                    } else if (color === '#3FA2FF') {
+                        element.setAttribute(attr, this.eyeColor);
                     }
-                } else if (color === eyeColors.main) {
-                    element.setAttribute(attr, tone.main);
-                } else if (color === eyeColors.shadow) {
-                    element.setAttribute(attr, tone.shadow);
-                } else if ((color.startsWith('#E6') || color.startsWith('#F4')) && !originalLipColors.includes(color)) {
-                    element.setAttribute(attr, tone.main);
-                } else if (color === '#3FA2FF') {
-                    element.setAttribute(attr, this.eyeColor);
                 }
+            });
+            
+            let style = element.getAttribute('style');
+            if (style) {
+                defaultColors.light.forEach((defaultColor, index) => {
+                    style = style.replace(new RegExp(defaultColor, 'gi'), 
+                        index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
+                });
+                style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
+                style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
+                originalLipColors.forEach((color, index) => {
+                    if (!preserveColors.includes(color)) {
+                        style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
+                    }
+                });
+                if (!preserveColors.some(color => style.includes(color)) && !originalLipColors.some(color => style.includes(color))) {
+                    style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
+                    style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
+                }
+                style = style.replace(/#3FA2FF/gi, this.eyeColor);
+                element.setAttribute('style', style);
             }
-        });
 
-        let style = element.getAttribute('style');
-        if (style) {
-            defaultColors.light.forEach((defaultColor, index) => {
-                style = style.replace(new RegExp(defaultColor, 'gi'), 
-                    index === 0 ? tone.main : (index === 1 ? tone.shadow : tone.highlight));
-            });
-            style = style.replace(new RegExp(eyeColors.main, 'gi'), tone.main);
-            style = style.replace(new RegExp(eyeColors.shadow, 'gi'), tone.shadow);
-            originalLipColors.forEach((color, index) => {
-                if (!preserveColors.includes(color)) {
-                    style = style.replace(new RegExp(color, 'gi'), lipPalette[index]);
-                }
-            });
-            if (!preserveColors.some(color => style.includes(color)) && !originalLipColors.some(color => style.includes(color))) {
-                style = style.replace(/#E6[0-9A-F]{4}/gi, tone.main);
-                style = style.replace(/#F4[0-9A-F]{4}/gi, tone.main);
-            }
-            style = style.replace(/#3FA2FF/gi, this.eyeColor);
-            element.setAttribute('style', style);
+            Array.from(element.children).forEach(replaceColor);
+        };
+
+        if (type === 'Hair') {
+            this.applyHairColor(obj);
+        } else {
+            replaceColor(svgDoc.documentElement);
         }
+        console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
+    }
 
-        Array.from(element.children).forEach(replaceColor);
-    };
+    applyHairColor(obj) {
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc) return;
 
-    replaceColor(svgDoc.documentElement);
-    console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
-}
+        const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
+        
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color && defaultHairColors.includes(color.toUpperCase())) {
+                    const blendedColor = this.blendColors(color, this.hairColor, 0.7);
+                    element.setAttribute(attr, blendedColor);
+                }
+            });
+
+            
+            let style = element.getAttribute('style');
+            if (style) {
+                defaultHairColors.forEach(defaultColor => {
+                    style = style.replace(new RegExp(defaultColor, 'gi'), this.hairColor);
+                });
+                element.setAttribute('style', style);
+            }
+
+            Array.from(element.children).forEach(replaceColor);
+        };
+
+        replaceColor(svgDoc.documentElement);
+    }
+
+    blendColors(color1, color2, ratio) {
+        const hex = (x) => {
+            const hex = Math.round(x).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        };
+        const r1 = parseInt(color1.slice(1, 3), 16);
+        const g1 = parseInt(color1.slice(3, 5), 16);
+        const b1 = parseInt(color1.slice(5, 7), 16);
+        const r2 = parseInt(color2.slice(1, 3), 16);
+         const g2 = parseInt(color2.slice(3, 5), 16);
+        const b2 = parseInt(color2.slice(5, 7), 16);
+        const r = Math.round(r1 * (1 - ratio) + r2 * ratio);
+        const g = Math.round(g1 * (1 - ratio) + g2 * ratio);
+        const b = Math.round(b1 * (1 - ratio) + b2 * ratio);
+        return `#${hex(r)}${hex(g)}${hex(b)}`;
+    }
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
@@ -279,14 +340,24 @@ applySkinTone(obj, type) {
     }
 
     changeLipColor(newColor) {
-    this.lipColor = newColor;
-    Object.values(this.layers).forEach(obj => {
-        if (obj.contentDocument) {
-            this.applySkinTone(obj, obj.dataset.type);
-        }
-    });
-    localStorage.setItem(`lipColor_${this.username}`, newColor);
-}
+        this.lipColor = newColor;
+        Object.values(this.layers).forEach(obj => {
+            if (obj.contentDocument) {
+                this.applySkinTone(obj, obj.dataset.type);
+            }
+        });
+        localStorage.setItem(`lipColor_${this.username}`, newColor);
+    }
+
+    changeHairColor(newColor) {
+        this.hairColor = newColor;
+        Object.values(this.layers).forEach(obj => {
+            if (obj.contentDocument && obj.dataset.type === 'Hair') {
+                this.applyHairColor(obj);
+            }
+        });
+        localStorage.setItem(`hairColor_${this.username}`, newColor);
+    }
 
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
@@ -329,8 +400,7 @@ applySkinTone(obj, type) {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
-
-    toggleEquippedItem(type) {
+   toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -339,7 +409,7 @@ applySkinTone(obj, type) {
                     this.layers[type].style.display = 'block';
                     this.lastAction[type] = 'shown';
                     this.hiddenEquippedItems.delete(type);
-                      this.layers[type].onload = () => {
+                    this.layers[type].onload = () => {
                         this.applySkinTone(this.layers[type], type);
                     };
                 }
