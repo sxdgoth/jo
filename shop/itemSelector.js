@@ -20,7 +20,9 @@ class ItemSelector {
             this.selectItem(item);
         }
 
-        this.updateShopDisplay();
+        if (window.shopManager) {
+            window.shopManager.updateItemImages();
+        }
     }
 
     selectItem(item) {
@@ -65,7 +67,8 @@ class ItemSelector {
 document.addEventListener('DOMContentLoaded', function() {
     if (window.avatarDisplay) {
         window.itemSelector = new ItemSelector(window.avatarDisplay);
-        
+        console.log('ItemSelector initialized');
+
         // Add click event listener for item selection
         document.addEventListener('click', function(e) {
             if (e.target.closest('.item-image')) {
