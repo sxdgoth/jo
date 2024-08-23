@@ -1,3 +1,5 @@
+import { HairColorManager } from './haircolormanager.js';
+
 function createLipPalette(baseColor) {
     const rgb = parseInt(baseColor.slice(1), 16);
     const r = (rgb >> 16) & 255;
@@ -19,18 +21,18 @@ class AvatarManager {
         this.skinTone = 'light';
         this.eyeColor = '#3FA2FF'; // Default eye color
         this.lipColor = '#E6998F'; // Default lip color
-        this.hairColor = '#1E1E1E'; // Default hair color
         this.debounceTimer = null;
         this.loadEquippedItems();
+        this.hairColorManager = new HairColorManager(this);
     }
 
     initialize() {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
-        this.setupHairColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         this.loadAndApplyHighlights();
+        this.hairColorManager.initialize();
     }
 
     setupEyeColorPicker() {
@@ -57,18 +59,6 @@ class AvatarManager {
         }
     }
 
-    setupHairColorPicker() {
-        const hairColorPicker = document.getElementById('color-picker');
-        if (hairColorPicker) {
-            hairColorPicker.value = this.hairColor;
-            hairColorPicker.addEventListener('input', (event) => {
-                this.changeHairColor(event.target.value);
-            });
-        } else {
-            console.error('Hair color picker not found');
-        }
-    }
-
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
@@ -91,10 +81,6 @@ class AvatarManager {
         const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
         if (savedLipColor) {
             this.lipColor = savedLipColor;
-        }
-        const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
-        if (savedHairColor) {
-            this.hairColor = savedHairColor;
         }
     }
 
@@ -202,13 +188,6 @@ class AvatarManager {
         });
     }
 
-    changeHairColor(newColor) {
-        this.hairColor = newColor;
-        requestAnimationFrame(() => {
-            this.updateTempAvatarDisplay();
-        });
-    }
-
     applySkinTone() {
         if (window.skinToneManager) {
             const tone = window.skinToneManager.skinTones[this.skinTone];
@@ -216,7 +195,7 @@ class AvatarManager {
         }
     }
 
-   updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -226,6 +205,7 @@ class AvatarManager {
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
                 this.applyLipColorToSVG(svgDoc);
+
                 if (type === 'Hair') {
                     this.hairColorManager.applyHairColor(svgDoc);
                 }
@@ -331,59 +311,6 @@ class AvatarManager {
         }
     }
 
-    applyHairColorToSVG(svgDoc) {
-        const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
-        const hairPaths = svgDoc.querySelectorAll('path');
-        hairPaths.forEach((path) => {
-            const color = this.getPathColor(path);
-            if (color && defaultHairColors.includes(color.toUpperCase())) {
-                const blendedColor = this.blendColors(color, this.hairColor, 0.7);
-                this.setPathColor(path, blendedColor);
-            }
-        });
-    }
-  getPathColor(path) {
-        if (path.hasAttribute('fill')) {
-            return path.getAttribute('fill');
-        }
-         if (path.hasAttribute('style')) {
-            const match = path.getAttribute('style').match(/fill:\s*(#[A-Fa-f0-9]{6})/);
-            if (match) return match[1];
-        }
-        return null;
-    }
-
-    blendColors(color1, color2, ratio) {
-        const rgb1 = this.hexToRgb(color1);
-        const rgb2 = this.hexToRgb(color2);
-        const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
-        );
-        return this.rgbToHex(...blended);
-    }
-
-    hexToRgb(hex) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return [r, g, b];
-    }
-
-    rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-
-    setPathColor(path, color) {
-        if (path.hasAttribute('fill')) {
-            path.setAttribute('fill', color);
-        }
-        if (path.hasAttribute('style')) {
-            let style = path.getAttribute('style');
-            style = style.replace(/fill:[^;]+;?/, `fill:${color};`);
-            path.setAttribute('style', style);
-        }
-    }
-
     loadAndApplyHighlights() {
         const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
         document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
@@ -396,7 +323,6 @@ class AvatarManager {
     }
 }
 
-// Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
