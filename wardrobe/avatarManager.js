@@ -111,21 +111,21 @@ class AvatarManager {
             });
         }
     }
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-        }
-        
-        // If the item is a hair item, update the HairColorChanger
-        if (item.type === 'Hair') {
-            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
-        }
-        
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
+   toggleItem(item) {
+    if (this.tempEquippedItems[item.type] === item.id) {
+        delete this.tempEquippedItems[item.type];
+    } else {
+        this.tempEquippedItems[item.type] = item.id;
     }
+    
+    // If the item is a hair item, update the HairColorChanger
+    if (item.type === 'Hair') {
+        this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+    }
+    
+    this.updateItemVisuals();
+    this.updateTempAvatarDisplay();
+}
 
     updateItemVisuals() {
         document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
@@ -142,7 +142,7 @@ class AvatarManager {
         });
     }
 
-   updateTempAvatarDisplay() {
+  updateTempAvatarDisplay() {
     if (window.avatarBody) {
         window.avatarBody.clearAllLayers();
         
@@ -217,30 +217,27 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
-        fetch(src)
-            .then(response => response.text())
-            .then(svgText => {
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                
-                this.applySkinToneToSVG(svgDoc);
-                this.applyEyeColorToSVG(svgDoc);
-                this.applyLipColorToSVG(svgDoc);
-                const serializer = new XMLSerializer();
-                const modifiedSvgString = serializer.serializeToString(svgDoc);
-                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                
-                requestAnimationFrame(() => {
-                    const layerElement = window.avatarBody.updateLayer(type, url);
-                    if (layerElement) {
-                        this.applyItemPosition(layerElement, type);
-                    }
-                });
-            })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
-    }
+   updateLayerWithSkinTone(type, src) {
+    fetch(src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            this.applySkinToneToSVG(svgDoc);
+            this.applyEyeColorToSVG(svgDoc);
+            this.applyLipColorToSVG(svgDoc);
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            const layerElement = window.avatarBody.updateLayer(type, url);
+            if (layerElement && typeof applyItemPosition === 'function') {
+                applyItemPosition(layerElement, type);
+            }
+        })
+        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
 }
 
      applySkinToneToSVG(svgDoc) {
