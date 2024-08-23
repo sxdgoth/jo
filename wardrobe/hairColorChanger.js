@@ -3,6 +3,7 @@ class HairColorChanger {
         this.avatarManager = avatarManager;
         this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || '#1E1E1E';
         this.selectedHairId = null;
+        console.log('HairColorChanger initialized with color:', this.hairColor);
     }
 
     setupHairColorPicker() {
@@ -12,6 +13,7 @@ class HairColorChanger {
             hairColorPicker.addEventListener('input', (event) => {
                 this.changeHairColor(event.target.value);
             });
+            console.log('Hair color picker set up with color:', this.hairColor);
         } else {
             console.error('Hair color picker not found');
         }
@@ -19,44 +21,59 @@ class HairColorChanger {
 
     setSelectedHair(hairId) {
         this.selectedHairId = hairId;
+        console.log('Selected hair ID:', hairId);
         this.updateHairColor();
     }
 
     changeHairColor(newColor) {
         this.hairColor = newColor;
         localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
+        console.log('Hair color changed to:', newColor);
         this.updateHairColor();
     }
 
     applyHairColor() {
+        console.log('Applying hair color...');
+        console.log('Current hair color:', this.hairColor);
+        console.log('Selected hair ID:', this.selectedHairId);
         if (this.selectedHairId) {
             this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
             localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
             localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
             this.updateHairColor();
             this.avatarManager.updateAvatarDisplay();
-            console.log(`Applied hair color: ${this.hairColor} to hair ID: ${this.selectedHairId}`);
+            console.log('Hair color applied:', this.hairColor);
         } else {
             console.warn('No hair item selected to apply color');
         }
     }
 
     updateHairColor() {
+        console.log('Updating hair color...');
+        console.log('Current hair color:', this.hairColor);
+        console.log('Selected hair ID:', this.selectedHairId);
         if (this.selectedHairId) {
             const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
             if (item) {
+                console.log('Updating layer with hair color...');
                 this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            } else {
+                console.error('Hair item not found in inventory');
             }
+        } else {
+            console.warn('No hair selected to update color');
         }
     }
 
     updateLayerWithHairColor(type, src) {
+        console.log('Fetching SVG from:', src);
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
+                console.log('Applying hair color to SVG...');
                 this.applyHairColorToSVG(svgDoc);
                 
                 const serializer = new XMLSerializer();
@@ -64,6 +81,7 @@ class HairColorChanger {
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
                 const url = URL.createObjectURL(blob);
                 
+                console.log('Updating avatar layer with modified SVG...');
                 requestAnimationFrame(() => {
                     window.avatarBody.updateLayer(type, url);
                 });
@@ -71,17 +89,20 @@ class HairColorChanger {
             .catch(error => console.error(`Error updating hair color:`, error));
     }
 
-
     applyHairColorToSVG(svgDoc) {
+        console.log('Applying hair color to SVG elements...');
         const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         const paths = svgDoc.querySelectorAll('path');
+        let colorApplied = false;
         paths.forEach(path => {
             const currentColor = this.getPathColor(path);
             if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
                 const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
                 this.setPathColor(path, blendedColor);
+                colorApplied = true;
             }
         });
+        console.log('Hair color applied to SVG:', colorApplied);
     }
 
     getPathColor(path) {
