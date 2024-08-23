@@ -1,4 +1,4 @@
-import { HairColorManager } from './haircolormanager.js';
+import { HairColorManager } from 'https://sxdgoth.github.io/jo/wardrobe/haircolormanager.js';
 
 function createLipPalette(baseColor) {
     const rgb = parseInt(baseColor.slice(1), 16);
