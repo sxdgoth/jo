@@ -49,11 +49,16 @@ function renderOwnedItems() {
             <p>Type: ${item.type}</p>
         `;
         wardrobeItemsContainer.appendChild(itemElement);
-        // Add click event listener to the item image
+        
+        // Apply positioning to the item image
         const itemImage = itemElement.querySelector('.item-image');
+        if (window.avatarManager) {
+            window.avatarManager.applyItemPosition(itemImage, item.type);
+        }
+        
+        // Add click event listener to the item image
         itemImage.addEventListener('click', () => toggleItem(item));
     });
-}
 
 function toggleItem(item) {
     if (window.avatarManager) {
