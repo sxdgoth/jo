@@ -7,6 +7,7 @@ class ItemSelector {
     }
 
     toggleItem(itemId) {
+        console.log('toggleItem called with itemId:', itemId);
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
             console.error('Item not found:', itemId);
@@ -23,6 +24,7 @@ class ItemSelector {
     }
 
     selectItem(item) {
+        console.log(`Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         if (this.selectedItems[item.type]) {
             this.avatarDisplay.removeItem(item.type);
         }
@@ -31,6 +33,7 @@ class ItemSelector {
     }
 
     deselectItem(type) {
+        console.log(`Deselecting item of type: ${type}`);
         delete this.selectedItems[type];
         this.avatarDisplay.removeItem(type);
     }
@@ -49,6 +52,7 @@ class ItemSelector {
     }
 
     resetSelection() {
+        console.log('Resetting all selections');
         Object.keys(this.selectedItems).forEach(type => {
             this.avatarDisplay.removeItem(type);
         });
@@ -61,6 +65,15 @@ class ItemSelector {
 document.addEventListener('DOMContentLoaded', function() {
     if (window.avatarDisplay) {
         window.itemSelector = new ItemSelector(window.avatarDisplay);
+        
+        // Add click event listener for item selection
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.item-image')) {
+                const itemId = e.target.closest('.item-image').dataset.id;
+                console.log('Item clicked:', itemId);
+                window.itemSelector.toggleItem(itemId);
+            }
+        });
     } else {
         console.error('AvatarDisplay not initialized');
     }
