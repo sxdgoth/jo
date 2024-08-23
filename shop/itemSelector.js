@@ -1,8 +1,8 @@
 // itemSelector.js
 
 class ItemSelector {
-    constructor(avatarDisplay) {
-        this.avatarDisplay = avatarDisplay;
+    constructor(avatarBody) {
+        this.avatarBody = avatarBody;
         this.selectedItems = {};
     }
 
@@ -26,16 +26,16 @@ class ItemSelector {
     selectItem(item) {
         console.log(`Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         if (this.selectedItems[item.type]) {
-            this.avatarDisplay.removeItem(item.type);
+            this.avatarBody.removeItem(item.type);
         }
         this.selectedItems[item.type] = item.id;
-        this.avatarDisplay.tryOnItem(item);
+        this.avatarBody.tryOnItem(item);
     }
 
     deselectItem(type) {
         console.log(`Deselecting item of type: ${type}`);
         delete this.selectedItems[type];
-        this.avatarDisplay.removeItem(type);
+        this.avatarBody.removeItem(type);
     }
 
     updateShopDisplay() {
@@ -54,30 +54,11 @@ class ItemSelector {
     resetSelection() {
         console.log('Resetting all selections');
         Object.keys(this.selectedItems).forEach(type => {
-            this.avatarDisplay.removeItem(type);
+            this.avatarBody.removeItem(type);
         });
         this.selectedItems = {};
         this.updateShopDisplay();
     }
 }
 
-// Initialize the ItemSelector when the DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.avatarDisplay) {
-        window.itemSelector = new ItemSelector(window.avatarDisplay);
-        
-        // Add click event listener for item selection
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.item-image')) {
-                const itemId = e.target.closest('.item-image').dataset.id;
-                console.log('Item clicked:', itemId);
-                window.itemSelector.toggleItem(itemId);
-            }
-        });
-    } else {
-        console.error('AvatarDisplay not initialized');
-    }
-});
-
-
-
+// The initialization of ItemSelector is now handled in avatarTemplate.js
