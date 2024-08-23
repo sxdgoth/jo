@@ -46,21 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function selectItem(itemId) {
-        const item = shopItems.find(i => i.id === itemId);
-        if (item && window.avatarDisplay) {
-            // Remove previously selected item of the same type, if any
-            if (selectedItems[item.type]) {
-                window.avatarDisplay.removeItem(item.type);
-            }
-            // Select the new item
-            console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            window.avatarDisplay.tryOnItem(item);
-            selectedItems[item.type] = itemId;
-            updateItemImages();
-        }
-    }
-
     function toggleTryOn(itemId) {
         console.log('toggleTryOn called with itemId:', itemId);
         const item = shopItems.find(i => i.id === itemId);
@@ -72,7 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 delete selectedItems[item.type];
             } else {
                 // Select the new item
-                selectItem(itemId);
+                if (selectedItems[item.type]) {
+                    // Remove previously selected item of the same type
+                    window.avatarDisplay.removeItem(item.type);
+                }
+                console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+                window.avatarDisplay.tryOnItem(item);
+                selectedItems[item.type] = itemId;
             }
             updateItemImages();
         } else {
