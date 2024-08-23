@@ -102,7 +102,7 @@ class AvatarManager {
                 if (item) {
                     if (type === 'Hair') {
                         this.hairColorChanger.setSelectedHair(itemId);
-                        this.hairColorChanger.updateHairColor();
+                        this.hairColorChanger.updateHairColorPreview();
                     } else {
                         this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                     }
