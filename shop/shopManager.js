@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
-    let selectedItem = null;
+    let selectedItems = {};
 
     function renderShopItems() {
         shopItemsContainer.innerHTML = '';
@@ -46,33 +46,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   function toggleTryOn(itemId) {
-    console.log('toggleTryOn called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item && window.avatarDisplay) {
-        if (selectedItem === itemId) {
-            // Unselect the item
-            console.log(`Unselecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            window.avatarDisplay.removeItem(item.type);
-            selectedItem = null;
-        } else {
+    function selectItem(itemId) {
+        const item = shopItems.find(i => i.id === itemId);
+        if (item && window.avatarDisplay) {
             // Remove previously selected item of the same type, if any
-            if (selectedItem) {
-                const previousItem = shopItems.find(i => i.id === selectedItem);
-                if (previousItem && previousItem.type === item.type) {
-                    window.avatarDisplay.removeItem(previousItem.type);
-                }
+            if (selectedItems[item.type]) {
+                window.avatarDisplay.removeItem(item.type);
             }
             // Select the new item
             console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             window.avatarDisplay.tryOnItem(item);
-            selectedItem = itemId;
+            selectedItems[item.type] = itemId;
+            updateItemImages();
         }
-        updateItemImages();
-    } else {
-        console.error('Item not found or avatarDisplay is not defined');
     }
-}
+
+    function toggleTryOn(itemId) {
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item && window.avatarDisplay) {
+            if (selectedItems[item.type] === itemId) {
+                // Unselect the item
+                console.log(`Unselecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+                window.avatarDisplay.removeItem(item.type);
+                delete selectedItems[item.type];
+            } else {
+                // Select the new item
+                selectItem(itemId);
+            }
+            updateItemImages();
+        } else {
+            console.error('Item not found or avatarDisplay is not defined');
+        }
+    }
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -80,9 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             
-            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-                window.avatarDisplay.currentItems[item.type] && 
-                window.avatarDisplay.currentItems[item.type].id === item.id) {
+            if (selectedItems[item.type] === item.id) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
@@ -122,13 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   function resetAvatarDisplay() {
-    if (window.avatarDisplay) {
-        window.avatarDisplay.resetTriedOnItems();
-        selectedItem = null;
-        updateItemImages();
+    function resetAvatarDisplay() {
+        if (window.avatarDisplay) {
+            window.avatarDisplay.resetTriedOnItems();
+            selectedItems = {};
+            updateItemImages();
+        }
     }
-}
 
     function filterItemsByCategory(category) {
         currentCategory = category;
