@@ -21,6 +21,7 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
+        this.hairColorChanger = new HairColorChanger(this);
     }
 
     initialize() {
@@ -29,6 +30,7 @@ class AvatarManager {
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         this.loadAndApplyHighlights(); 
+        this.hairColorChanger.setupHairColorPicker();
     }
 
     setupEyeColorPicker() {
@@ -100,17 +102,22 @@ class AvatarManager {
         }
     }
 
-    toggleItem(item) {
+   toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
-            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
-            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
+        
+        // If the item is a hair item, update the HairColorChanger
+        if (item.type === 'Hair') {
+            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+        }
+        
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
+    
 
    updateItemVisuals() {
     document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
@@ -136,13 +143,18 @@ class AvatarManager {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
                     if (item) {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                        if (type === 'Hair') {
+                            this.hairColorChanger.updateHairColor();
+                        } else {
+                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                        }
                     }
                 }
             });
         }
     }
 
+    
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         this.updateTempAvatarDisplay();
