@@ -67,3 +67,6 @@ function applyItemPosition(itemElement, itemType) {
     `;
     console.log(`Applied position to ${itemType}:`, itemElement.style.transform);
 }
+
+// At the end of itemPositioning.js
+window.applyItemPosition = applyItemPosition;
