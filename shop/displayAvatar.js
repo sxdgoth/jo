@@ -374,38 +374,28 @@ rgbToHex(r, g, b) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-
-  toggleItem(item) {
-    console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (this.isItemTriedOn(item)) {
-        this.removeItem(item.type);
-    } else {
-        this.tryOnItem(item);
-    }
-}
-
-    
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        this.triedOnItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+        if (!this.triedOnItems) this.triedOnItems = {};
+        if (!this.currentItems) this.currentItems = {};
+
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            this.removeItem(item.type);
+        } else {
+            this.currentItems[item.type] = item;
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+        }
+
+        this.reorderLayers();
     }
 
-    isItemTriedOn(item) {
-    return this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id;
-}
-
-   
-     removeItem(type) {
+    removeItem(type) {
         console.log(`Removing item of type: ${type}`);
-        delete this.triedOnItems[type];
+        delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-
-    
     updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
@@ -420,21 +410,11 @@ rgbToHex(r, g, b) {
                 };
             } else {
                 this.layers[type].style.display = 'none';
-                this.layers[type].data = '';
             }
         } else {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
-
-    resetTriedOnItems() {
-        this.triedOnItems = {};
-        Object.keys(this.layers).forEach(type => {
-            this.updateAvatarDisplay(type, null);
-        });
-    }
-
-    
    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
@@ -465,20 +445,22 @@ rgbToHex(r, g, b) {
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
+    resetTriedOnItems() {
+        this.currentItems = {};
+        Object.keys(this.layers).forEach(type => {
+            this.updateAvatarDisplay(type, null);
+        });
+    }
+}
 
-
-
-// At the end of the file:
+// Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
-        console.log("AvatarDisplay initialized:", window.avatarDisplay);
-        
-        // Dispatch a custom event when avatarDisplay is ready
-        window.dispatchEvent(new Event('avatarDisplayReady'));
+        window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
         console.error('No logged in user found');
     }
