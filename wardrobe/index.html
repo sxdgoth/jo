@@ -79,34 +79,6 @@
 
 <script src="https://sxdgoth.github.io/jo/wardrobe/hairColorChanger.js"></script>    
     
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize HairColorChanger after AvatarManager is initialized
-    if (window.avatarManager) {
-        window.hairColorChanger = new HairColorChanger(window.avatarManager);
-
-        // Add event listeners to hair items
-        document.querySelectorAll('.wardrobe-item[data-type="Hair"]').forEach(item => {
-            item.addEventListener('click', (event) => {
-                const hairId = event.currentTarget.querySelector('.item-image').dataset.id;
-                window.hairColorChanger.setSelectedHair(hairId);
-                // Update tempEquippedItems in AvatarManager
-                window.avatarManager.tempEquippedItems['Hair'] = hairId;
-                window.avatarManager.updateTempAvatarDisplay();
-            });
-        });
-
-        // Override updateTempAvatarDisplay method in AvatarManager
-        const originalUpdateTempAvatarDisplay = window.avatarManager.updateTempAvatarDisplay;
-        window.avatarManager.updateTempAvatarDisplay = function() {
-            originalUpdateTempAvatarDisplay.call(this);
-            if (window.hairColorChanger.selectedHairId) {
-                window.hairColorChanger.updateHairColor();
-            }
-        };
-    }
-});
-</script>
 
 
 
