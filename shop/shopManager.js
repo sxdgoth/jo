@@ -6,15 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
 
-    function renderShopItems() {
-        console.log('Rendering shop items. Current category:', currentCategory);
-        console.log('Total shop items:', shopItems.length);
-        shopItemsContainer.innerHTML = '';
-        const filteredItems = currentCategory === 'All' 
-            ? shopItems 
-            : shopItems.filter(item => item.type === currentCategory);
-        console.log('Filtered items:', filteredItems.length);
-        filteredItems.forEach(item => {
+   function renderShopItems() {
+    console.log('Rendering shop items. Current category:', currentCategory);
+    console.log('Total shop items:', shopItems.length);
+    shopItemsContainer.innerHTML = '';
+    const filteredItems = currentCategory === 'All' 
+        ? shopItems 
+        : shopItems.filter(item => item.type === currentCategory);
+    console.log('Filtered items:', filteredItems.length);
+    filteredItems.forEach(item => {
+        console.log('Rendering item:', item.name);
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
             itemElement.style.border = '2px solid red'; // Temporary style for visibility
@@ -108,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
    // In the click event listener in shopManager.js
 document.addEventListener('click', function(e) {
+    console.log('Click event triggered');
     if (e.target.closest('.item-image')) {
         const itemId = e.target.closest('.item-image').dataset.id;
         console.log('ShopManager: Item clicked:', itemId);
@@ -115,16 +117,12 @@ document.addEventListener('click', function(e) {
             window.itemSelector.toggleItem(itemId);
         } else {
             console.error('ShopManager: window.itemSelector is not defined');
-            // Attempt to initialize itemSelector if it's not defined
-            if (window.avatarDisplay) {
-                window.itemSelector = new ItemSelector(window.avatarDisplay);
-                window.itemSelector.toggleItem(itemId);
-            } else {
-                console.error('ShopManager: window.avatarDisplay is not defined');
-            }
+            // Log the current state
+            console.log('window.avatarDisplay:', window.avatarDisplay);
+            console.log('window.itemSelector:', window.itemSelector);
         }
     }
-
+    
     window.shopManager = {
         buyItem,
         renderShopItems,
