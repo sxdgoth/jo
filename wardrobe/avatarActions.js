@@ -1,5 +1,3 @@
-// avatarActions.js
-
 function applyAvatar() {
     if (window.avatarManager) {
         // Clear all equipped items
@@ -33,11 +31,7 @@ function applyAvatar() {
 
 function clearAvatar() {
     if (window.avatarManager) {
-        window.avatarManager.tempEquippedItems = {};
-        window.avatarManager.equippedItems = {};
-        localStorage.setItem(`equippedItems_${window.avatarManager.username}`, JSON.stringify({}));
-        window.avatarManager.updateItemVisuals();
-        window.avatarManager.updateTempAvatarDisplay();
+        window.avatarManager.clearAvatar();
     } else {
         console.error('Avatar manager not initialized');
     }
