@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-  function toggleTryOn(itemId) {
+ function toggleTryOn(itemId) {
     console.log('toggleTryOn called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item && window.avatarDisplay) {
