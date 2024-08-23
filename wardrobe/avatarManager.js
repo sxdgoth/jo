@@ -1,3 +1,7 @@
+// avatarmanager.js
+
+import { HairColorManager } from './haircolormanager.js';
+
 function createLipPalette(baseColor) {
     const rgb = parseInt(baseColor.slice(1), 16);
     const r = (rgb >> 16) & 255;
@@ -21,6 +25,7 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
+        this.hairColorManager = new HairColorManager(this);
     }
 
     initialize() {
@@ -28,7 +33,8 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
+        this.loadAndApplyHighlights();
+        this.hairColorManager.initialize();
     }
 
     setupEyeColorPicker() {
@@ -59,7 +65,6 @@ class AvatarManager {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
             this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
             this.equippedItems = Object.fromEntries(
                 Object.entries(this.equippedItems).filter(([_, value]) => value)
             );
@@ -67,17 +72,14 @@ class AvatarManager {
             this.equippedItems = {};
         }
         this.tempEquippedItems = {...this.equippedItems};
-
         const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
         if (savedSkinTone) {
             this.skinTone = savedSkinTone;
         }
-
         const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
         if (savedEyeColor) {
             this.eyeColor = savedEyeColor;
         }
-
         const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
         if (savedLipColor) {
             this.lipColor = savedLipColor;
@@ -102,30 +104,28 @@ class AvatarManager {
 
     toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
-            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
-            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
 
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
+    updateItemVisuals() {
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (item && this.tempEquippedItems[item.type] === item.id) {
+                itemImage.classList.add('equipped');
+                itemContainer.classList.add('highlighted');
+            } else {
+                itemImage.classList.remove('equipped');
+                itemContainer.classList.remove('highlighted');
+            }
+        });
+    }
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -154,7 +154,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeEyeColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeEyeColor(newColor) {
@@ -174,7 +174,7 @@ class AvatarManager {
         }
         this.debounceTimer = setTimeout(() => {
             this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
+        }, 50);
     }
 
     changeLipColor(newColor) {
@@ -197,7 +197,7 @@ class AvatarManager {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
+    updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -207,6 +207,12 @@ class AvatarManager {
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
                 this.applyLipColorToSVG(svgDoc);
+
+                if (type === 'Hair') {
+                    this.hairColorManager.applyHairColor(svgDoc);
+                }
+
+                  
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
@@ -219,7 +225,7 @@ class AvatarManager {
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
 
-     applySkinToneToSVG(svgDoc) {
+    applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -231,8 +237,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
-
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E'];
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
                 let color = element.getAttribute(attr);
@@ -278,7 +283,7 @@ class AvatarManager {
         };
         replaceColor(svgDoc.documentElement);
     }
-
+    
     applyEyeColorToSVG(svgDoc) {
         const eyeElements = svgDoc.querySelectorAll('path[fill="#3FA2FF"], path[fill="#3fa2ff"]');
         eyeElements.forEach(element => {
@@ -286,25 +291,20 @@ class AvatarManager {
         });
     }
 
-
-
-loadAndApplyHighlights() {
-    const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        if (highlightedItems.includes(itemId)) {
-            itemContainer.classList.add('highlighted');
-        }
-    });
-}
-
-
+    loadAndApplyHighlights() {
+        const highlightedItems = JSON.parse(localStorage.getItem(`highlightedItems_${this.username}`)) || [];
+        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+            const itemImage = itemContainer.querySelector('.item-image');
+            const itemId = itemImage.dataset.id;
+            if (highlightedItems.includes(itemId)) {
+                itemContainer.classList.add('highlighted');
+            }
+        });
+    }
     
     applyLipColorToSVG(svgDoc) {
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         const lipPalette = createLipPalette(this.lipColor);
-
         const lipElements = svgDoc.querySelectorAll('path[fill="#E6998F"], path[fill="#BF766E"], path[fill="#F2ADA5"]');
         lipElements.forEach(element => {
             const currentColor = element.getAttribute('fill').toUpperCase();
@@ -313,8 +313,6 @@ loadAndApplyHighlights() {
                 element.setAttribute('fill', lipPalette[index]);
             }
         });
-
-        // Also update lip colors in style attributes
         const allElements = svgDoc.getElementsByTagName('*');
         for (let element of allElements) {
             let style = element.getAttribute('style');
@@ -328,7 +326,6 @@ loadAndApplyHighlights() {
     }
 }
 
-// Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
