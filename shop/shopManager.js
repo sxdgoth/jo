@@ -46,7 +46,7 @@ function toggleTryOn(itemId) {
     console.log('toggleTryOn called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item && window.avatarDisplay) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         window.avatarDisplay.tryOnItem(item);
         updateItemImages();
