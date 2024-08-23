@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
+    let tempEquippedItems = {};
 
     function renderShopItems() {
         shopItemsContainer.innerHTML = '';
@@ -42,35 +43,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-function toggleTryOn(itemId) {
-    console.log('toggleTryOn called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item && window.avatarDisplay) {
-        console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        window.avatarDisplay.tryOnItem(item);
-        updateItemImages();
-    } else {
-        console.error('Item not found or avatarDisplay is not defined');
+    function toggleTryOn(itemId) {
+        console.log('toggleTryOn called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item && window.avatarDisplay) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            
+            if (tempEquippedItems[item.type] === item.id) {
+                delete tempEquippedItems[item.type];
+            } else {
+                tempEquippedItems[item.type] = item.id;
+            }
+            
+            updateTempAvatarDisplay();
+            updateItemImages();
+        } else {
+            console.error('Item not found or avatarDisplay is not defined');
+        }
     }
-}
+
+    function updateTempAvatarDisplay() {
+        if (window.avatarDisplay) {
+            window.avatarDisplay.resetTriedOnItems();
+            
+            Object.entries(tempEquippedItems).forEach(([type, itemId]) => {
+                if (itemId) {
+                    const item = shopItems.find(i => i.id === itemId);
+                    if (item) {
+                        window.avatarDisplay.tryOnItem(item);
+                    }
+                }
+            });
+        }
+    }
 
     function updateItemImages() {
-    document.querySelectorAll('.shop-item').forEach(shopItem => {
-        const image = shopItem.querySelector('.item-image');
-        const itemId = image.dataset.id;
-        const item = shopItems.find(i => i.id === itemId);
-        
-        if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-            window.avatarDisplay.currentItems[item.type] && 
-            window.avatarDisplay.currentItems[item.type].id === item.id) {
-            shopItem.classList.add('highlighted');
-        } else {
-            shopItem.classList.remove('highlighted');
-        }
-    });
-}
-    
+        document.querySelectorAll('.shop-item').forEach(shopItem => {
+            const image = shopItem.querySelector('.item-image');
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            
+            if (tempEquippedItems[item.type] === item.id) {
+                shopItem.classList.add('highlighted');
+            } else {
+                shopItem.classList.remove('highlighted');
+            }
+        });
+    }
+
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
@@ -103,11 +123,10 @@ function toggleTryOn(itemId) {
         }
     }
 
-    function resetAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
-            updateItemImages();
-        }
+    function resetTempEquippedItems() {
+        tempEquippedItems = {};
+        updateTempAvatarDisplay();
+        updateItemImages();
     }
 
     function filterItemsByCategory(category) {
@@ -143,11 +162,17 @@ function toggleTryOn(itemId) {
         }
     });
 
+    // Add a reset button
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset Tried-On Items';
+    resetButton.addEventListener('click', resetTempEquippedItems);
+    shopItemsContainer.parentNode.insertBefore(resetButton, shopItemsContainer);
+
     window.shopManager = {
         toggleTryOn,
         buyItem,
         renderShopItems,
-        resetAvatarDisplay,
+        resetTempEquippedItems,
         filterItemsByCategory
     };
 
