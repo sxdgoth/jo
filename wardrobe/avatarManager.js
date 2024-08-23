@@ -115,7 +115,7 @@ class AvatarManager {
         }
     }
 
-   toggleItem(item) {
+  toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
         } else {
@@ -130,6 +130,7 @@ class AvatarManager {
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
+
     
 
    updateItemVisuals() {
