@@ -216,7 +216,7 @@ class AvatarManager {
         }
     }
 
-    updateLayerWithSkinTone(type, src) {
+   updateLayerWithSkinTone(type, src) {
         fetch(src)
             .then(response => response.text())
             .then(svgText => {
@@ -227,7 +227,7 @@ class AvatarManager {
                 this.applyEyeColorToSVG(svgDoc);
                 this.applyLipColorToSVG(svgDoc);
                 if (type === 'Hair') {
-                    this.applyHairColorToSVG(svgDoc);
+                    this.hairColorManager.applyHairColor(svgDoc);
                 }
 
                 const serializer = new XMLSerializer();
@@ -241,6 +241,7 @@ class AvatarManager {
             })
             .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
     }
+
     applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
         const defaultColors = {
