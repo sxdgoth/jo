@@ -42,26 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleTryOn(itemId) {
+  function toggleTryOn(itemId) {
     console.log('toggleTryOn called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item && window.avatarDisplay) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        const currentItem = window.avatarDisplay.currentItems[item.type];
-        
-        // If the clicked item is already tried on, remove it
-        if (currentItem && currentItem.id === item.id) {
-            window.avatarDisplay.removeItem(item.type);
-        } else {
-            // If there's a different item of the same type already tried on, remove it first
-            if (currentItem) {
-                window.avatarDisplay.removeItem(item.type);
-            }
-            // Try on the new item
-            window.avatarDisplay.tryOnItem(item);
-        }
-        
+        window.avatarDisplay.tryOnItem(item);
         updateItemImages();
     } else {
         console.error('Item not found or avatarDisplay is not defined');
