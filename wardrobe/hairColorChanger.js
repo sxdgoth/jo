@@ -118,3 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('AvatarManager not found');
     }
 });
+
+
+
