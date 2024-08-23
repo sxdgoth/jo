@@ -1,5 +1,7 @@
+
 class AvatarDisplay {
     constructor(containerId, username) {
+        console.log('AvatarDisplay: Initializing for user', username);
         this.username = username;
         this.container = document.getElementById(containerId);
         this.triedOnItems = {};
@@ -464,3 +466,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No logged in user found');
     }
 });
+
+
+
