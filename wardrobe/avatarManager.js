@@ -143,31 +143,6 @@ class AvatarManager {
     }
 
 
- clearAvatar() {
-        this.tempEquippedItems = {};
-        this.skinTone = 'light'; // Reset to default skin tone
-        this.eyeColor = '#3FA2FF'; // Reset to default eye color
-        this.lipColor = '#E6998F'; // Reset to default lip color
-        this.hairColorChanger.resetHairColor(); // Assuming there's a reset method in HairColorChanger
-
-        // Update the avatar display
-        this.updateTempAvatarDisplay();
-        this.updateItemVisuals();
-
-        // Reset color pickers
-        const eyeColorPicker = document.getElementById('eye-color-input');
-        if (eyeColorPicker) {
-            eyeColorPicker.value = this.eyeColor;
-        }
-
-        const lipColorPicker = document.getElementById('lip-color-input');
-        if (lipColorPicker) {
-            lipColorPicker.value = this.lipColor;
-        }
-
-        // You might want to reset skin tone selector if you have one
-        // this.updateSkinToneSelector();
-    }
     
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
