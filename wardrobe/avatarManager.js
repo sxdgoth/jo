@@ -21,7 +21,6 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
-        this.hairColorChanger = new HairColorChanger(this);
     }
 
     initialize() {
@@ -29,8 +28,7 @@ class AvatarManager {
         this.setupLipColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
-        this.loadAndApplyHighlights();
-        this.hairColorChanger.setupHairColorPicker();
+        this.loadAndApplyHighlights(); 
     }
 
     setupEyeColorPicker() {
@@ -102,19 +100,14 @@ class AvatarManager {
         }
     }
 
-     toggleItem(item) {
+    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
+            // If the item is currently selected, deselect it
             delete this.tempEquippedItems[item.type];
         } else {
+            // If the item is not selected, select it
             this.tempEquippedItems[item.type] = item.id;
         }
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
-    }
-      if (item.type === 'Hair') {
-            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
-        }
-        
         this.updateItemVisuals();
         this.updateTempAvatarDisplay();
     }
@@ -143,11 +136,7 @@ class AvatarManager {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
                     if (item) {
-                        if (type === 'Hair') {
-                            this.hairColorChanger.updateHairColor();
-                        } else {
-                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                        }
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                     }
                 }
             });
