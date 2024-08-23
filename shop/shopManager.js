@@ -2,10 +2,22 @@
 
 console.log('shopManager.js loaded');
 
+function ensureAvatarDisplay(callback) {
+    if (window.avatarDisplay) {
+        callback();
+    } else if (window.initializeAvatarDisplay && window.initializeAvatarDisplay()) {
+        callback();
+    } else {
+        console.error('Failed to initialize AvatarDisplay');
+    }
+}
+
 function initializeShopManager() {
+    console.log("Initializing Shop Manager");
+
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
-
+    
     function renderShopItems() {
         shopItemsContainer.innerHTML = '';
         const filteredItems = currentCategory === 'All' 
@@ -48,21 +60,24 @@ function initializeShopManager() {
     }
 
     function toggleTryOn(itemId) {
-        console.log('toggleTryOn called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            if (window.avatarDisplay) {
-                window.avatarDisplay.toggleItem(item);
-                updateItemImages();
+        ensureAvatarDisplay(() => {
+            console.log('toggleTryOn called with itemId:', itemId);
+            const item = shopItems.find(i => i.id === itemId);
+            if (item) {
+                console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+                
+                if (window.avatarDisplay) {
+                    window.avatarDisplay.toggleItem(item);
+                    updateItemImages();
+                } else {
+                    console.error('window.avatarDisplay is still not defined after initialization attempt.');
+                }
             } else {
-                console.error('window.avatarDisplay is not defined. Make sure it is initialized before calling toggleTryOn.');
+                console.error('Item not found for id:', itemId);
             }
-        } else {
-            console.error('Item not found for id:', itemId);
-        }
+        });
     }
+
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -135,7 +150,7 @@ function initializeShopManager() {
         }
     }
 
-    // Event delegation for item clicks
+     // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
             const itemId = e.target.closest('.item-image').dataset.id;
@@ -160,10 +175,14 @@ function initializeShopManager() {
 
     // Initialize the shop
     renderShopItems();
-}
 
+    console.log("Shop Manager initialized");
+}
 
 // Initialize the shop manager when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initializeShopManager, 100);
 });
+
+
+
