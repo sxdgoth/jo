@@ -98,15 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event delegation for item clicks
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.item-image')) {
-            const itemId = e.target.closest('.item-image').dataset.id;
-            console.log('Item clicked:', itemId);
-            if (window.itemSelector) {
-                window.itemSelector.toggleItem(itemId);
-            } else {
-                console.error('window.itemSelector is not defined');
-            }
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.item-image')) {
+        const itemId = e.target.closest('.item-image').dataset.id;
+        console.log('ShopManager: Item clicked:', itemId);
+        if (window.itemSelector) {
+            window.itemSelector.toggleItem(itemId);
+        } else {
+            console.error('ShopManager: window.itemSelector is not defined');
+        }
+    }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
