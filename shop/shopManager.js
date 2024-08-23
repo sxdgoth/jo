@@ -46,22 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleTryOn(itemId) {
-        console.log('toggleTryOn called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            if (window.avatarDisplay) {
-                window.avatarDisplay.tryOnItem(item);
+    console.log('toggleTryOn called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        if (window.avatarDisplay) {
+            // Check if the item is already tried on
+            if (window.avatarDisplay.currentItems && 
+                window.avatarDisplay.currentItems[item.type] && 
+                window.avatarDisplay.currentItems[item.type].id === item.id) {
+                // If it's already tried on, remove it
+                window.avatarDisplay.removeItem(item.type);
             } else {
-                console.error('window.avatarDisplay is not defined');
+                // If it's not tried on, try it on
+                window.avatarDisplay.tryOnItem(item);
             }
-            
             updateItemImages();
         } else {
-            console.error('Item not found for id:', itemId);
+            console.error('window.avatarDisplay is not defined');
         }
+    } else {
+        console.error('Item not found for id:', itemId);
     }
+}
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
