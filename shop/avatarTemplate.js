@@ -1,29 +1,26 @@
-// avatarTemplate.js
-
 class AvatarBody {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.baseUrl = 'https://sxdgoth.github.io/jo/home/assets/body/';
-        this.bodyParts = [
-            { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
-            { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
-            { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
-            { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
-            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
-            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
-            { name: 'Pants', file: '', type: 'Pants', isBase: false },
-            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
-            { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
-            { name: 'Face', file: '', type: 'Face', isBase: false },
-            { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
-            { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
-            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
-            { name: 'Nose', file: '', type: 'Nose', isBase: false },
-            { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false },
-            { name: 'Hair', file: '', type: 'Hair', isBase: false }
-        ];
+       this.bodyParts = [
+    { name: 'Legs', file: 'avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+    { name: 'Arms', file: 'avatar-armsandhands.svg', type: 'Arms', isBase: true },
+    { name: 'Body', file: 'avatar-body.svg', type: 'Body', isBase: true },
+    { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },
+    { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+    { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+    { name: 'Pants', file: '', type: 'Pants', isBase: false },
+    { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+    { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
+    { name: 'Face', file: '', type: 'Face', isBase: false },
+    { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
+    { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
+    { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
+    { name: 'Nose', file: '', type: 'Nose', isBase: false },
+    { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false },
+    { name: 'Hair', file: '', type: 'Hair', isBase: false }
+];
         this.layers = {};
-        this.currentItems = {};
     }
 
     loadAvatar() {
@@ -54,40 +51,42 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-      updateLayer(type, src) {
-        console.log(`AvatarBody: Updating layer: ${type}, src: ${src}`);
+    updateLayer(type, src) {
+        console.log('Updating layer:', type, src);
         if (this.layers[type]) {
             const bodyPart = this.bodyParts.find(part => part.type === type);
             if (src) {
                 this.layers[type].src = src;
                 this.layers[type].style.display = 'block';
-                console.log(`AvatarBody: Updated ${type} layer with ${src}`);
+                console.log(`Updated ${type} layer with ${src}`);
             } else if (!bodyPart.isBase) {
                 this.layers[type].style.display = 'none';
-                console.log(`AvatarBody: Removed ${type} layer`);
+                console.log(`Removed ${type} layer`);
             } else {
                 this.layers[type].src = this.baseUrl + bodyPart.file;
                 this.layers[type].style.display = 'block';
-                console.log(`AvatarBody: Reverted ${type} to base layer`);
+                console.log(`Reverted ${type} to base layer`);
             }
         } else {
-            console.warn(`AvatarBody: Layer ${type} not found`);
+            console.warn(`Layer ${type} not found`);
         }
         this.reorderLayers();
     }
-}
 
-    reorderLayers() {
-        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
-        order.forEach((type, index) => {
-            if (this.layers[type]) {
-                this.layers[type].style.zIndex = index + 1;
-            }
-        });
-    }
+   reorderLayers() {
+    const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+    order.forEach((type, index) => {
+        if (this.layers[type]) {
+            this.layers[type].style.zIndex = index + 1;
+        }
+    });
+}
 
     initializeAvatar() {
         this.loadAvatar();
+        if (window.avatarManager) {
+            window.avatarManager.updateAvatarDisplay();
+        }
     }
 
     clearAllLayers() {
@@ -100,32 +99,9 @@ class AvatarBody {
         });
         this.reorderLayers();
     }
-
-  tryOnItem(item) {
-        console.log(`AvatarBody: Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        this.currentItems[item.type] = item;
-        const src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
-        console.log(`AvatarBody: Setting src for ${item.type} to ${src}`);
-        this.updateLayer(item.type, src);
-    }
-
-   removeItem(type) {
-        console.log(`AvatarBody: Removing item of type: ${type}`);
-        delete this.currentItems[type];
-        this.updateLayer(type, null);
-    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing AvatarBody');
     window.avatarBody = new AvatarBody('avatar-display');
     window.avatarBody.initializeAvatar();
-
-    // Connect AvatarBody to ItemSelector
-    if (window.ItemSelector) {
-        console.log('ItemSelector found, initializing');
-        window.itemSelector = new ItemSelector(window.avatarBody);
-    } else {
-        console.error('ItemSelector not found');
-    }
 });
