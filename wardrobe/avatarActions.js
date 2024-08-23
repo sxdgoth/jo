@@ -18,6 +18,11 @@ function applyAvatar() {
         localStorage.setItem(`eyeColor_${window.avatarManager.username}`, window.avatarManager.eyeColor);
         localStorage.setItem(`lipColor_${window.avatarManager.username}`, window.avatarManager.lipColor);
         
+        // Save hair color
+        if (window.avatarManager.hairColorChanger) {
+            localStorage.setItem(`hairColor_${window.avatarManager.username}`, window.avatarManager.hairColorChanger.hairColor);
+        }
+
         // Update the avatar display to reflect the changes
         window.avatarManager.updateAvatarDisplay();
         window.avatarManager.updateItemVisuals();
