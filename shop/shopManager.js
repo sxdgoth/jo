@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateItemImages() {
+        console.log('Updating item images');
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
@@ -115,12 +116,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event delegation for item clicks
+   // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
             const itemId = e.target.closest('.item-image').dataset.id;
+            console.log('Item clicked:', itemId);
             if (window.itemSelector) {
                 window.itemSelector.toggleItem(itemId);
+            } else {
+                console.error('ItemSelector not initialized');
             }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
@@ -135,9 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
-        filterItemsByCategory
+        filterItemsByCategory,
+        updateItemImages
     };
 
     // Initialize the shop
     renderShopItems();
+    console.log('Shop initialized');
 });
