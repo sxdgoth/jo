@@ -1,4 +1,3 @@
-
 class AvatarDisplay {
     constructor(containerId, username) {
         console.log('AvatarDisplay: Initializing for user', username);
@@ -11,7 +10,6 @@ class AvatarDisplay {
             console.error(`Container with id "${containerId}" not found`);
             return;
         }
-
         this.baseUrl = 'https://sxdgoth.github.io/jo/';
         this.layers = {};
         this.equippedItems = {};
@@ -50,7 +48,6 @@ class AvatarDisplay {
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
         this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
         this.originalColors = {};
-
         this.loadSkinTone();
         this.loadEyeColor();
         this.loadLipColor();
@@ -96,11 +93,11 @@ class AvatarDisplay {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         console.log("Saved items:", savedItems);
         const equippedItems = savedItems ? JSON.parse(savedItems) : {};
-
         this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
         this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
         this.lipColor = localStorage.getItem(`lipColor_${this.username}`) || '#E6998F';
         this.hairColor = localStorage.getItem(`hairColor_${this.username}`) || '#1E1E1E';
+
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
@@ -158,8 +155,8 @@ class AvatarDisplay {
             obj.onload = () => {
                 this.applySkinTone(obj, part.type);
             };
-
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
+
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
         });
@@ -195,7 +192,7 @@ class AvatarDisplay {
         const preserveColors = ['#E6958A'];  // Add colors here to prevent changes
         const originalLipColors = ['#E6998F', '#BF766E', '#F2ADA5'];
         
-           // Function to create a lip color palette
+        // Function to create a lip color palette
         const createLipPalette = (baseColor) => {
             const rgb = parseInt(baseColor.slice(1), 16);
             const r = (rgb >> 16) & 255;
@@ -208,7 +205,6 @@ class AvatarDisplay {
                 `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
             ];
         };
-
         const lipPalette = createLipPalette(this.lipColor);
         
         const replaceColor = (element) => {
@@ -262,7 +258,6 @@ class AvatarDisplay {
                 style = style.replace(/#3FA2FF/gi, this.eyeColor);
                 element.setAttribute('style', style);
             }
-
             Array.from(element.children).forEach(replaceColor);
         };
 
@@ -271,86 +266,68 @@ class AvatarDisplay {
         } else {
             replaceColor(svgDoc.documentElement);
         }
-        console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
+          console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
     }
 
-removeItem(type) {
-    console.log(`Removing item of type: ${type}`);
-    if (this.layers[type]) {
-        this.layers[type].style.display = 'none';
-        delete this.currentItems[type];
-    }
-    // Ensure base parts are always visible
-    this.baseParts.forEach(basePart => {
-        if (this.layers[basePart]) {
-            this.layers[basePart].style.display = 'block';
-        }
-    });
-}
-
-    
-   applyHairColor(obj) {
-    const svgDoc = obj.contentDocument;
-    if (!svgDoc) return;
-
-    const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
-    
-    const replaceColor = (element) => {
-        ['fill', 'stroke'].forEach(attr => {
-            let color = element.getAttribute(attr);
-            if (color && defaultHairColors.includes(color.toUpperCase())) {
-                const blendedColor = this.blendColors(color, this.hairColor, 0.7);
-                element.setAttribute(attr, blendedColor);
-            }
-        });
-
-        let style = element.getAttribute('style');
-        if (style) {
-            defaultHairColors.forEach(defaultColor => {
-                const blendedColor = this.blendColors(defaultColor, this.hairColor, 0.7);
-                style = style.replace(new RegExp(defaultColor, 'gi'), blendedColor);
+    applyHairColor(obj) {
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc) return;
+        const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
+        
+        const replaceColor = (element) => {
+            ['fill', 'stroke'].forEach(attr => {
+                let color = element.getAttribute(attr);
+                if (color && defaultHairColors.includes(color.toUpperCase())) {
+                    const blendedColor = this.blendColors(color, this.hairColor, 0.7);
+                    element.setAttribute(attr, blendedColor);
+                }
             });
-            element.setAttribute('style', style);
-        }
-
-        Array.from(element.children).forEach(replaceColor);
-    };
-
-    replaceColor(svgDoc.documentElement);
-}
-
-   blendColors(color1, color2, ratio) {
-    const rgb1 = this.hexToRgb(color1);
-    const rgb2 = this.hexToRgb(color2);
-    const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
-    const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
-    
-    let blendRatio = ratio;
-    if (brightness2 > brightness1) {
-        // For lighter colors, reduce the blend ratio to maintain highlights
-        blendRatio = ratio * 0.7;
-    } else {
-        // For darker colors, increase the blend ratio for a more dramatic change
-        blendRatio = Math.min(ratio * 1.3, 1);
+            let style = element.getAttribute('style');
+            if (style) {
+                defaultHairColors.forEach(defaultColor => {
+                    const blendedColor = this.blendColors(defaultColor, this.hairColor, 0.7);
+                    style = style.replace(new RegExp(defaultColor, 'gi'), blendedColor);
+                });
+                element.setAttribute('style', style);
+            }
+            Array.from(element.children).forEach(replaceColor);
+        };
+        replaceColor(svgDoc.documentElement);
     }
-    const blended = rgb1.map((channel, i) => 
-        Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
-    );
-    return this.rgbToHex(...blended);
-}
 
-hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16)
-    ] : null;
-}
+blendColors(color1, color2, ratio) {
+        const rgb1 = this.hexToRgb(color1);
+        const rgb2 = this.hexToRgb(color2);
+        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
+        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
+        
+        let blendRatio = ratio;
+        if (brightness2 > brightness1) {
+            // For lighter colors, reduce the blend ratio to maintain highlights
+            blendRatio = ratio * 0.7;
+        } else {
+            // For darker colors, increase the blend ratio for a more dramatic change
+            blendRatio = Math.min(ratio * 1.3, 1);
+        }
+        const blended = rgb1.map((channel, i) => 
+            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
+        );
+        return this.rgbToHex(...blended);
+    }
 
-rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
+    }
+
+    rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
     changeSkinTone(newTone) {
         this.skinTone = newTone;
         Object.values(this.layers).forEach(obj => {
@@ -360,8 +337,7 @@ rgbToHex(r, g, b) {
         });
         localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
-
-    changeEyeColor(newColor) {
+  changeEyeColor(newColor) {
         this.eyeColor = newColor;
         Object.values(this.layers).forEach(obj => {
             if (obj.contentDocument) {
@@ -394,44 +370,52 @@ rgbToHex(r, g, b) {
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
-        // Always update with the new item
+        // Remove existing item of the same type
+        this.removeItem(item.type);
+        
+        // Apply the new item
         this.currentItems[item.type] = item;
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-
         this.reorderLayers();
     }
 
-    
-tryOnItem(item) {
-    console.log(`AvatarDisplay: Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    this.currentItems[item.type] = item;
-    this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-    this.reorderLayers();
-}
-
- updateAvatarDisplay(type, src) {
-    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
-    if (this.layers[type]) {
-        this.layers[type].data = src;
-        this.layers[type].style.display = 'block';
-        this.layers[type].onload = () => {
-            console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
-            this.applySkinTone(this.layers[type], type);
-            if (type === 'Eyes') {
-                setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+    removeItem(type) {
+        console.log(`Removing item of type: ${type}`);
+        if (this.layers[type]) {
+            this.layers[type].style.display = 'none';
+            this.layers[type].data = ''; // Clear the source
+        }
+        delete this.currentItems[type];
+        
+        // Ensure base parts are always visible
+        this.baseParts.forEach(basePart => {
+            if (this.layers[basePart]) {
+                this.layers[basePart].style.display = 'block';
             }
-        };
-        this.layers[type].onerror = () => {
-            console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
-        };
-    } else {
-        console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
+        });
     }
-}
 
+    updateAvatarDisplay(type, src) {
+        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+        if (this.layers[type]) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = src ? 'block' : 'none';
+            this.layers[type].onload = () => {
+                console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Eyes') {
+                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                }
+            };
+            this.layers[type].onerror = () => {
+                console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
+            };
+        } else {
+            console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
+        }
+    }
 
-   toggleEquippedItem(type) {
+    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
                 const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -462,10 +446,13 @@ tryOnItem(item) {
     }
 
     resetTriedOnItems() {
-        this.currentItems = {};
-        Object.keys(this.layers).forEach(type => {
-            this.updateAvatarDisplay(type, null);
+        console.log('Resetting tried on items');
+        Object.keys(this.currentItems).forEach(type => {
+            this.removeItem(type);
         });
+        this.currentItems = {};
+        this.loadEquippedItems();
+        this.loadAvatar();
     }
 }
 
@@ -481,6 +468,3 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No logged in user found');
     }
 });
-
-
-
