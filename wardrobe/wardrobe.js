@@ -58,9 +58,6 @@ function renderOwnedItems() {
 function toggleItem(item) {
     if (window.avatarManager) {
         window.avatarManager.toggleItem(item);
-        if (item.type === 'Hair') {
-            window.avatarManager.hairColorChanger.setSelectedHair(item.id);
-        }
     } else {
         console.error('AvatarManager not initialized');
     }
