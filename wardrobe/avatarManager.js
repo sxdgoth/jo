@@ -1,5 +1,3 @@
-import { HairColorManager } from 'https://sxdgoth.github.io/jo/wardrobe/haircolormanager.js';
-
 function createLipPalette(baseColor) {
     const rgb = parseInt(baseColor.slice(1), 16);
     const r = (rgb >> 16) & 255;
@@ -23,8 +21,6 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
-        this.hairColorManager.initialize();
-        this.hairColorManager.loadHairColor();
     }
 
     initialize() {
@@ -211,11 +207,6 @@ class AvatarManager {
                 this.applySkinToneToSVG(svgDoc);
                 this.applyEyeColorToSVG(svgDoc);
                 this.applyLipColorToSVG(svgDoc);
-                
-                if (type === 'Hair') {
-                    this.hairColorManager.applyHairColor(svgDoc);
-                }
-
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
                 const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
