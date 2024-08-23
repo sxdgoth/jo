@@ -20,9 +20,7 @@ class ItemSelector {
             this.selectItem(item);
         }
 
-        if (window.shopManager) {
-            window.shopManager.updateItemImages();
-        }
+        this.updateShopDisplay();
     }
 
     selectItem(item) {
@@ -67,8 +65,7 @@ class ItemSelector {
 document.addEventListener('DOMContentLoaded', function() {
     if (window.avatarDisplay) {
         window.itemSelector = new ItemSelector(window.avatarDisplay);
-        console.log('ItemSelector initialized');
-
+        
         // Add click event listener for item selection
         document.addEventListener('click', function(e) {
             if (e.target.closest('.item-image')) {
@@ -81,3 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('AvatarDisplay not initialized');
     }
 });
+
+
+
