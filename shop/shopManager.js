@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderShopItems() {
         shopItemsContainer.innerHTML = '';
-
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
@@ -45,28 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleTryOn(itemId) {
-        console.log('toggleTryOn called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item && window.avatarDisplay) {
-            console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            
-            window.avatarDisplay.tryOnItem(item);
-            updateItemImages();
-        } else {
-            console.error('Item not found or avatarDisplay is not defined');
-        }
-    }
-
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = shopItems.find(i => i.id === itemId);
             
-            if (window.avatarDisplay && window.avatarDisplay.currentItems && 
-                window.avatarDisplay.currentItems[item.type] && 
-                window.avatarDisplay.currentItems[item.type].id === item.id) {
+            if (window.itemSelector && window.itemSelector.selectedItems[item.type] === item.id) {
                 shopItem.classList.add('highlighted');
             } else {
                 shopItem.classList.remove('highlighted');
@@ -107,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
-            updateItemImages();
+        if (window.itemSelector) {
+            window.itemSelector.resetSelection();
         }
+        updateItemImages();
     }
 
     function filterItemsByCategory(category) {
@@ -135,8 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
             const itemId = e.target.closest('.item-image').dataset.id;
-            console.log('Item clicked:', itemId);
-            toggleTryOn(itemId);
+            if (window.itemSelector) {
+                window.itemSelector.toggleItem(itemId);
+            }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
@@ -147,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.shopManager = {
-        toggleTryOn,
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
