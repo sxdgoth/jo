@@ -11,8 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createUserInventory(loggedInUser.username);
         
         // Initialize AvatarManager
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
+        if (window.AvatarManager) {
+            window.avatarManager = new window.AvatarManager(loggedInUser.username);
+            window.avatarManager.initialize();
+        } else {
+            console.error('AvatarManager class not found');
+        }
         
         // Render the avatar
         if (window.avatarBody && typeof window.avatarBody.initializeAvatar === 'function') {
@@ -50,13 +54,8 @@ function renderOwnedItems() {
         `;
         wardrobeItemsContainer.appendChild(itemElement);
         
-        // Apply positioning to the item image
-        const itemImage = itemElement.querySelector('.item-image');
-        if (window.avatarManager) {
-            window.avatarManager.applyItemPosition(itemImage, item.type);
-        }
-        
         // Add click event listener to the item image
+        const itemImage = itemElement.querySelector('.item-image');
         itemImage.addEventListener('click', () => toggleItem(item));
     });
 }
