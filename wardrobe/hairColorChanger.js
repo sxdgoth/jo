@@ -5,6 +5,7 @@ class HairColorChanger {
         this.avatarManager = avatarManager;
         this.colorInput = document.getElementById('hair-color-input');
         this.defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
+        this.originalColors = {};
         this.initialize();
     }
 
@@ -42,7 +43,8 @@ class HairColorChanger {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
                 
-                this.applyHairColorToSVG(svgDoc);
+                this.storeOriginalColors(svgDoc);
+                this.applyHairColorToSVG(svgDoc, this.avatarManager.hairColor);
 
                 const serializer = new XMLSerializer();
                 const modifiedSvgString = serializer.serializeToString(svgDoc);
@@ -56,15 +58,27 @@ class HairColorChanger {
             .catch(error => console.error('Error updating hair color:', error));
     }
 
-    applyHairColorToSVG(svgDoc) {
+    storeOriginalColors(svgDoc) {
+        this.originalColors = {};
+        svgDoc.querySelectorAll('path').forEach((path, index) => {
+            const color = this.getPathColor(path);
+            if (color) {
+                this.originalColors[index] = color;
+            }
+        });
+        console.log('Original colors:', this.originalColors);
+    }
+
+    applyHairColorToSVG(svgDoc, newColor) {
         const paths = svgDoc.querySelectorAll('path');
-        paths.forEach((path) => {
-            const currentColor = this.getPathColor(path);
-            if (currentColor && this.defaultHairColors.includes(currentColor.toUpperCase())) {
-                const blendedColor = this.blendColors(currentColor, this.avatarManager.hairColor, 0.7);
+        paths.forEach((path, index) => {
+            const originalColor = this.originalColors[index];
+            if (originalColor && this.defaultHairColors.includes(originalColor.toUpperCase())) {
+                const blendedColor = this.blendColors(originalColor, newColor, 0.7);
                 this.setPathColor(path, blendedColor);
             }
         });
+        console.log(`Color changed to ${newColor}. Affected paths updated.`);
     }
 
     getPathColor(path) {
@@ -92,8 +106,18 @@ class HairColorChanger {
     blendColors(color1, color2, ratio) {
         const rgb1 = this.hexToRgb(color1);
         const rgb2 = this.hexToRgb(color2);
+        const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
+        const brightness2 = (rgb2[0] * 299 + rgb2[1] * 587 + rgb2[2] * 114) / 1000;
+        
+        let blendRatio = ratio;
+        if (brightness2 > brightness1) {
+            blendRatio = ratio * 0.7;
+        } else {
+            blendRatio = Math.min(ratio * 1.3, 1);
+        }
+
         const blended = rgb1.map((channel, i) => 
-            Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
+            Math.round(channel * (1 - blendRatio) + rgb2[i] * blendRatio)
         );
         return this.rgbToHex(...blended);
     }
@@ -118,6 +142,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('AvatarManager not found');
     }
 });
-
-
-
