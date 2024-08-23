@@ -6,16 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
 
-   function renderShopItems() {
-    console.log('Rendering shop items. Current category:', currentCategory);
-    console.log('Total shop items:', shopItems.length);
-    shopItemsContainer.innerHTML = '';
-    const filteredItems = currentCategory === 'All' 
-        ? shopItems 
-        : shopItems.filter(item => item.type === currentCategory);
-    console.log('Filtered items:', filteredItems.length);
-    filteredItems.forEach(item => {
-        console.log('Rendering item:', item.name);
+    function renderShopItems() {
+        console.log('Rendering shop items. Current category:', currentCategory);
+        console.log('Total shop items:', shopItems.length);
+        shopItemsContainer.innerHTML = '';
+        const filteredItems = currentCategory === 'All' 
+            ? shopItems 
+            : shopItems.filter(item => item.type === currentCategory);
+        console.log('Filtered items:', filteredItems.length);
+        filteredItems.forEach(item => {
+            console.log('Rendering item:', item.name);
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
             itemElement.style.border = '2px solid red'; // Temporary style for visibility
@@ -107,22 +107,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   // In the click event listener in shopManager.js
-document.addEventListener('click', function(e) {
-    console.log('Click event triggered');
-    if (e.target.closest('.item-image')) {
-        const itemId = e.target.closest('.item-image').dataset.id;
-        console.log('ShopManager: Item clicked:', itemId);
-        if (window.itemSelector) {
-            window.itemSelector.toggleItem(itemId);
-        } else {
-            console.error('ShopManager: window.itemSelector is not defined');
-            // Log the current state
-            console.log('window.avatarDisplay:', window.avatarDisplay);
-            console.log('window.itemSelector:', window.itemSelector);
+       // Event listener for clicks
+    document.addEventListener('click', function(e) {
+        console.log('Click event triggered');
+        if (e.target.closest('.item-image')) {
+            const itemId = e.target.closest('.item-image').dataset.id;
+            console.log('ShopManager: Item clicked:', itemId);
+            if (window.itemSelector) {
+                window.itemSelector.toggleItem(itemId);
+            } else {
+                console.error('ShopManager: window.itemSelector is not defined');
+                // Log the current state
+                console.log('window.avatarDisplay:', window.avatarDisplay);
+                console.log('window.itemSelector:', window.itemSelector);
+            }
+        } else if (e.target.classList.contains('buy-btn')) {
+            const itemId = e.target.dataset.id;
+            buyItem(itemId);
+        } else if (e.target.classList.contains('category-btn')) {
+            const category = e.target.dataset.category;
+            filterItemsByCategory(category);
         }
-    }
-    
+    });
+
+    // Assign shopManager to window object
     window.shopManager = {
         buyItem,
         renderShopItems,
@@ -132,4 +140,4 @@ document.addEventListener('click', function(e) {
 
     // Initialize the shop
     renderShopItems();
-});
+});                    
