@@ -46,7 +46,7 @@ function renderOwnedItems() {
                 <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
             </div>
             <h3>${item.name}</h3>
-            <p>Type: ${item.type}</p>
+
         `;
         wardrobeItemsContainer.appendChild(itemElement);
         
