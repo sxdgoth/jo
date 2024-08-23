@@ -58,33 +58,39 @@ class AvatarManager {
     }
 
     loadEquippedItems() {
-        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
-            this.equippedItems = Object.fromEntries(
-                Object.entries(this.equippedItems).filter(([_, value]) => value)
-            );
-        } else {
-            this.equippedItems = {};
-        }
-        this.tempEquippedItems = {...this.equippedItems};
-
-        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
-            this.skinTone = savedSkinTone;
-        }
-
-        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
-        if (savedEyeColor) {
-            this.eyeColor = savedEyeColor;
-        }
-
-        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
-        if (savedLipColor) {
-            this.lipColor = savedLipColor;
-        }
+    const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+    if (savedItems) {
+        this.equippedItems = JSON.parse(savedItems);
+        // Filter out any null, undefined, or false values
+        this.equippedItems = Object.fromEntries(
+            Object.entries(this.equippedItems).filter(([_, value]) => value)
+        );
+    } else {
+        this.equippedItems = {};
     }
+    this.tempEquippedItems = {...this.equippedItems};
+
+    const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
+    if (savedSkinTone) {
+        this.skinTone = savedSkinTone;
+    }
+
+    const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
+    if (savedEyeColor) {
+        this.eyeColor = savedEyeColor;
+    }
+
+    const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
+    if (savedLipColor) {
+        this.lipColor = savedLipColor;
+    }
+
+    // Add this block to load the saved hair color
+    const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
+    if (savedHairColor) {
+        this.hairColorChanger.hairColor = savedHairColor;
+    }
+}
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
