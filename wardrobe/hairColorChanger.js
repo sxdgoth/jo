@@ -3,27 +3,8 @@
 class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
-        this.colorInput = document.getElementById('hair-color-input');
         this.defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         this.originalColors = {};
-        this.initialize();
-    }
-
-    initialize() {
-        if (this.colorInput) {
-            this.colorInput.value = this.avatarManager.hairColor;
-            this.colorInput.addEventListener('input', (e) => {
-                this.changeColor(e.target.value);
-            });
-        } else {
-            console.error('Hair color input not found');
-        }
-    }
-
-    changeColor(newColor) {
-        this.avatarManager.hairColor = newColor;
-        localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
-        this.updateHairColor();
     }
 
     updateHairColor() {
@@ -66,7 +47,6 @@ class HairColorChanger {
                 this.originalColors[index] = color;
             }
         });
-        console.log('Original colors:', this.originalColors);
     }
 
     applyHairColorToSVG(svgDoc, newColor) {
@@ -78,7 +58,6 @@ class HairColorChanger {
                 this.setPathColor(path, blendedColor);
             }
         });
-        console.log(`Color changed to ${newColor}. Affected paths updated.`);
     }
 
     getPathColor(path) {
