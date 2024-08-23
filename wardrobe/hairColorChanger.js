@@ -3,7 +3,7 @@
 class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
-        this.colorPicker = document.getElementById('hair-color-picker');
+        this.colorInput = document.getElementById('hair-color-input');
         this.defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         this.originalColors = {};
 
@@ -11,12 +11,12 @@ class HairColorChanger {
     }
 
     initialize() {
-        if (this.colorPicker) {
-            this.colorPicker.addEventListener('input', (e) => {
+        if (this.colorInput) {
+            this.colorInput.addEventListener('input', (e) => {
                 this.changeColor(e.target.value);
             });
         } else {
-            console.error('Hair color picker not found');
+            console.error('Hair color input not found');
         }
     }
 
