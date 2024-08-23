@@ -1,103 +1,100 @@
-function createLipPalette(baseColor) {
-    const rgb = parseInt(baseColor.slice(1), 16);
-    const r = (rgb >> 16) & 255;
-    const g = (rgb >> 8) & 255;
-    const b = rgb & 255;
-    
-    return [
-        `#${baseColor.slice(1)}`, // Main color
-        `#${Math.max(0, r - 40).toString(16).padStart(2, '0')}${Math.max(0, g - 40).toString(16).padStart(2, '0')}${Math.max(0, b - 40).toString(16).padStart(2, '0')}`, // Darker shade
-        `#${Math.min(255, r + 20).toString(16).padStart(2, '0')}${Math.min(255, g + 20).toString(16).padStart(2, '0')}${Math.min(255, b + 20).toString(16).padStart(2, '0')}` // Lighter shade
-    ];
-}
-
 class AvatarManager {
     constructor(username) {
         this.username = username;
         this.equippedItems = {};
         this.tempEquippedItems = {};
         this.skinTone = 'light';
-        this.eyeColor = '#3FA2FF'; // Default eye color
-        this.lipColor = '#E6998F'; // Default lip color
+        this.eyeColor = '#3FA2FF';
+        this.lipColor = '#E6998F';
         this.debounceTimer = null;
+        this.hairColorChanger = new HairColorChanger(this);
         this.loadEquippedItems();
-        this.hairColorChanger = new HairColorChanger(this); // Make sure this line is present
     }
-    
 
-     initialize() {
+    initialize() {
         this.setupEyeColorPicker();
         this.setupLipColorPicker();
-        this.setupHairColorPicker(); // Add this line
+        this.setupHairColorPicker();
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         this.loadAndApplyHighlights();
     }
 
+    loadEquippedItems() {
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        if (savedItems) {
+            this.equippedItems = JSON.parse(savedItems);
+        }
+    }
+
     setupEyeColorPicker() {
-        const eyeColorPicker = document.getElementById('eye-color-input');
+        const eyeColorPicker = document.getElementById('eye-color-picker');
         if (eyeColorPicker) {
             eyeColorPicker.value = this.eyeColor;
             eyeColorPicker.addEventListener('input', (event) => {
-                this.debounceChangeEyeColor(event.target.value);
+                this.changeEyeColor(event.target.value);
             });
-        } else {
-            console.error('Eye color picker not found');
         }
     }
 
     setupLipColorPicker() {
-        const lipColorPicker = document.getElementById('lip-color-input');
+        const lipColorPicker = document.getElementById('lip-color-picker');
         if (lipColorPicker) {
             lipColorPicker.value = this.lipColor;
             lipColorPicker.addEventListener('input', (event) => {
-                this.debounceChangeLipColor(event.target.value);
+                this.changeLipColor(event.target.value);
             });
-        } else {
-            console.error('Lip color picker not found');
         }
     }
 
-      setupHairColorPicker() {
+    setupHairColorPicker() {
         const hairColorPicker = document.getElementById('color-picker');
         if (hairColorPicker) {
             hairColorPicker.value = this.hairColorChanger.hairColor;
             hairColorPicker.addEventListener('input', (event) => {
                 this.hairColorChanger.changeHairColor(event.target.value);
             });
-        } else {
-            console.error('Hair color picker not found');
         }
     }
 
+    changeEyeColor(newColor) {
+        this.eyeColor = newColor;
+        localStorage.setItem(`eyeColor_${this.username}`, newColor);
+        this.updateAvatarDisplay();
+    }
 
-    loadEquippedItems() {
-        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
-        if (savedItems) {
-            this.equippedItems = JSON.parse(savedItems);
-            // Filter out any null, undefined, or false values
-            this.equippedItems = Object.fromEntries(
-                Object.entries(this.equippedItems).filter(([_, value]) => value)
-            );
+    changeLipColor(newColor) {
+        this.lipColor = newColor;
+        localStorage.setItem(`lipColor_${this.username}`, newColor);
+        this.updateAvatarDisplay();
+    }
+
+    toggleItem(item) {
+        if (this.tempEquippedItems[item.type] === item.id) {
+            delete this.tempEquippedItems[item.type];
         } else {
-            this.equippedItems = {};
+            this.tempEquippedItems[item.type] = item.id;
         }
-        this.tempEquippedItems = {...this.equippedItems};
+        
+        if (item.type === 'Hair') {
+            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+        }
+        
+        this.updateItemVisuals();
+        this.updateTempAvatarDisplay();
+    }
 
-        const savedSkinTone = localStorage.getItem(`skinTone_${this.username}`);
-        if (savedSkinTone) {
-            this.skinTone = savedSkinTone;
-        }
-
-        const savedEyeColor = localStorage.getItem(`eyeColor_${this.username}`);
-        if (savedEyeColor) {
-            this.eyeColor = savedEyeColor;
-        }
-
-        const savedLipColor = localStorage.getItem(`lipColor_${this.username}`);
-        if (savedLipColor) {
-            this.lipColor = savedLipColor;
-        }
+    updateItemVisuals() {
+        const items = document.querySelectorAll('.wardrobe-item');
+        items.forEach(item => {
+            const itemId = item.querySelector('.item-image').dataset.id;
+            const itemType = item.querySelector('p').textContent.split(': ')[1];
+            if (this.tempEquippedItems[itemType] === itemId) {
+                item.classList.add('equipped');
+            } else {
+                item.classList.remove('equipped');
+            }
+        });
     }
 
     updateAvatarDisplay() {
@@ -109,47 +106,16 @@ class AvatarManager {
                 if (itemId) {
                     const item = window.userInventory.getItems().find(i => i.id === itemId);
                     if (item) {
-                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                        if (type === 'Hair') {
+                            this.hairColorChanger.updateHairColor();
+                        } else {
+                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                        }
                     }
                 }
             });
         }
     }
-
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-            if (item.type === 'Hair') {
-                this.hairColorChanger.setSelectedHair(null);
-            }
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-             if (item.type === 'Hair') {
-            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
-        
-            }
-        }
-        
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
-    }
-
-    
-
-   updateItemVisuals() {
-    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-        const itemImage = itemContainer.querySelector('.item-image');
-        const itemId = itemImage.dataset.id;
-        const item = window.userInventory.getItems().find(i => i.id === itemId);
-        if (item && this.tempEquippedItems[item.type] === item.id) {
-            itemImage.classList.add('equipped');
-            itemContainer.classList.add('highlighted');
-        } else {
-            itemImage.classList.remove('equipped');
-            itemContainer.classList.remove('highlighted');
-        }
-    });
-}
 
     updateTempAvatarDisplay() {
         if (window.avatarBody) {
@@ -169,54 +135,6 @@ class AvatarManager {
                 }
             });
         }
-    }
-}
-    
-    changeSkinTone(newTone) {
-        this.skinTone = newTone;
-        this.updateTempAvatarDisplay();
-    }
-
-    debounceChangeEyeColor(newColor) {
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-        }
-        this.debounceTimer = setTimeout(() => {
-            this.changeEyeColor(newColor);
-        }, 50); // 50ms debounce time
-    }
-
-    changeEyeColor(newColor) {
-        this.eyeColor = newColor;
-        const eyeColorPicker = document.getElementById('eye-color-input');
-        if (eyeColorPicker) {
-            eyeColorPicker.value = newColor;
-        }
-        requestAnimationFrame(() => {
-            this.updateTempAvatarDisplay();
-        });
-    }
-
-    debounceChangeLipColor(newColor) {
-        if (this.debounceTimer) {
-            clearTimeout(this.debounceTimer);
-        }
-        this.debounceTimer = setTimeout(() => {
-            this.changeLipColor(newColor);
-        }, 50); // 50ms debounce time
-    }
-
-    changeLipColor(newColor) {
-        this.lipColor = newColor;
-        const lipColorPicker = document.getElementById('lip-color-input');
-        if (lipColorPicker) {
-            lipColorPicker.value = newColor;
-        }
-        const lipPalette = createLipPalette(newColor);
-        console.log(`New lip color palette: ${lipPalette.join(', ')}`);
-        requestAnimationFrame(() => {
-            this.updateTempAvatarDisplay();
-        });
     }
 
     applySkinTone() {
