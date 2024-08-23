@@ -375,15 +375,15 @@ rgbToHex(r, g, b) {
     }
 
 
-   toggleItem(item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
-            this.removeItem(item.type);
-        } else {
-            this.tryOnItem(item);
-        }
+  toggleItem(item) {
+    console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    if (this.isItemTriedOn(item)) {
+        this.removeItem(item.type);
+    } else {
+        this.tryOnItem(item);
     }
+}
 
     
     tryOnItem(item) {
@@ -393,9 +393,9 @@ rgbToHex(r, g, b) {
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
 
-     isItemTrjedOn(item) {
-        return this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id;
-    }
+    isItemTriedOn(item) {
+    return this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id;
+}
 
    
      removeItem(type) {
