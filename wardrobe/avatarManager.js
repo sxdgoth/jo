@@ -113,7 +113,7 @@ class AvatarManager {
         
 
 applyChanges() {
-    this.equippedItems = {...this.tempEquippedItems};
+   this.equippedItems = {...this.tempEquippedItems};
     
     // Save the hair color if a hair item is equipped
     if (this.equippedItems['Hair']) {
@@ -370,6 +370,7 @@ loadAndApplyHighlights() {
     }
 }
 
+// Initialize the AvatarManager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     if (loggedInUser) {
