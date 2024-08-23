@@ -1,17 +1,23 @@
 // shopManager.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing shop');
     const shopItemsContainer = document.querySelector('.shop-items');
+    console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
 
     function renderShopItems() {
+        console.log('Rendering shop items. Current category:', currentCategory);
+        console.log('Total shop items:', shopItems.length);
         shopItemsContainer.innerHTML = '';
         const filteredItems = currentCategory === 'All' 
             ? shopItems 
             : shopItems.filter(item => item.type === currentCategory);
+        console.log('Filtered items:', filteredItems.length);
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
+            itemElement.style.border = '2px solid red'; // Temporary style for visibility
             const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
@@ -41,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buyItem(itemId) {
+        console.log('Attempting to buy item:', itemId);
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
             console.error('Item not found');
@@ -73,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetAvatarDisplay() {
+        console.log('Resetting avatar display');
         if (window.avatarDisplay) {
             window.avatarDisplay.resetTriedOnItems();
             renderShopItems();
@@ -80,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function filterItemsByCategory(category) {
+        console.log('Filtering items by category:', category);
         currentCategory = category;
         renderShopItems();
     }
@@ -98,16 +107,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event delegation for item clicks
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.item-image')) {
-        const itemId = e.target.closest('.item-image').dataset.id;
-        console.log('ShopManager: Item clicked:', itemId);
-        if (window.itemSelector) {
-            window.itemSelector.toggleItem(itemId);
-        } else {
-            console.error('ShopManager: window.itemSelector is not defined');
-        }
-    }
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.item-image')) {
+            const itemId = e.target.closest('.item-image').dataset.id;
+            console.log('ShopManager: Item clicked:', itemId);
+            if (window.itemSelector) {
+                window.itemSelector.toggleItem(itemId);
+            } else {
+                console.error('ShopManager: window.itemSelector is not defined');
+            }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
