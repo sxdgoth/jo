@@ -127,15 +127,17 @@ class AvatarManager {
         }
     }
 
-  toggleItem(item) {
+    toggleItem(item) {
         if (this.tempEquippedItems[item.type] === item.id) {
             delete this.tempEquippedItems[item.type];
+            if (item.type === 'Hair') {
+                this.hairColorChanger.setSelectedHair(null);
+            }
         } else {
             this.tempEquippedItems[item.type] = item.id;
-        }
-        
-        if (item.type === 'Hair') {
-            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+            if (item.type === 'Hair') {
+                this.hairColorChanger.setSelectedHair(item.id);
+            }
         }
         
         this.updateItemVisuals();
