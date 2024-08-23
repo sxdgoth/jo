@@ -46,7 +46,7 @@ class AvatarDisplay {
             }
         };
         this.facialFeatures = ['Eyes', 'Nose', 'Mouth'];
-        this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+        this.baseParts = ['Legs', 'Arms', 'Body', 'Neck', 'Head'];
         this.originalColors = {};
         this.loadSkinTone();
         this.loadEyeColor();
