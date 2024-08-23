@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filteredItems.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-                const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
                     <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
@@ -23,16 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
-
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
-
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
         });
-
         updateCategoryButtons();
         updateItemImages();
     }
@@ -52,7 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             
             if (window.avatarDisplay) {
-                window.avatarDisplay.tryOnItem(item);
+                if (window.avatarDisplay.currentItems && 
+                    window.avatarDisplay.currentItems[item.type] && 
+                    window.avatarDisplay.currentItems[item.type].id === item.id) {
+                    // If the item is already tried on, remove it
+                    window.avatarDisplay.removeItem(item.type);
+                } else {
+                    // Otherwise, try on the item
+                    window.avatarDisplay.tryOnItem(item);
+                }
             } else {
                 console.error('window.avatarDisplay is not defined');
             }
@@ -162,4 +167,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the shop
     renderShopItems();
 });
- 
