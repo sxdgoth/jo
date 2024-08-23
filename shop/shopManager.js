@@ -46,26 +46,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleTryOn(itemId) {
-        console.log('toggleTryOn called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item && window.avatarDisplay) {
-            if (selectedItem === itemId) {
-                // Unselect the item
-                console.log(`Unselecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-                window.avatarDisplay.removeItem(item.type);
-                selectedItem = null;
-            } else {
-                // Select the item
-                console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-                window.avatarDisplay.tryOnItem(item);
-                selectedItem = itemId;
-            }
-            updateItemImages();
+   function toggleTryOn(itemId) {
+    console.log('toggleTryOn called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item && window.avatarDisplay) {
+        if (selectedItem === itemId) {
+            // Unselect the item
+            console.log(`Unselecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            window.avatarDisplay.removeItem(item.type);
+            selectedItem = null;
         } else {
-            console.error('Item not found or avatarDisplay is not defined');
+            // Remove previously selected item of the same type, if any
+            if (selectedItem) {
+                const previousItem = shopItems.find(i => i.id === selectedItem);
+                if (previousItem && previousItem.type === item.type) {
+                    window.avatarDisplay.removeItem(previousItem.type);
+                }
+            }
+            // Select the new item
+            console.log(`Applying item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            window.avatarDisplay.tryOnItem(item);
+            selectedItem = itemId;
         }
+        updateItemImages();
+    } else {
+        console.error('Item not found or avatarDisplay is not defined');
     }
+}
 
     function updateItemImages() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -115,13 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function resetAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
-            selectedItem = null;
-            updateItemImages();
-        }
+   function resetAvatarDisplay() {
+    if (window.avatarDisplay) {
+        window.avatarDisplay.resetTriedOnItems();
+        selectedItem = null;
+        updateItemImages();
     }
+}
 
     function filterItemsByCategory(category) {
         currentCategory = category;
