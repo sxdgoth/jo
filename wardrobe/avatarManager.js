@@ -26,15 +26,18 @@ class AvatarManager {
     
 
     initialize() {
-        this.setupEyeColorPicker();
-        this.setupLipColorPicker();
-        this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
+    this.setupEyeColorPicker();
+    this.setupLipColorPicker();
+    this.updateAvatarDisplay();
+    this.updateItemVisuals();
+    this.loadAndApplyHighlights(); 
+    if (this.hairColorChanger) {
         this.hairColorChanger.setupHairColorPicker();
-        this.setupHairColorApplyButton(); // Add this line
+        this.setupHairColorApplyButton();
+    } else {
+        console.error('HairColorChanger not initialized');
     }
-
+}
 
     setupEyeColorPicker() {
         const eyeColorPicker = document.getElementById('eye-color-input');
@@ -60,17 +63,21 @@ class AvatarManager {
         }
     }
 
-      setupHairColorApplyButton() {
-        const applyHairColorButton = document.getElementById('apply-hair-color');
-        if (applyHairColorButton) {
-            applyHairColorButton.addEventListener('click', () => {
+     setupHairColorApplyButton() {
+    const applyHairColorButton = document.getElementById('apply-hair-color');
+    if (applyHairColorButton) {
+        applyHairColorButton.addEventListener('click', () => {
+            if (this.hairColorChanger) {
                 this.hairColorChanger.applyHairColor();
-                this.updateAvatarDisplay(); // Make sure to update the avatar display
-            });
-        } else {
-            console.error('Apply hair color button not found');
-        }
+                this.updateAvatarDisplay();
+            } else {
+                console.error('HairColorChanger not initialized');
+            }
+        });
+    } else {
+        console.error('Apply hair color button not found');
     }
+}
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
