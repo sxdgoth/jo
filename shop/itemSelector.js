@@ -2,15 +2,16 @@
 
 class ItemSelector {
     constructor(avatarBody) {
+        console.log('ItemSelector: Initializing with avatarBody:', avatarBody);
         this.avatarBody = avatarBody;
         this.selectedItems = {};
     }
 
     toggleItem(itemId) {
-        console.log('toggleItem called with itemId:', itemId);
+        console.log('ItemSelector: toggleItem called with itemId:', itemId);
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
-            console.error('Item not found:', itemId);
+            console.error('ItemSelector: Item not found:', itemId);
             return;
         }
 
@@ -24,7 +25,7 @@ class ItemSelector {
     }
 
     selectItem(item) {
-        console.log(`Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        console.log(`ItemSelector: Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         if (this.selectedItems[item.type]) {
             this.avatarBody.removeItem(item.type);
         }
@@ -33,10 +34,11 @@ class ItemSelector {
     }
 
     deselectItem(type) {
-        console.log(`Deselecting item of type: ${type}`);
+        console.log(`ItemSelector: Deselecting item of type: ${type}`);
         delete this.selectedItems[type];
         this.avatarBody.removeItem(type);
     }
+
 
     updateShopDisplay() {
         document.querySelectorAll('.shop-item').forEach(shopItem => {
