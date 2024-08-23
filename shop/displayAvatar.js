@@ -385,30 +385,33 @@ rgbToHex(r, g, b) {
     }
 
     
-removeItem(type) {
-    console.log(`Removing item of type: ${type}`);
-    delete this.currentItems[type];
-    if (this.layers[type]) {
-        this.layers[type].style.display = 'none';
-        this.layers[type].data = ''; // Clear the source
-    }
+tryOnItem(item) {
+    console.log(`AvatarDisplay: Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    this.currentItems[item.type] = item;
+    this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    this.reorderLayers();
 }
 
  updateAvatarDisplay(type, src) {
-        console.log(`Updating avatar display for ${type} with src: ${src}`);
-        if (this.layers[type]) {
-            this.layers[type].data = src;
-            this.layers[type].style.display = 'block';
-            this.layers[type].onload = () => {
-                this.applySkinTone(this.layers[type], type);
-                if (type === 'Eyes') {
-                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
-                }
-            };
-        } else {
-            console.warn(`Layer not found for type: ${type}`);
-        }
+    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+    if (this.layers[type]) {
+        this.layers[type].data = src;
+        this.layers[type].style.display = 'block';
+        this.layers[type].onload = () => {
+            console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
+            this.applySkinTone(this.layers[type], type);
+            if (type === 'Eyes') {
+                setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+            }
+        };
+        this.layers[type].onerror = () => {
+            console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
+        };
+    } else {
+        console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
     }
+}
 
 
    toggleEquippedItem(type) {
