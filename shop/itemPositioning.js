@@ -1,3 +1,5 @@
+// itemPositioning.js
+
 const itemPositions = {
     eyes: {
         translateX: '-20px',
@@ -19,32 +21,32 @@ const itemPositions = {
         translateY: '-40px',
         scale: 2.0
     },
-      jacket: {
+    jacket: {
         translateX: '0px',
         translateY: '0px',
         scale: 2.5
     },
-      eyebrows: {
+    eyebrows: {
         translateX: '-20px',
         translateY: '150px',
         scale: 5.0
     },
-      mouth: {
+    mouth: {
         translateX: '-40px',
         translateY: '150px',
         scale: 7.0
     },
-       cheeks: {
+    cheeks: {
         translateX: '-20px',
         translateY: '120px',
         scale: 5.0
     },
-        nose: {
+    nose: {
         translateX: '-40px',
         translateY: '180px',
         scale: 7.0
     },
-        hair: {
+    hair: {
         translateX: '0px',
         translateY: '30px',
         scale: 1.5
@@ -59,14 +61,16 @@ itemPositions.default = {
 };
 
 function applyItemPosition(itemElement, itemType) {
-    const position = itemPositions[itemType] || itemPositions.default;
+    const position = itemPositions[itemType.toLowerCase()] || itemPositions.default;
     itemElement.style.transform = `
         translateX(${position.translateX})
         translateY(${position.translateY})
         scale(${position.scale})
     `;
+    itemElement.style.transformOrigin = 'center';
     console.log(`Applied position to ${itemType}:`, itemElement.style.transform);
 }
 
-// At the end of itemPositioning.js
+// Make itemPositions and applyItemPosition globally accessible
+window.itemPositions = itemPositions;
 window.applyItemPosition = applyItemPosition;
