@@ -97,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.hairColorChanger.setSelectedHair(hairId);
                 // Update tempEquippedItems in AvatarManager
                 window.avatarManager.tempEquippedItems['Hair'] = hairId;
-                window.avatarManager.updateTempAvatarDisplay();
             });
         });
 
@@ -111,6 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.avatarManager.equippedItems['Hair'] = window.hairColorChanger.selectedHairId;
             }
             window.avatarManager.updateAvatarDisplay();
+        };
+
+        // Override updateTempLayer method in AvatarManager
+        window.avatarManager.updateTempLayer = function(type, url) {
+            if (window.avatarBody) {
+                window.avatarBody.updateLayer(type, url);
+            }
         };
     } else {
         console.error('No logged in user found');
