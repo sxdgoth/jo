@@ -251,7 +251,7 @@ class AvatarManager {
             main: '#F4D5BF',
             shadow: '#E6BBA8'
         };
-        const preserveColors = ['#E6958A', '#E6998F', '#BF766E']; // Add more colors here if needed
+        const preserveColors = ['#E6958A', '#E6998F', '#BF766E', '#F4F4F4']; // Add more colors here if needed
 
         const replaceColor = (element) => {
             ['fill', 'stroke'].forEach(attr => {
