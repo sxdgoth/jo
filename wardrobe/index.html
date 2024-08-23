@@ -81,13 +81,8 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager(loggedInUser.username);
-        window.avatarManager.initialize();
-
-        // Initialize HairColorChanger
+    // Initialize HairColorChanger after AvatarManager is initialized
+    if (window.avatarManager) {
         window.hairColorChanger = new HairColorChanger(window.avatarManager);
 
         // Add event listeners to hair items
@@ -97,32 +92,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.hairColorChanger.setSelectedHair(hairId);
                 // Update tempEquippedItems in AvatarManager
                 window.avatarManager.tempEquippedItems['Hair'] = hairId;
+                window.avatarManager.updateTempAvatarDisplay();
             });
         });
 
-        // Modify the existing apply changes function or add a new one
-        window.applyChanges = () => {
-            // Apply other changes from AvatarManager
-            window.avatarManager.applyChanges();
-
-            // Apply hair color changes
+        // Override updateTempAvatarDisplay method in AvatarManager
+        const originalUpdateTempAvatarDisplay = window.avatarManager.updateTempAvatarDisplay;
+        window.avatarManager.updateTempAvatarDisplay = function() {
+            originalUpdateTempAvatarDisplay.call(this);
             if (window.hairColorChanger.selectedHairId) {
-                window.avatarManager.equippedItems['Hair'] = window.hairColorChanger.selectedHairId;
-            }
-            window.avatarManager.updateAvatarDisplay();
-        };
-
-        // Override updateTempLayer method in AvatarManager
-        window.avatarManager.updateTempLayer = function(type, url) {
-            if (window.avatarBody) {
-                window.avatarBody.updateLayer(type, url);
+                window.hairColorChanger.updateHairColor();
             }
         };
-    } else {
-        console.error('No logged in user found');
     }
 });
 </script>
+
+
+
+
     
 </body>
 </html>
