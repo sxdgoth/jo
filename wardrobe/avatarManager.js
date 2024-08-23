@@ -25,13 +25,14 @@ class AvatarManager {
     }
 
     initialize() {
-        this.setupEyeColorPicker();
-        this.setupLipColorPicker();
-        this.updateAvatarDisplay();
-        this.updateItemVisuals();
-        this.loadAndApplyHighlights(); 
-        this.hairColorChanger.setupHairColorPicker();
-    }
+    this.setupEyeColorPicker();
+    this.setupLipColorPicker();
+    this.loadInventoryItems();
+    this.updateAvatarDisplay();
+    this.updateItemVisuals();
+    this.loadAndApplyHighlights(); 
+    this.hairColorChanger.setupHairColorPicker();
+}
 
     setupEyeColorPicker() {
         const eyeColorPicker = document.getElementById('eye-color-input');
@@ -91,6 +92,35 @@ class AvatarManager {
         }
     }
 
+    loadInventoryItems() {
+    if (window.userInventory) {
+        this.inventoryItems = window.userInventory.getItems();
+        this.displayInventoryItems();
+    } else {
+        console.error('User inventory not found');
+    }
+}
+
+displayInventoryItems() {
+    const wardrobeContainer = document.querySelector('.wardrobe-items');
+    if (!wardrobeContainer) {
+        console.error('Wardrobe container not found');
+        return;
+    }
+
+    wardrobeContainer.innerHTML = ''; // Clear existing items
+
+    this.inventoryItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'wardrobe-item';
+        itemElement.innerHTML = `
+            <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}" class="item-image" data-id="${item.id}">
+            <p>${item.name}</p>
+        `;
+        itemElement.addEventListener('click', () => this.toggleItem(item));
+        wardrobeContainer.appendChild(itemElement);
+    });
+}
     updateAvatarDisplay() {
         if (window.avatarBody) {
             window.avatarBody.clearAllLayers();
@@ -111,56 +141,56 @@ class AvatarManager {
         }
     }
 
-    toggleItem(item) {
-        if (this.tempEquippedItems[item.type] === item.id) {
-            delete this.tempEquippedItems[item.type];
-        } else {
-            this.tempEquippedItems[item.type] = item.id;
-        }
-        
-        // If the item is a hair item, update the HairColorChanger
-        if (item.type === 'Hair') {
-            this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
-        }
-        
-        this.updateItemVisuals();
-        this.updateTempAvatarDisplay();
+   toggleItem(item) {
+    if (this.tempEquippedItems[item.type] === item.id) {
+        delete this.tempEquippedItems[item.type];
+    } else {
+        this.tempEquippedItems[item.type] = item.id;
     }
     
-    updateItemVisuals() {
-        document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
-            const itemImage = itemContainer.querySelector('.item-image');
-            const itemId = itemImage.dataset.id;
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item && this.tempEquippedItems[item.type] === item.id) {
-                itemImage.classList.add('equipped');
-                itemContainer.classList.add('highlighted');
-            } else {
-                itemImage.classList.remove('equipped');
-                itemContainer.classList.remove('highlighted');
+    // If the item is a hair item, update the HairColorChanger
+    if (item.type === 'Hair') {
+        this.hairColorChanger.setSelectedHair(this.tempEquippedItems[item.type]);
+    }
+    
+    this.updateItemVisuals();
+    this.updateTempAvatarDisplay();
+}
+    
+  updateItemVisuals() {
+    document.querySelectorAll('.wardrobe-item').forEach(itemContainer => {
+        const itemImage = itemContainer.querySelector('.item-image');
+        const itemId = itemImage.dataset.id;
+        const item = this.inventoryItems.find(i => i.id === itemId);
+        if (item && this.tempEquippedItems[item.type] === item.id) {
+            itemImage.classList.add('equipped');
+            itemContainer.classList.add('highlighted');
+        } else {
+            itemImage.classList.remove('equipped');
+            itemContainer.classList.remove('highlighted');
+        }
+    });
+}
+
+    updateTempAvatarDisplay() {
+    if (window.avatarBody) {
+        window.avatarBody.clearAllLayers();
+        
+        this.applySkinTone();
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = this.inventoryItems.find(i => i.id === itemId);
+                if (item) {
+                    if (type === 'Hair') {
+                        this.hairColorChanger.updateHairColor();
+                    } else {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                    }
+                }
             }
         });
     }
-
-    updateTempAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        if (type === 'Hair') {
-                            this.hairColorChanger.updateHairColor();
-                        } else {
-                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                        }
-                    }
-                }
-            });
-        }
-    }
+}
     
     changeSkinTone(newTone) {
         this.skinTone = newTone;
@@ -358,43 +388,36 @@ class AvatarManager {
         this.updateAvatarDisplay();
     }
 
-    clearAvatar() {
-        // Get the user's owned items
-        const ownedItems = window.userInventory.getItems();
-
-        // Clear only equipped items that are not the user's default items
-        this.tempEquippedItems = {};
-        
-        // Re-equip default items if they exist in the user's inventory
-        ownedItems.forEach(item => {
-            if (item.isDefault) {
-                this.tempEquippedItems[item.type] = item.id;
-            }
-        });
-
-        // Reset to default appearance settings
-        this.skinTone = 'light'; // Reset to default skin tone
-        this.eyeColor = '#3FA2FF'; // Reset to default eye color
-        this.lipColor = '#E6998F'; // Reset to default lip color
-        this.hairColorChanger.resetHairColor(); // Assuming there's a reset method in HairColorChanger
-
-        // Update the avatar display
-        this.updateTempAvatarDisplay();
-        this.updateItemVisuals();
-
-        // Reset color pickers
-        const eyeColorPicker = document.getElementById('eye-color-input');
-        if (eyeColorPicker) {
-            eyeColorPicker.value = this.eyeColor;
+   clearAvatar() {
+    // Clear only equipped items that are not the user's default items
+    this.tempEquippedItems = {};
+    
+    // Re-equip default items if they exist in the user's inventory
+    this.inventoryItems.forEach(item => {
+        if (item.isDefault) {
+            this.tempEquippedItems[item.type] = item.id;
         }
+    });
 
-        const lipColorPicker = document.getElementById('lip-color-input');
-        if (lipColorPicker) {
-            lipColorPicker.value = this.lipColor;
-        }
+    // Reset to default appearance settings
+    this.skinTone = 'light';
+    this.eyeColor = '#3FA2FF';
+    this.lipColor = '#E6998F';
+    this.hairColorChanger.resetHairColor();
 
-        // You might want to reset skin tone selector if you have one
-        // this.updateSkinToneSelector();
+    // Update the avatar display
+    this.updateTempAvatarDisplay();
+    this.updateItemVisuals();
+
+    // Reset color pickers
+    const eyeColorPicker = document.getElementById('eye-color-input');
+    if (eyeColorPicker) {
+        eyeColorPicker.value = this.eyeColor;
+    }
+
+    const lipColorPicker = document.getElementById('lip-color-input');
+    if (lipColorPicker) {
+        lipColorPicker.value = this.lipColor;
     }
 }
 
