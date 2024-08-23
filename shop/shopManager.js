@@ -1,6 +1,7 @@
 // shopManager.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('ShopManager: DOM loaded');
     const shopItemsContainer = document.querySelector('.shop-items');
     let currentCategory = 'All';
 
@@ -102,10 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event delegation for item clicks
+    /  // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
-            // Item selection is now handled by itemSelector
+            const itemId = e.target.closest('.item-image').dataset.id;
+            console.log('ShopManager: Item clicked:', itemId);
+            if (window.itemSelector) {
+                window.itemSelector.toggleItem(itemId);
+            } else {
+                console.error('ShopManager: ItemSelector not found');
+            }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
@@ -114,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             filterItemsByCategory(category);
         }
     });
-
+    
     window.shopManager = {
         buyItem,
         renderShopItems,
@@ -122,9 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterItemsByCategory
     };
 
-    // Initialize the shop
+  // Initialize the shop
     renderShopItems();
+    console.log('ShopManager: Shop initialized');
 });
-
-
-
