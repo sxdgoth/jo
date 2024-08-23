@@ -104,4 +104,12 @@ class AvatarBody {
 document.addEventListener('DOMContentLoaded', function() {
     window.avatarBody = new AvatarBody('avatar-display');
     window.avatarBody.initializeAvatar();
+    
+    // Make sure avatarDisplay is defined before creating ItemSelector
+    if (window.avatarDisplay) {
+        console.log('Creating ItemSelector');
+        window.itemSelector = new ItemSelector(window.avatarDisplay);
+    } else {
+        console.error('avatarDisplay not found when creating ItemSelector');
+    }
 });
