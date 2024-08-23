@@ -218,28 +218,29 @@ class AvatarManager {
     }
 
     updateLayerWithSkinTone(type, src) {
-    fetch(src)
-        .then(response => response.text())
-        .then(svgText => {
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-            
-            this.applySkinToneToSVG(svgDoc);
-            this.applyEyeColorToSVG(svgDoc);
-            this.applyLipColorToSVG(svgDoc);
-            const serializer = new XMLSerializer();
-            const modifiedSvgString = serializer.serializeToString(svgDoc);
-            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-            const url = URL.createObjectURL(blob);
-            
-            requestAnimationFrame(() => {
-                const layerElement = window.avatarBody.updateLayer(type, url);
-                if (layerElement) {
-                    this.applyItemPosition(layerElement, type);
-                }
-            });
-        })
-        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+        fetch(src)
+            .then(response => response.text())
+            .then(svgText => {
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                
+                this.applySkinToneToSVG(svgDoc);
+                this.applyEyeColorToSVG(svgDoc);
+                this.applyLipColorToSVG(svgDoc);
+                const serializer = new XMLSerializer();
+                const modifiedSvgString = serializer.serializeToString(svgDoc);
+                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+                const url = URL.createObjectURL(blob);
+                
+                requestAnimationFrame(() => {
+                    const layerElement = window.avatarBody.updateLayer(type, url);
+                    if (layerElement) {
+                        this.applyItemPosition(layerElement, type);
+                    }
+                });
+            })
+            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+    }
 }
 
      applySkinToneToSVG(svgDoc) {
