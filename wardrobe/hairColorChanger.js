@@ -49,6 +49,18 @@ class HairColorChanger {
         });
     }
 
+setupHairColorPicker() {
+    const hairColorPicker = document.getElementById('hair-color-input');
+    if (hairColorPicker) {
+        hairColorPicker.value = this.hairColor;
+        hairColorPicker.addEventListener('input', (event) => {
+            this.changeHairColor(event.target.value);
+        });
+    } else {
+        console.error('Hair color picker not found');
+    }
+}
+    
     applyHairColorToSVG(svgDoc, newColor) {
         const paths = svgDoc.querySelectorAll('path');
         paths.forEach((path, index) => {
