@@ -26,18 +26,21 @@ class AvatarManager {
     
 
     initialize() {
-    this.setupEyeColorPicker();
-    this.setupLipColorPicker();
-    this.updateAvatarDisplay();
-    this.updateItemVisuals();
-    this.loadAndApplyHighlights(); 
-    if (this.hairColorChanger) {
-        this.hairColorChanger.setupHairColorPicker();
-        this.setupHairColorApplyButton();
-    } else {
-        console.error('HairColorChanger not initialized');
+        this.setupEyeColorPicker();
+        this.setupLipColorPicker();
+        this.updateAvatarDisplay();
+        this.updateItemVisuals();
+        this.loadAndApplyHighlights(); 
+        if (this.hairColorChanger) {
+            this.hairColorChanger.setupHairColorPicker();
+            // Use setTimeout to ensure the DOM is loaded
+            setTimeout(() => {
+                this.setupHairColorApplyButton();
+            }, 0);
+        } else {
+            console.error('HairColorChanger not initialized');
+        }
     }
-}
 
     setupEyeColorPicker() {
         const eyeColorPicker = document.getElementById('eye-color-input');
@@ -64,20 +67,20 @@ class AvatarManager {
     }
 
      setupHairColorApplyButton() {
-    const applyHairColorButton = document.getElementById('apply-hair-color');
-    if (applyHairColorButton) {
-        applyHairColorButton.addEventListener('click', () => {
-            if (this.hairColorChanger) {
-                this.hairColorChanger.applyHairColor();
-                this.updateAvatarDisplay();
-            } else {
-                console.error('HairColorChanger not initialized');
-            }
-        });
-    } else {
-        console.error('Apply hair color button not found');
+        const applyHairColorButton = document.getElementById('apply-hair-color');
+        if (applyHairColorButton) {
+            applyHairColorButton.addEventListener('click', () => {
+                if (this.hairColorChanger) {
+                    this.hairColorChanger.applyHairColor();
+                    this.updateAvatarDisplay();
+                } else {
+                    console.error('HairColorChanger not initialized');
+                }
+            });
+        } else {
+            console.error('Apply hair color button not found');
+        }
     }
-}
 
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
