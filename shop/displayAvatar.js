@@ -390,13 +390,14 @@ rgbToHex(r, g, b) {
         this.reorderLayers();
     }
 
+    
     removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
         this.updateAvatarDisplay(type, null);
     }
 
-    updateAvatarDisplay(type, src) {
+      updateAvatarDisplay(type, src) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
@@ -410,11 +411,13 @@ rgbToHex(r, g, b) {
                 };
             } else {
                 this.layers[type].style.display = 'none';
+                this.layers[type].data = ''; // Clear the source
             }
         } else {
             console.warn(`Layer not found for type: ${type}`);
         }
     }
+
    toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
