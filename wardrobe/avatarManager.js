@@ -142,25 +142,26 @@ class AvatarManager {
         });
     }
 
-    updateTempAvatarDisplay() {
-        if (window.avatarBody) {
-            window.avatarBody.clearAllLayers();
-            
-            this.applySkinTone();
-            Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
-                if (itemId) {
-                    const item = window.userInventory.getItems().find(i => i.id === itemId);
-                    if (item) {
-                        if (type === 'Hair') {
-                            this.hairColorChanger.updateHairColor();
-                        } else {
-                            this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                        }
+   updateTempAvatarDisplay() {
+    if (window.avatarBody) {
+        window.avatarBody.clearAllLayers();
+        
+        this.applySkinTone();
+        Object.entries(this.tempEquippedItems).forEach(([type, itemId]) => {
+            if (itemId) {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    if (type === 'Hair') {
+                        this.hairColorChanger.setSelectedHair(itemId);
+                        this.hairColorChanger.updateHairColorPreview();
+                    } else {
+                        this.updateLayerWithSkinTone(type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                     }
                 }
-            });
-        }
+            }
+        });
     }
+}
 
     changeSkinTone(newTone) {
         this.skinTone = newTone;
