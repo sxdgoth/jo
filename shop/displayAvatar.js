@@ -374,14 +374,14 @@ rgbToHex(r, g, b) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-     tryOnItem(item) {
+      tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
             // If the same item is clicked again, remove it
             this.removeItem(item.type);
         } else {
-            // Always update with the new item, regardless of whether there was a previous item
+            // Update with the new item
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
@@ -390,10 +390,13 @@ rgbToHex(r, g, b) {
     }
     
 
-    removeItem(type) {
+   removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         delete this.currentItems[type];
-        this.updateAvatarDisplay(type, null);
+        if (this.layers[type]) {
+            this.layers[type].style.display = 'none';
+            this.layers[type].data = ''; // Clear the source
+        }
     }
 
 
@@ -401,23 +404,13 @@ rgbToHex(r, g, b) {
         console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             if (src) {
-                const img = new Image();
-                img.onload = () => {
-                    this.layers[type].data = src;
-                    this.layers[type].style.display = 'block';
+                this.layers[type].data = src;
+                this.layers[type].style.display = 'block';
+                this.layers[type].onload = () => {
                     this.applySkinTone(this.layers[type], type);
-                    if (type === 'Eyes') {
-                        setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
-                    }
                 };
-                img.onerror = () => {
-                    console.error(`Failed to load image: ${src}`);
-                    this.layers[type].style.display = 'none';
-                };
-                img.src = src;
             } else {
-                this.layers[type].style.display = 'none';
-                this.layers[type].data = ''; // Clear the source
+                this.removeItem(type);
             }
         } else {
             console.warn(`Layer not found for type: ${type}`);
