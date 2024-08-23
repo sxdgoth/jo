@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
- function toggleTryOn(itemId) {
+function toggleTryOn(itemId) {
     console.log('toggleTryOn called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item && window.avatarDisplay) {
@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Item not found or avatarDisplay is not defined');
     }
 }
-    
-  function updateItemImages() {
+
+    function updateItemImages() {
     document.querySelectorAll('.shop-item').forEach(shopItem => {
         const image = shopItem.querySelector('.item-image');
         const itemId = image.dataset.id;
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 }
-
+    
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
