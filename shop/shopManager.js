@@ -33,7 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         updateCategoryButtons();
-        updateItemImages();
+        if (window.itemSelector) {
+            window.itemSelector.updateShopDisplay();
+        }
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -44,21 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateItemImages() {
-        console.log('Updating item images');
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (window.itemSelector && window.itemSelector.selectedItems[item.type] === item.id) {
-                shopItem.classList.add('highlighted');
-            } else {
-                shopItem.classList.remove('highlighted');
-            }
-        });
-    }
-    
     function buyItem(itemId) {
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
@@ -95,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.itemSelector) {
             window.itemSelector.resetSelection();
         }
-        updateItemImages();
     }
 
     function filterItemsByCategory(category) {
@@ -116,16 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   // Event delegation for item clicks
+    // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         if (e.target.closest('.item-image')) {
-            const itemId = e.target.closest('.item-image').dataset.id;
-            console.log('Item clicked:', itemId);
-            if (window.itemSelector) {
-                window.itemSelector.toggleItem(itemId);
-            } else {
-                console.error('ItemSelector not initialized');
-            }
+            // Item selection is now handled by itemSelector
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             buyItem(itemId);
@@ -139,11 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
-        filterItemsByCategory,
-        updateItemImages
+        filterItemsByCategory
     };
 
     // Initialize the shop
     renderShopItems();
-    console.log('Shop initialized');
 });
+
+
+
