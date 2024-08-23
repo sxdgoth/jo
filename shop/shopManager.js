@@ -52,19 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         if (window.avatarDisplay) {
-            // Check if the item is already tried on
-            if (window.avatarDisplay.currentItems && 
-                window.avatarDisplay.currentItems[item.type] && 
-                window.avatarDisplay.currentItems[item.type].id === item.id) {
-                // If it's already tried on, remove it
-                window.avatarDisplay.removeItem(item.type);
-            } else {
-                // If it's not tried on, try it on
-                window.avatarDisplay.tryOnItem(item);
-            }
+            window.avatarDisplay.toggleItem(item);
             updateItemImages();
         } else {
-            console.error('window.avatarDisplay is not defined');
+            console.error('window.avatarDisplay is not defined. Make sure it is initialized before calling toggleTryOn.');
         }
     } else {
         console.error('Item not found for id:', itemId);
