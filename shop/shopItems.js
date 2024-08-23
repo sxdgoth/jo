@@ -25,3 +25,5 @@ const shopItems = [
     
     // Add more items as needed
 ];
+
+console.log('shopItems loaded:', shopItems.length);
