@@ -4,62 +4,44 @@ class HairColorChanger {
         this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || '#1E1E1E';
         this.selectedHairId = null;
     }
-    
-    setupHairColorPicker() {
-        const hairColorPicker = document.getElementById('color-picker');
-        if (hairColorPicker) {
-            hairColorPicker.value = this.hairColor;
-            hairColorPicker.addEventListener('input', (event) => {
-                this.changeHairColor(event.target.value);
-            });
-            console.log('Hair color picker set up with color:', this.hairColor);
-        } else {
-            console.error('Hair color picker not found');
-        }
-    }
 
     setSelectedHair(hairId) {
+        console.log('Setting selected hair ID:', hairId);
         this.selectedHairId = hairId;
-        console.log('Selected hair ID:', hairId);
-        this.updateHairColor();
-    }
-
-    changeHairColor(newColor) {
-        this.hairColor = newColor;
-        localStorage.setItem(`hairColor_${this.avatarManager.username}`, newColor);
-        console.log('Hair color changed to:', newColor);
-        this.updateHairColor();
     }
 
     applyHairColor() {
         console.log('Applying hair color...');
         console.log('Current hair color:', this.hairColor);
         console.log('Selected hair ID:', this.selectedHairId);
-        if (this.selectedHairId) {
-            this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
-            localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
-            localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
-            this.updateHairColor();
-            console.log('Hair color applied:', this.hairColor);
-        } else {
-            console.warn('No hair item selected to apply color');
+        
+        if (!this.selectedHairId) {
+            console.warn('No hair item selected. Please select a hair item first.');
+            return;
         }
+
+        this.avatarManager.equippedItems['Hair'] = this.selectedHairId;
+        localStorage.setItem(`equippedItems_${this.avatarManager.username}`, JSON.stringify(this.avatarManager.equippedItems));
+        localStorage.setItem(`hairColor_${this.avatarManager.username}`, this.hairColor);
+        this.updateHairColor();
     }
-    
+
     updateHairColor() {
         console.log('Updating hair color...');
         console.log('Current hair color:', this.hairColor);
         console.log('Selected hair ID:', this.selectedHairId);
-        if (this.selectedHairId) {
-            const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
-            if (item) {
-                console.log('Updating layer with hair color...');
-                this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-            } else {
-                console.error('Hair item not found in inventory');
-            }
+
+        if (!this.selectedHairId) {
+            console.warn('No hair selected to update color. Please select a hair item first.');
+            return;
+        }
+
+        const item = window.userInventory.getItems().find(i => i.id === this.selectedHairId);
+        if (item) {
+            console.log('Updating layer with hair color...');
+            this.updateLayerWithHairColor('Hair', `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         } else {
-            console.warn('No hair selected to update color');
+            console.error('Hair item not found in inventory');
         }
     }
 
