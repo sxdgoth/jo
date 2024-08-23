@@ -5,22 +5,25 @@ class ItemSelector {
         this.selectedItems = {};
     }
 
-    toggleItem(itemId) {
-        console.log('ItemSelector: toggleItem called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (!item) {
-            console.error('ItemSelector: Item not found:', itemId);
-            return;
-        }
-
-        if (this.selectedItems[item.type] === itemId) {
-            this.deselectItem(item.type);
-        } else {
-            this.selectItem(item);
-        }
-
-        this.updateShopDisplay();
+   toggleItem(itemId) {
+    console.log('ItemSelector: toggleItem called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (!item) {
+        console.error('ItemSelector: Item not found:', itemId);
+        return;
     }
+
+    if (this.selectedItems[item.type] === itemId) {
+        console.log('ItemSelector: Deselecting item');
+        this.deselectItem(item.type);
+    } else {
+        console.log('ItemSelector: Selecting item');
+        this.selectItem(item);
+    }
+
+    this.updateShopDisplay();
+}
+
 
     selectItem(item) {
         console.log(`ItemSelector: Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
