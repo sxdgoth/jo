@@ -1,8 +1,21 @@
 class HairColorChanger {
     constructor(avatarManager) {
         this.avatarManager = avatarManager;
-        this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || '#1E1E1E';
+        this.hairColor = '#1E1E1E'; // Default hair color
         this.selectedHairId = null;
+    }
+
+    setupHairColorPicker() {
+        const hairColorPicker = document.getElementById('color-picker');
+        if (hairColorPicker) {
+            this.hairColor = localStorage.getItem(`hairColor_${this.avatarManager.username}`) || this.hairColor;
+            hairColorPicker.value = this.hairColor;
+            hairColorPicker.addEventListener('input', (event) => {
+                this.changeHairColor(event.target.value);
+            });
+        } else {
+            console.error('Hair color picker not found');
+        }
     }
 
     setSelectedHair(hairId) {
@@ -46,6 +59,7 @@ class HairColorChanger {
             .catch(error => console.error(`Error updating hair color:`, error));
     }
 
+
     applyHairColorToSVG(svgDoc) {
         const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
         const paths = svgDoc.querySelectorAll('path');
@@ -57,7 +71,7 @@ class HairColorChanger {
             }
         });
     }
-    
+
     getPathColor(path) {
         if (path.hasAttribute('fill')) {
             return path.getAttribute('fill');
