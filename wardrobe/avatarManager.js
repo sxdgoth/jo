@@ -21,6 +21,7 @@ class AvatarManager {
         this.lipColor = '#E6998F'; // Default lip color
         this.debounceTimer = null;
         this.loadEquippedItems();
+        this.hairColor = '#1E1E1E'; 
     }
 
     initialize() {
@@ -29,6 +30,7 @@ class AvatarManager {
         this.updateAvatarDisplay();
         this.updateItemVisuals();
         this.loadAndApplyHighlights(); 
+        this.setupHairColorPicker();
     }
 
     setupEyeColorPicker() {
@@ -55,6 +57,37 @@ class AvatarManager {
         }
     }
 
+setupHairColorPicker() {
+    const hairColorPicker = document.getElementById('hair-color-input');
+    if (hairColorPicker) {
+        hairColorPicker.value = this.hairColor;
+        hairColorPicker.addEventListener('input', (event) => {
+            this.debounceChangeHairColor(event.target.value);
+        });
+    } else {
+        console.error('Hair color picker not found');
+    }
+
+debounceChangeHairColor(newColor) {
+    if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = setTimeout(() => {
+        this.changeHairColor(newColor);
+    }, 50); // 50ms debounce time
+}
+
+changeHairColor(newColor) {
+    this.hairColor = newColor;
+    const hairColorPicker = document.getElementById('hair-color-input');
+    if (hairColorPicker) {
+        hairColorPicker.value = newColor;
+    }
+    requestAnimationFrame(() => {
+        this.updateTempAvatarDisplay();
+    });
+}
+    
     loadEquippedItems() {
         const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
         if (savedItems) {
@@ -83,6 +116,11 @@ class AvatarManager {
             this.lipColor = savedLipColor;
         }
     }
+     const savedHairColor = localStorage.getItem(`hairColor_${this.username}`);
+    if (savedHairColor) {
+        this.hairColor = savedHairColor;
+    }
+}
 
     updateAvatarDisplay() {
         if (window.avatarBody) {
@@ -197,27 +235,84 @@ class AvatarManager {
         }
     }
 
-  updateLayerWithSkinTone(type, src) {
-        fetch(src)
-            .then(response => response.text())
-            .then(svgText => {
-                const parser = new DOMParser();
-                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                
-                this.applySkinToneToSVG(svgDoc);
-                this.applyEyeColorToSVG(svgDoc);
-                this.applyLipColorToSVG(svgDoc);
-                const serializer = new XMLSerializer();
-                const modifiedSvgString = serializer.serializeToString(svgDoc);
-                const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
-                const url = URL.createObjectURL(blob);
-                
-                requestAnimationFrame(() => {
-                    window.avatarBody.updateLayer(type, url);
-                });
-            })
-            .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+applyHairColorToSVG(svgDoc) {
+    const defaultHairColors = ['#1E1E1E', '#323232', '#464646', '#5A5A5A', '#787878'];
+    const hairElements = svgDoc.querySelectorAll('path');
+    hairElements.forEach(element => {
+        const currentColor = this.getElementColor(element);
+        if (currentColor && defaultHairColors.includes(currentColor.toUpperCase())) {
+            const blendedColor = this.blendColors(currentColor, this.hairColor, 0.7);
+            this.setElementColor(element, blendedColor);
+        }
+    });
+}
+
+getElementColor(element) {
+    if (element.hasAttribute('fill')) {
+        return element.getAttribute('fill');
     }
+    if (element.hasAttribute('style')) {
+        const match = element.getAttribute('style').match(/fill:\s*(#[A-Fa-f0-9]{6})/);
+        if (match) return match[1];
+    }
+    return null;
+}
+
+setElementColor(element, color) {
+    if (element.hasAttribute('fill')) {
+        element.setAttribute('fill', color);
+    }
+    if (element.hasAttribute('style')) {
+        let style = element.getAttribute('style');
+        style = style.replace(/fill:[^;]+;?/, `fill:${color};`);
+        element.setAttribute('style', style);
+    }
+}
+
+blendColors(color1, color2, ratio) {
+    const rgb1 = this.hexToRgb(color1);
+    const rgb2 = this.hexToRgb(color2);
+    const blended = rgb1.map((channel, i) => 
+        Math.round(channel * (1 - ratio) + rgb2[i] * ratio)
+    );
+    return this.rgbToHex(...blended);
+}
+
+hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b];
+}
+
+rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+    
+  updateLayerWithSkinTone(type, src) {
+    fetch(src)
+        .then(response => response.text())
+        .then(svgText => {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            
+            this.applySkinToneToSVG(svgDoc);
+            this.applyEyeColorToSVG(svgDoc);
+            this.applyLipColorToSVG(svgDoc);
+            this.applyHairColorToSVG(svgDoc); // Add this line
+
+            const serializer = new XMLSerializer();
+            const modifiedSvgString = serializer.serializeToString(svgDoc);
+            const blob = new Blob([modifiedSvgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            requestAnimationFrame(() => {
+                window.avatarBody.updateLayer(type, url);
+            });
+        })
+        .catch(error => console.error(`Error updating layer ${type} with skin tone:`, error));
+}
 
      applySkinToneToSVG(svgDoc) {
         const tone = window.skinToneManager.skinTones[this.skinTone];
