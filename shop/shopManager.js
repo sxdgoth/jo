@@ -32,6 +32,10 @@ class ShopManager {
             `;
             shopContainer.appendChild(itemElement);
             this.applyItemPosition(itemElement.querySelector('.item-image'), item.type);
+            
+            // Update buy button state
+            const buyButton = itemElement.querySelector('.buy-btn');
+            updateBuyButtonState(buyButton, item.id);
         });
         console.log(`Rendered ${itemsToRender.length} shop items`);
 
@@ -52,7 +56,7 @@ class ShopManager {
                 this.toggleItem(itemId);
             } else if (event.target.classList.contains('buy-btn')) {
                 const itemId = event.target.dataset.id;
-                this.buyItem(itemId);
+                window.buyItem(itemId);
             }
         });
     }
@@ -63,11 +67,6 @@ class ShopManager {
         if (item && window.shopAvatarDisplay) {
             window.shopAvatarDisplay.tryOnItem(item);
         }
-    }
-
-    buyItem(itemId) {
-        console.log('Buying item:', itemId);
-        // Implement buying logic here
     }
 
     resetAvatarDisplay() {
