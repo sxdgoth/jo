@@ -1,18 +1,28 @@
 // avatarDisplay.js
 
 class AvatarDisplay {
-    constructor(avatarManager) {
-        this.avatarManager = avatarManager;
+    constructor() {
         this.displayContainer = document.getElementById('avatar-display-container');
+        this.avatarManager = null;
+        this.currentUser = null;
     }
 
     initialize() {
-        this.createDisplayElements();
-        this.updateDisplay();
+        this.currentUser = UserManager.getCurrentUser();
+        if (this.currentUser) {
+            this.avatarManager = new AvatarManager(this.currentUser.username);
+            this.avatarManager.initialize();
+            this.createDisplayElements();
+            this.updateDisplay();
+        } else {
+            console.error('No user logged in');
+            this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
+        }
     }
 
     createDisplayElements() {
         this.displayContainer.innerHTML = `
+            <h2>Welcome, ${this.currentUser.username}!</h2>
             <div id="avatar-image"></div>
             <div id="avatar-details">
                 <p id="skin-tone-display"></p>
@@ -22,21 +32,24 @@ class AvatarDisplay {
                 <h3>Applied Items:</h3>
                 <ul id="applied-items-list"></ul>
             </div>
+            <p id="user-coins">Coins: ${UserManager.getUserCoins()}</p>
         `;
     }
 
     updateDisplay() {
+        if (!this.currentUser) return;
+
         this.updateAvatarImage();
         this.updateSkinTone();
         this.updateEyeColor();
         this.updateLipColor();
         this.updateHairColor();
         this.updateAppliedItems();
+        this.updateUserCoins();
     }
 
     updateAvatarImage() {
         const avatarImage = document.getElementById('avatar-image');
-        // You'll need to implement a method to generate or retrieve the avatar image URL
         avatarImage.style.backgroundImage = `url(${this.getAvatarImageUrl()})`;
     }
 
@@ -80,6 +93,11 @@ class AvatarDisplay {
         });
     }
 
+    updateUserCoins() {
+        const userCoinsDisplay = document.getElementById('user-coins');
+        userCoinsDisplay.textContent = `Coins: ${UserManager.getUserCoins()}`;
+    }
+
     getAvatarImageUrl() {
         // Implement this method to generate or retrieve the avatar image URL
         // This might involve combining all the layers of the avatar
@@ -90,10 +108,6 @@ class AvatarDisplay {
 
 // Initialize the AvatarDisplay when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.avatarManager) {
-        window.avatarDisplay = new AvatarDisplay(window.avatarManager);
-        window.avatarDisplay.initialize();
-    } else {
-        console.error('Avatar manager not initialized');
-    }
+    window.avatarDisplay = new AvatarDisplay();
+    window.avatarDisplay.initialize();
 });
