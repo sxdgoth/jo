@@ -53,26 +53,39 @@ class AvatarBody {
     }
 
     updateLayer(type, src) {
-        console.log('Updating layer:', type, src);
-        if (this.layers[type]) {
-            const bodyPart = this.bodyParts.find(part => part.type === type);
-            if (src) {
+    console.log('Updating layer:', type, src);
+    if (this.layers[type]) {
+        const bodyPart = this.bodyParts.find(part => part.type === type);
+        if (src) {
+            if (this.layers[type].tagName.toLowerCase() === 'object') {
+                this.layers[type].data = src;
+            } else {
                 this.layers[type].src = src;
-                this.layers[type].style.display = 'block';
-                console.log(`Updated ${type} layer with ${src}`);
-            } else if (!bodyPart.isBase) {
-                this.layers[type].style.display = 'none';
-                console.log(`Removed ${type} layer`);
+            }
+            this.layers[type].style.display = 'block';
+            console.log(`Updated ${type} layer with ${src}`);
+        } else if (!bodyPart.isBase) {
+            this.layers[type].style.display = 'none';
+            if (this.layers[type].tagName.toLowerCase() === 'object') {
+                this.layers[type].data = '';
+            } else {
+                this.layers[type].src = '';
+            }
+            console.log(`Removed ${type} layer`);
+        } else {
+            if (this.layers[type].tagName.toLowerCase() === 'object') {
+                this.layers[type].data = this.baseUrl + bodyPart.file;
             } else {
                 this.layers[type].src = this.baseUrl + bodyPart.file;
-                this.layers[type].style.display = 'block';
-                console.log(`Reverted ${type} to base layer`);
             }
-        } else {
-            console.warn(`Layer ${type} not found`);
+            this.layers[type].style.display = 'block';
+            console.log(`Reverted ${type} to base layer`);
         }
-        this.reorderLayers();
+    } else {
+        console.warn(`Layer ${type} not found`);
     }
+    this.reorderLayers();
+}
 
    reorderLayers() {
     const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair',  'Neck', 'Hoodie', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
