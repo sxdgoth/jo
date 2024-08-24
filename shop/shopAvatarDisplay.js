@@ -5,41 +5,27 @@ class ShopAvatarDisplay extends AvatarDisplay {
         super(containerId, username);
         this.triedOnItems = {};
         this.requiredTypes = ['Shirt', 'Pants', 'Nose', 'Eyes', 'Eyebrows', 'Mouth'];
+        console.log('ShopAvatarDisplay initialized');
     }
 
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         if (this.triedOnItems[item.type] && this.triedOnItems[item.type].id === item.id) {
-            // If the same item is clicked again, only remove it if it's not a required type
             if (!this.requiredTypes.includes(item.type)) {
                 this.removeTriedOnItem(item.type);
             }
         } else {
-            // Apply the new item
             this.triedOnItems[item.type] = item;
-            this.updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            const src = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+            console.log(`Updating avatar display with src: ${src}`);
+            this.updateAvatarDisplay(item.type, src);
         }
         this.reorderLayers();
     }
 
-    removeTriedOnItem(type) {
-        console.log(`Removing tried-on item of type: ${type}`);
-        delete this.triedOnItems[type];
-        
-        // Revert to equipped item if exists
-        if (this.equippedItems[type]) {
-            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-            if (equippedItem) {
-                this.updateAvatarDisplay(type, `https://sxdgoth.github.io/jo/${equippedItem.path}${equippedItem.id}`);
-            }
-        } else if (!this.requiredTypes.includes(type)) {
-            // If no equipped item and not a required type, hide the layer
-            this.updateAvatarDisplay(type, '');
-        }
-    }
-
     updateAvatarDisplay(type, src) {
+        console.log(`ShopAvatarDisplay: Updating ${type} with src: ${src}`);
         super.updateAvatarDisplay(type, src);
         if (window.layerManager) {
             window.layerManager.reorderLayers();
@@ -50,10 +36,12 @@ class ShopAvatarDisplay extends AvatarDisplay {
     applyItemPosition(type) {
         const layer = this.layers[type];
         if (layer && window.applyItemPosition) {
+            console.log(`Applying position to ${type}`);
             window.applyItemPosition(layer, type.toLowerCase());
+        } else {
+            console.log(`Failed to apply position to ${type}. Layer: ${!!layer}, applyItemPosition: ${!!window.applyItemPosition}`);
         }
     }
 }
 
-// Make sure ShopAvatarDisplay is available globally
 window.ShopAvatarDisplay = ShopAvatarDisplay;
