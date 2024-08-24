@@ -63,52 +63,31 @@
     <script src="https://sxdgoth.github.io/jo/shop/shopManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shop.js"></script>
 <script>
-    class AvatarDisplay {
-        constructor(containerId, username) {
-            // ... existing constructor code ...
-        }
-
-        // ... other existing methods ...
-
-        clearSelectedItems() {
-            console.log('Clearing all selected items');
-            
-            // Reset current items
-            this.currentItems = {};
-            
-            // Reload the equipped items
-            this.loadEquippedItems();
-            
-            // Reload the avatar to show only equipped items
-            this.loadAvatar();
-            
-            console.log('Selected items cleared, reverted to applied avatar');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
-            window.avatarDisplay.loadAvatar();
-
-            // Set up the reset button
-            const resetButton = document.getElementById('reset-avatar-button');
-            if (resetButton) {
-                resetButton.addEventListener('click', function() {
-                    if (typeof window.avatarDisplay.clearSelectedItems === 'function') {
-                        window.avatarDisplay.clearSelectedItems();
-                    } else {
-                        console.error('clearSelectedItems is not a function');
-                    }
-                });
-            } else {
-                console.warn('Reset button not found');
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded');
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        console.log('Logged in user found:', loggedInUser.username);
+        
+        // Set up the reset button
+        const resetButton = document.getElementById('reset-avatar-button');
+        if (resetButton) {
+            console.log('Reset button found');
+            resetButton.addEventListener('click', function() {
+                console.log('Reset button clicked');
+                if (window.avatarDisplay && typeof window.avatarDisplay.clearSelectedItems === 'function') {
+                    window.avatarDisplay.clearSelectedItems();
+                } else {
+                    console.error('avatarDisplay not found or clearSelectedItems is not a function');
+                }
+            });
         } else {
-            console.error('No logged in user found');
+            console.warn('Reset button not found');
         }
-    });
+    } else {
+        console.error('No logged in user found');
+    }
+});
 </script>
 </body>
 </html>
