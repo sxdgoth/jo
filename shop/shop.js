@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     console.log("Logged in user:", loggedInUser);
 
-     if (loggedInUser) {
+    if (loggedInUser) {
         document.getElementById('user-name').textContent = loggedInUser.username;
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
@@ -17,11 +17,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Initialize ShopManager
         console.log("Initializing ShopManager");
-        window.shopManager = new ShopManager();
+        window.shopManager = new ShopManager(shopItems);
         window.shopManager.renderShopItems();
 
         // Add reset button for tried-on items
         addResetButton();
+
+        // Add event listeners for category buttons
+        addCategoryListeners();
     } else {
         console.error("No logged in user found");
         window.location.href = '../index.html';
@@ -56,11 +59,23 @@ function addResetButton() {
     const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset Tried-On Items';
     resetButton.addEventListener('click', () => {
-        if (window.shopManager && typeof window.shopManager.resetAvatarDisplay === 'function') {
+        if (window.shopManager) {
             window.shopManager.resetAvatarDisplay();
         }
     });
     document.querySelector('.shop-container').prepend(resetButton);
+}
+
+function addCategoryListeners() {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const category = this.dataset.category;
+            if (window.shopManager) {
+                window.shopManager.filterItemsByCategory(category);
+            }
+        });
+    });
 }
 
 // Expose the function to the global scope
