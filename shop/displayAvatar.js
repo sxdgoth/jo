@@ -36,12 +36,14 @@ class AvatarDisplay {
             this.updateAvatarDisplay(part, `${this.baseUrl}home/assets/body/avatar-${part.toLowerCase()}.svg`);
         });
 
-        // Load equipped items (you'll need to implement this based on your data structure)
-        // For example:
-        // Object.keys(this.equippedItems).forEach(type => {
-        //     const itemId = this.equippedItems[type];
-        //     this.updateAvatarDisplay(type, `${this.baseUrl}home/assets/${type.toLowerCase()}/${itemId}`);
-        // });
+        // Load equipped items
+        Object.keys(this.equippedItems).forEach(type => {
+            const itemId = this.equippedItems[type];
+            const item = shopItems.find(i => i.id === itemId);
+            if (item) {
+                this.updateAvatarDisplay(type, `${this.baseUrl}${item.path}${item.id}`);
+            }
+        });
 
         this.layerManager.initialize();
     }
@@ -178,6 +180,34 @@ class AvatarDisplay {
             this.applySkinTone(mouthElement, 'Mouth');
         }
     }
+
+    equipItem(item) {
+        this.equippedItems[item.type] = item.id;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    }
+
+    unequipItem(type) {
+        delete this.equippedItems[type];
+        this.removeItem(type);
+    }
+
+    saveAvatar() {
+        // Implement avatar saving logic here
+        console.log('Saving avatar:', this.equippedItems);
+        // You might want to send this data to a server or store it locally
+    }
+
+    loadSavedAvatar(savedData) {
+        // Implement loading saved avatar data
+        console.log('Loading saved avatar data:', savedData);
+        this.equippedItems = savedData.equippedItems || {};
+        this.skinTone = savedData.skinTone || this.skinTone;
+        this.eyeColor = savedData.eyeColor || this.eyeColor;
+        this.lipColor = savedData.lipColor || this.lipColor;
+        this.loadAvatar();
+    }
+
+    // Add any additional methods you need here
 }
 
 class LayerManager {
@@ -230,7 +260,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
+
+        // Load saved avatar data if available
+        const savedAvatarData = JSON.parse(localStorage.getItem(`avatar_${loggedInUser.username}`));
+        if (savedAvatarData) {
+            window.avatarDisplay.loadSavedAvatar(savedAvatarData);
+        }
     } else {
         console.error('No logged in user found');
     }
 });
+
+// Export the AvatarDisplay class if you're using modules
+// export { AvatarDisplay };
