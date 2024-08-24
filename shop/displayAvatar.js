@@ -367,11 +367,12 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-   tryOnItem(item) {
+  tryOnItem(item) {
     console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
     
-    // If the item is already tried on, remove it
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+    // If the item is already tried on or equipped, remove it
+    if ((this.currentItems[item.type] && this.currentItems[item.type].id === item.id) ||
+        (this.equippedItems[item.type] === item.id && !this.currentItems[item.type])) {
         this.removeItem(item.type);
     } else {
         // Apply the new item
@@ -381,7 +382,7 @@ blendColors(color1, color2, ratio) {
     this.reorderLayers();
 }
 
-   removeItem(type) {
+removeItem(type) {
     console.log(`Removing item of type: ${type}`);
     if (this.layers[type]) {
         this.layers[type].style.display = 'none';
@@ -404,6 +405,8 @@ blendColors(color1, color2, ratio) {
         }
     });
 }
+
+
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
