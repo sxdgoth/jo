@@ -359,54 +359,24 @@ class AvatarDisplay {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-    removeItem(type) {
-        console.log(`Removing item of type: ${type}`);
-        if (this.layers[type]) {
-            this.layers[type].style.display = 'none';
-            this.layers[type].data = ''; // Clear the source
-        }
-        delete this.currentItems[type];
-        
-        // If this is not a base part, check if there's an equipped item to display
-        if (!this.baseParts.includes(type) && this.equippedItems[type]) {
-            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-            if (equippedItem) {
-                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-            }
-        }
-        
-        // Ensure base parts are always visible
-        this.baseParts.forEach(basePart => {
-            if (this.layers[basePart]) {
-                this.layers[basePart].style.display = 'block';
-            }
-        });
+   removeItem(type) {
+    console.log(`Removing item of type: ${type}`);
+    if (window.avatarBody) {
+        window.avatarBody.updateLayer(type, '');
+    } else {
+        console.error('AvatarBody not initialized');
     }
+    delete this.currentItems[type];
+}
 
-    updateAvatarDisplay(type, src) {
-        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
-        if (this.layers[type]) {
-            if (src) {
-                this.layers[type].data = src;
-                this.layers[type].style.display = 'block';
-                this.layers[type].onload = () => {
-                    console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
-                    this.applySkinTone(this.layers[type], type);
-                    if (type === 'Eyes') {
-                        setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
-                    }
-                };
-                this.layers[type].onerror = () => {
-                    console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
-                };
-            } else {
-                this.layers[type].style.display = 'none';
-                this.layers[type].data = '';
-            }
-        } else {
-            console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
-        }
+   updateAvatarDisplay(type, src) {
+    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+    if (window.avatarBody) {
+        window.avatarBody.updateLayer(type, src);
+    } else {
+        console.error('AvatarBody not initialized');
     }
+}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
