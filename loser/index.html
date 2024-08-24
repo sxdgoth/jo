@@ -182,6 +182,10 @@
                 document.getElementById('user-name').textContent = loggedInUser.username;
                 document.getElementById('user-coins').textContent = loggedInUser.coins;
                 console.log('User logged in:', loggedInUser.username);
+
+                // Initialize AvatarDisplay
+                window.avatarDisplay = new AvatarDisplay();
+                window.avatarDisplay.initialize();
             } else {
                 console.log('No user logged in');
                 // Redirect to login page if no user is logged in
@@ -193,13 +197,6 @@
                 const shopItem = createShopItem(item);
                 shopItemsContainer.appendChild(shopItem);
             });
-
-            // Make sure avatarBody is initialized
-            if (!window.avatarBody) {
-                console.error('avatarBody not found. Make sure avatarTemplate.js is loaded correctly.');
-            } else {
-                console.log('avatarBody initialized');
-            }
         });
 
         function logout() {
