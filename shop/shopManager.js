@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
 
+
     function renderShopItems() {
         console.log('Rendering shop items. Current category:', currentCategory);
         console.log('Total shop items:', shopItems.length);
@@ -97,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event delegation for item clicks
-  document.addEventListener('click', function(e) {
+ document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
         if (e.target.closest('.item-image')) {
             const itemImage = e.target.closest('.item-image');
@@ -129,6 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderShopItems();
 
     // Log avatarDisplay and itemSelector for debugging
-    console.log('avatarDisplay:', window.avatarDisplay);
+   console.log('avatarDisplay:', window.avatarDisplay);
     console.log('itemSelector:', window.itemSelector);
 });
