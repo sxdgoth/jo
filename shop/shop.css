@@ -293,12 +293,5 @@ main {
     background-color: #d32f2f;
 }
 
-@media (max-width: 768px) {
-    .avatar-section {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-}
-
 
 
