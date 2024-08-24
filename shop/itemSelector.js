@@ -1,6 +1,6 @@
 class ItemSelector {
     constructor(avatarDisplay) {
-        console.log('ItemSelector initialized');
+        console.log('ItemSelector constructor called');
         this.avatarDisplay = avatarDisplay;
         this.selectedItems = {};
     }
@@ -24,28 +24,19 @@ class ItemSelector {
 
     tryOnItem(item) {
         console.log('Trying on item:', item.name);
-        
-        if (this.selectedItems[item.type]) {
-            this.removeItem(item.type);
-        }
-
-        const itemSrc = `${this.avatarDisplay.baseUrl}${item.path}${item.id}`;
+        const itemSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
         console.log('Updating avatar display with src:', itemSrc);
         this.avatarDisplay.updateAvatarDisplay(item.type, itemSrc);
-
         this.selectedItems[item.type] = item.id;
         this.updateItemSelection(item.id, true);
     }
 
     removeItem(type) {
         console.log('Removing item of type:', type);
-        
         this.avatarDisplay.removeItem(type);
-
         if (this.selectedItems[type]) {
             this.updateItemSelection(this.selectedItems[type], false);
         }
-
         delete this.selectedItems[type];
     }
 
@@ -54,29 +45,9 @@ class ItemSelector {
         const itemElement = document.querySelector(`.item-image[data-id="${itemId}"]`);
         if (itemElement) {
             itemElement.classList.toggle('selected', isSelected);
-        } else {
-            console.warn('Item element not found for id:', itemId);
         }
-    }
-
-    resetSelection() {
-        console.log('Resetting selection');
-        Object.keys(this.selectedItems).forEach(type => {
-            this.removeItem(type);
-        });
-        this.selectedItems = {};
-        this.avatarDisplay.resetTriedOnItems();
     }
 }
 
-// Initialize ItemSelector when the DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing ItemSelector');
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser && window.avatarDisplay) {
-        window.itemSelector = new ItemSelector(window.avatarDisplay);
-        console.log('ItemSelector initialized:', window.itemSelector);
-    } else {
-        console.error('AvatarDisplay not initialized or no logged in user found');
-    }
-});
+// Make ItemSelector globally accessible
+window.ItemSelector = ItemSelector;
