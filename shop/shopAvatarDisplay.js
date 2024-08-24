@@ -18,7 +18,7 @@ class ShopAvatarDisplay extends AvatarDisplay {
         } else {
             // Apply the new item
             this.triedOnItems[item.type] = item;
-            this.updateAvatarDisplay(item.type, `${item.path}${item.id}`);
+            this.updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         }
         this.reorderLayers();
     }
@@ -31,20 +31,12 @@ class ShopAvatarDisplay extends AvatarDisplay {
         if (this.equippedItems[type]) {
             const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
             if (equippedItem) {
-                this.updateAvatarDisplay(type, `${equippedItem.path}${equippedItem.id}`);
+                this.updateAvatarDisplay(type, `https://sxdgoth.github.io/jo/${equippedItem.path}${equippedItem.id}`);
             }
         } else if (!this.requiredTypes.includes(type)) {
             // If no equipped item and not a required type, hide the layer
             this.updateAvatarDisplay(type, '');
         }
-    }
-
-    resetTriedOnItems() {
-        Object.keys(this.triedOnItems).forEach(type => {
-            if (!this.requiredTypes.includes(type)) {
-                this.removeTriedOnItem(type);
-            }
-        });
     }
 
     updateAvatarDisplay(type, src) {
@@ -58,7 +50,7 @@ class ShopAvatarDisplay extends AvatarDisplay {
     applyItemPosition(type) {
         const layer = this.layers[type];
         if (layer && window.applyItemPosition) {
-            window.applyItemPosition(layer, type);
+            window.applyItemPosition(layer, type.toLowerCase());
         }
     }
 }
