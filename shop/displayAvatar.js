@@ -367,71 +367,68 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-  
-    tryOnItem(item) {
-        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-            // If the same item is clicked again, remove it
-            this.removeItem(item.type);
-        } else {
-            // Apply the new item
-            this.currentItems[item.type] = item;
-            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-        }
-        this.reorderLayers();
+   tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    // If the item is already tried on, remove it
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        this.removeItem(item.type);
+    } else {
+        // Apply the new item
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
+    this.reorderLayers();
+}
 
- 
-    removeItem(type) {
-        console.log(`Removing item of type: ${type}`);
-        if (this.layers[type]) {
-            this.layers[type].style.display = 'none';
-            this.layers[type].data = ''; // Clear the source
+   removeItem(type) {
+    console.log(`Removing item of type: ${type}`);
+    if (this.layers[type]) {
+        this.layers[type].style.display = 'none';
+        this.layers[type].data = ''; // Clear the source
+    }
+    delete this.currentItems[type];
+    
+    // If this is not a base part, check if there's an equipped item to display
+    if (!this.baseParts.includes(type) && this.equippedItems[type]) {
+        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+        if (equippedItem) {
+            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
         }
-        delete this.currentItems[type];
-        
-        // If this is not a base part, check if there's an equipped item to display
-        if (!this.baseParts.includes(type) && this.equippedItems[type]) {
-            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-            if (equippedItem) {
-                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-            }
-        }
-        
-        // Ensure base parts are always visible
-        this.baseParts.forEach(basePart => {
-            if (this.layers[basePart]) {
-                this.layers[basePart].style.display = 'block';
-            }
-        });
     }
     
-   updateAvatarDisplay(type, src) {
-        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
-        if (this.layers[type]) {
-            if (src) {
-                this.layers[type].data = src;
-                this.layers[type].style.display = 'block';
-                this.layers[type].onload = () => {
-                    console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
-                    this.applySkinTone(this.layers[type], type);
-                    if (type === 'Eyes') {
-                        setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
-                    }
-                };
-                this.layers[type].onerror = () => {
-                    console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
-                };
-            } else {
-                this.layers[type].style.display = 'none';
-                this.layers[type].data = '';
-            }
+    // Ensure base parts are always visible
+    this.baseParts.forEach(basePart => {
+        if (this.layers[basePart]) {
+            this.layers[basePart].style.display = 'block';
+        }
+    });
+}
+    updateAvatarDisplay(type, src) {
+    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Eyes') {
+                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                }
+            };
+            this.layers[type].onerror = () => {
+                console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
+            };
         } else {
-            console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
+            this.layers[type].style.display = 'none';
+            this.layers[type].data = '';
         }
+    } else {
+        console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
     }
-    
+}
+
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
