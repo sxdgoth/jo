@@ -8,22 +8,24 @@ class AvatarDisplay {
     }
 
     initialize() {
-        console.log('Initializing AvatarDisplay');
-        this.currentUser = this.getCurrentUser();
-        if (this.currentUser) {
-            console.log('Current user:', this.currentUser);
-            this.avatarManager = window.avatarManager;
-            if (!this.avatarManager) {
-                console.error('AvatarManager not found');
-                return;
-            }
-            this.createDisplayElements();
-            this.updateDisplay();
-        } else {
-            console.error('No user logged in');
-            this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
-        }
+    console.log('Initializing AvatarDisplay');
+    this.currentUser = this.getCurrentUser();
+    if (this.currentUser) {
+        console.log('Current user:', this.currentUser);
+        this.loadAvatarState();
+        this.createDisplayElements();
+        this.updateDisplay();
+    } else {
+        console.error('No user logged in');
+        this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
     }
+}
+
+loadAvatarState() {
+    const avatarState = JSON.parse(localStorage.getItem('avatarState') || '{}');
+    this.avatarManager = new AvatarManager(this.currentUser.username);
+    this.avatarManager.initialize(avatarState);
+}
 
     getCurrentUser() {
         const userJson = sessionStorage.getItem('loggedInUser');
