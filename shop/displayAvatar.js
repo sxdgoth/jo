@@ -374,6 +374,10 @@ blendColors(color1, color2, ratio) {
     if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
         this.removeItem(item.type);
     } else {
+        // Remove any existing item of the same type
+        if (this.currentItems[item.type]) {
+            this.removeItem(item.type);
+        }
         // Apply the new item
         this.currentItems[item.type] = item;
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
@@ -404,6 +408,7 @@ blendColors(color1, color2, ratio) {
         }
     });
 }
+    
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
