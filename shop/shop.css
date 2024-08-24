@@ -59,7 +59,6 @@ main {
 }
 
 .avatar-container {
-    flex: 0 0 300px;
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
@@ -67,10 +66,10 @@ main {
     height: 400px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
 }
 
 #avatar-display {
