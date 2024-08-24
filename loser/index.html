@@ -120,89 +120,9 @@
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
     <script src="https://sxdgoth.github.io/jo/loser/avatarDisplay1.js"></script>
+    <script src="https://sxdgoth.github.io/jo/loser/shopInteraction.js"></script>
     <script src="https://sxdgoth.github.io/jo/loser/shop.js"></script>
      <script src="https://sxdgoth.github.io/jo/welcome.js"></script>
-   <script>
-        const shopItemsContainer = document.getElementById('shop-items');
-        let currentItems = {};
-
-        function createShopItem(item) {
-            const shopItem = document.createElement('div');
-            shopItem.className = 'shop-item';
-            shopItem.innerHTML = `
-                <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}">
-                <p>${item.name}</p>
-                <p>Price: $${item.price}</p>
-            `;
-            shopItem.addEventListener('click', () => toggleItem(item, shopItem));
-            return shopItem;
-        }
-
-        function toggleItem(item, shopItemElement) {
-            if (window.avatarBody) {
-                if (currentItems[item.type] && currentItems[item.type].id === item.id) {
-                    // If the item is already selected, remove it
-                    window.avatarBody.updateLayer(item.type, '');
-                    delete currentItems[item.type];
-                    shopItemElement.classList.remove('selected');
-                } else {
-                    // If the item is not selected, add it
-                    window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-                    currentItems[item.type] = item;
-                    shopItemElement.classList.add('selected');
-                }
-                updateShopItemSelection();
-            } else {
-                console.error('avatarBody not found');
-            }
-        }
-
-        function updateShopItemSelection() {
-            shopItemsContainer.querySelectorAll('.shop-item').forEach(shopItem => {
-                const itemName = shopItem.querySelector('p').textContent;
-                const item = shopItems.find(i => i.name === itemName);
-                if (currentItems[item.type] && currentItems[item.type].id === item.id) {
-                    shopItem.classList.add('selected');
-                } else {
-                    shopItem.classList.remove('selected');
-                }
-            });
-        }
-  // Initialize shop items and check login status
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM content loaded');
-
-            // Check if user is logged in
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            console.log('Logged in user:', loggedInUser);
-
-            if (loggedInUser) {
-                document.getElementById('user-name').textContent = loggedInUser.username;
-                document.getElementById('user-coins').textContent = loggedInUser.coins;
-                console.log('User logged in:', loggedInUser.username);
-
-                // Initialize AvatarDisplay
-                window.avatarDisplay = new AvatarDisplay();
-                window.avatarDisplay.initialize();
-            } else {
-                console.log('No user logged in');
-                // Redirect to login page if no user is logged in
-                window.location.href = '../index.html';
-            }
-
-            // Initialize shop items
-            shopItems.forEach(item => {
-                const shopItem = createShopItem(item);
-                shopItemsContainer.appendChild(shopItem);
-            });
-        });
-
-        function logout() {
-            console.log('Logout function called');
-            sessionStorage.removeItem('loggedInUser');
-            // Redirect to login page after logout
-            window.location.href = '../index.html';
-        }
-    </script>
+   
 </body>
 </html>
