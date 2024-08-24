@@ -3,12 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (loggedInUser) {
         // Initialize AvatarDisplay
-        window.avatarDisplay = new AvatarDisplay();
-        window.avatarDisplay.initialize();
+        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+        window.avatarDisplay.loadAvatar();
         
-        // Create AvatarBody instance
-        window.avatarBody = new AvatarBody('avatar-display');
-        window.avatarBody.initializeAvatar();
+        // Update user coins display
+        updateUserCoinsDisplay(loggedInUser.coins);
         
         // Initialize user's inventory
         window.createUserInventory(loggedInUser.username);
@@ -19,6 +18,13 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '../index.html';
     }
 });
+
+function updateUserCoinsDisplay(coins) {
+    const userCoinsElement = document.getElementById('user-coins');
+    if (userCoinsElement) {
+        userCoinsElement.textContent = `Coins: ${coins.toLocaleString()}`;
+    }
+}
 
 function renderShopItems() {
     const shopItemsContainer = document.getElementById('shop-items');
@@ -40,24 +46,35 @@ function renderShopItems() {
 }
 
 function buyItem(itemId) {
-    // Implement buying logic here
-    console.log(`Buying item: ${itemId}`);
-    
-    // Example buying logic (you'll need to adjust this):
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     const item = shopItems.find(i => i.id === itemId);
-    if (item && window.avatarDisplay.currentUser.coins >= item.price) {
-        window.avatarDisplay.currentUser.coins -= item.price;
+    
+    if (!item) {
+        console.error('Item not found');
+        return;
+    }
+    
+    if (loggedInUser.coins >= item.price) {
+        // Deduct coins
+        loggedInUser.coins -= item.price;
+        sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        
+        // Add item to inventory
         window.userInventory.addItem(item);
-        window.avatarDisplay.avatarManager.equipItem(item.type, itemId);
         
-        // Save the updated avatar state
-        localStorage.setItem('avatarState', JSON.stringify(window.avatarDisplay.avatarManager.getState()));
+        // Update avatar display
+        window.avatarDisplay.equippedItems[item.type] = item.id;
+        window.avatarDisplay.updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
         
-        // Update the display
-        window.avatarDisplay.updateDisplay();
+        // Save equipped items
+        localStorage.setItem(`equippedItems_${loggedInUser.username}`, JSON.stringify(window.avatarDisplay.equippedItems));
+        
+        // Update coins display
+        updateUserCoinsDisplay(loggedInUser.coins);
         
         console.log(`Bought item: ${item.name}`);
     } else {
-        console.log("Can't buy item: insufficient funds or item not found");
+        console.log("Not enough coins to buy this item");
+        // You might want to show a message to the user here
     }
 }
