@@ -75,9 +75,13 @@
             border-color: #007bff;
             background-color: #e6f2ff;
         }
-   #welcome-message {
+        
+     #welcome-message {
             text-align: center;
             margin-bottom: 20px;
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
         }
         #logout-btn {
             background-color: #f44336;
@@ -95,10 +99,11 @@
     </style>
 </head>
 <body>
-    <div id="welcome-message" style="display: none;">
-        <h1>Welcome, <span id="user-name"></span>!</h1>
+    <div id="welcome-message">
+        <h1>Welcome, <span id="user-name">Guest</span>!</h1>
         <button id="logout-btn" onclick="logout()">Logout</button>
     </div>
+
 
     <main>
         <div class="avatar-container">
