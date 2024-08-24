@@ -56,7 +56,7 @@ class ShopManager {
         }
     }
 
-    addEventListeners() {
+   addEventListeners() {
         const shopContainer = document.querySelector('.shop-items');
         shopContainer.addEventListener('click', (event) => {
             const itemContainer = event.target.closest('.item-image');
@@ -65,10 +65,15 @@ class ShopManager {
                 this.toggleItem(itemId);
             } else if (event.target.classList.contains('buy-btn')) {
                 const itemId = event.target.dataset.id;
-                window.buyItem(itemId);
+                if (window.buyItem) {
+                    window.buyItem(itemId);
+                } else {
+                    console.error('buyItem function not found');
+                }
             }
         });
     }
+
 
     toggleItem(itemId) {
         console.log('Toggling item:', itemId);
