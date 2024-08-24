@@ -24,14 +24,15 @@ class ShopManager {
         itemsToRender.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'shop-item';
+            
+            const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
+
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
-                    <svg width="100%" height="100%">
-                        <use href="${item.path}${item.id}#svgView(viewBox(0,0,100,100))" />
-                    </svg>
+                    <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
                 </div>
                 <h3>${item.name}</h3>
-                <p>Price: ${item.price} coins</p>
+                <p>${item.price} coins</p>
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopContainer.appendChild(itemElement);
