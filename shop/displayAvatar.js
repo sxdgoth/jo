@@ -415,6 +415,27 @@ blendColors(color1, color2, ratio) {
         }
     }
 
+  isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
+    }
+
+    updateEquippedItems() {
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
+    }
+
+    resetTriedOnItems() {
+        console.log('Resetting tried on items');
+        Object.keys(this.currentItems).forEach(type => {
+            this.removeItem(type);
+        });
+        this.currentItems = {};
+        this.loadEquippedItems();
+        this.loadAvatar();
+    }
+}
+
+    
   
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
