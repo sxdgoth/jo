@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add event listeners for category buttons
         addCategoryListeners();
+
+        // Initialize inventory state
+        initializeInventoryState();
     } else {
         console.error("No logged in user found");
         window.location.href = '../index.html';
@@ -95,9 +98,9 @@ function buyItem(itemId) {
             updateUserCoinsAfterPurchase(newCoins);
 
             // Add item to user's inventory
-            addItemToInventory(loggedInUser.username, item);
+            onItemPurchased(item);
 
-            // Update the shop display (optional)
+            // Update the shop display
             if (window.shopManager) {
                 window.shopManager.renderShopItems();
             }
@@ -110,17 +113,6 @@ function buyItem(itemId) {
     }
 }
 
-// Function to add item to user's inventory
-function addItemToInventory(username, item) {
-    let inventory = JSON.parse(localStorage.getItem(`inventory_${username}`)) || [];
-    inventory.push(item);
-    localStorage.setItem(`inventory_${username}`, JSON.stringify(inventory));
-    console.log(`Item ${item.name} added to ${username}'s inventory`);
-}
-
 // Expose necessary functions to the global scope
 window.updateUserCoinsAfterPurchase = updateUserCoinsAfterPurchase;
 window.buyItem = buyItem;
-
-
-
