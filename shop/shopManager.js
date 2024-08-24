@@ -62,30 +62,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-     function toggleItem(itemId) {
-        console.log('toggleItem called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-                window.avatarDisplay.tryOnItem(item);
-                if (!nonRemovableTypes.includes(item.type)) {
-                    if (selectedItems[item.type] && selectedItems[item.type].id === item.id) {
-                        delete selectedItems[item.type];
-                    } else {
-                        selectedItems[item.type] = item;
-                    }
-                } else {
-                    selectedItems[item.type] = item;
-                }
+    function toggleItem(itemId) {
+    console.log('toggleItem called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            window.avatarDisplay.tryOnItem(item);
+            if (selectedItems[item.type] && selectedItems[item.type].id === item.id) {
+                delete selectedItems[item.type];
             } else {
-                console.error('avatarDisplay not found or tryOnItem is not a function');
+                selectedItems[item.type] = item;
             }
-            updateSelectedItems();
         } else {
-            console.error('Item not found for id:', itemId);
+            console.error('avatarDisplay not found or tryOnItem is not a function');
         }
+        updateSelectedItems();
+    } else {
+        console.error('Item not found for id:', itemId);
     }
+}
 
     function updateSelectedItems() {
         console.log('Updating selected items');
