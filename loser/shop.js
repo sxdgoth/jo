@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
         window.avatarDisplay = new AvatarDisplay();
         window.avatarDisplay.initialize();
         
+        // Create AvatarBody instance
+        window.avatarBody = new AvatarBody('avatar-display');
+        window.avatarBody.initializeAvatar();
+        
+        // Initialize user's inventory
+        window.createUserInventory(loggedInUser.username);
+        
         // Render shop items
         renderShopItems();
     } else {
@@ -35,8 +42,22 @@ function renderShopItems() {
 function buyItem(itemId) {
     // Implement buying logic here
     console.log(`Buying item: ${itemId}`);
-    // After buying, update the avatar display
-    if (window.avatarDisplay) {
+    
+    // Example buying logic (you'll need to adjust this):
+    const item = shopItems.find(i => i.id === itemId);
+    if (item && window.avatarDisplay.currentUser.coins >= item.price) {
+        window.avatarDisplay.currentUser.coins -= item.price;
+        window.userInventory.addItem(item);
+        window.avatarDisplay.avatarManager.equipItem(item.type, itemId);
+        
+        // Save the updated avatar state
+        localStorage.setItem('avatarState', JSON.stringify(window.avatarDisplay.avatarManager.getState()));
+        
+        // Update the display
         window.avatarDisplay.updateDisplay();
+        
+        console.log(`Bought item: ${item.name}`);
+    } else {
+        console.log("Can't buy item: insufficient funds or item not found");
     }
 }
