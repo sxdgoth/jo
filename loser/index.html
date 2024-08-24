@@ -170,29 +170,40 @@
             });
         }
 
-        // Initialize shop items and check login status
+       // Initialize shop items and check login status
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM content loaded');
+
+            // Check if user is logged in
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            console.log('Logged in user:', loggedInUser);
+
+            if (loggedInUser) {
+                document.getElementById('user-name').textContent = loggedInUser.username;
+                console.log('User logged in:', loggedInUser.username);
+            } else {
+                console.log('No user logged in');
+            }
+
+            // Initialize shop items
             shopItems.forEach(item => {
                 const shopItem = createShopItem(item);
                 shopItemsContainer.appendChild(shopItem);
             });
 
-            // Check if user is logged in
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (loggedInUser) {
-                showWelcomeMessage(loggedInUser.username);
-            } else {
-                // Redirect to login page or show login form
-                // For now, we'll set a test user
-                sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'testUser' }));
-                showWelcomeMessage('testUser');
-            }
-
             // Make sure avatarBody is initialized
             if (!window.avatarBody) {
                 console.error('avatarBody not found. Make sure avatarTemplate.js is loaded correctly.');
+            } else {
+                console.log('avatarBody initialized');
             }
         });
+
+        function logout() {
+            console.log('Logout function called');
+            sessionStorage.removeItem('loggedInUser');
+            document.getElementById('user-name').textContent = 'Guest';
+        }
     </script>
 </body>
 </html>
