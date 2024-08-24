@@ -52,39 +52,26 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-    updateLayer(type, src) {
-    console.log('Updating layer:', type, src);
-    if (this.layers[type]) {
-        const bodyPart = this.bodyParts.find(part => part.type === type);
-        if (src) {
-            if (this.layers[type].tagName.toLowerCase() === 'object') {
+     updateLayer(type, src) {
+        console.log('Updating layer:', type, src);
+        if (this.layers[type]) {
+            if (src) {
                 this.layers[type].data = src;
+                this.layers[type].style.display = 'block';
+                console.log(`Updated ${type} layer with ${src}`);
             } else {
-                this.layers[type].src = src;
-            }
-            this.layers[type].style.display = 'block';
-            console.log(`Updated ${type} layer with ${src}`);
-        } else if (!bodyPart.isBase) {
-            this.layers[type].style.display = 'none';
-            if (this.layers[type].tagName.toLowerCase() === 'object') {
+                this.layers[type].style.display = 'none';
                 this.layers[type].data = '';
-            } else {
-                this.layers[type].src = '';
+                console.log(`Removed ${type} layer`);
             }
-            console.log(`Removed ${type} layer`);
+            this.layers[type].onload = () => {
+                this.applySkinTone(this.layers[type], type);
+            };
         } else {
-            if (this.layers[type].tagName.toLowerCase() === 'object') {
-                this.layers[type].data = this.baseUrl + bodyPart.file;
-            } else {
-                this.layers[type].src = this.baseUrl + bodyPart.file;
-            }
-            this.layers[type].style.display = 'block';
-            console.log(`Reverted ${type} to base layer`);
+            console.warn(`Layer ${type} not found`);
         }
-    } else {
-        console.warn(`Layer ${type} not found`);
+        this.reorderLayers();
     }
-    this.reorderLayers();
 }
 
    reorderLayers() {
