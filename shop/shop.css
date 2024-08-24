@@ -274,11 +274,7 @@ main {
 
 
 
-.avatar-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+
 
 #reset-avatar-button {
     display: block;
