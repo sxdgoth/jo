@@ -367,20 +367,22 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-  tryOnItem(item) {
-        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+ tryOnItem(item) {
+        console.log(`AvatarDisplay: Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
             // If the item is already tried on, remove it
+            console.log(`AvatarDisplay: Removing item ${item.id} of type ${item.type}`);
             this.removeItem(item.type);
         } else {
             // Apply the new item
+            console.log(`AvatarDisplay: Applying new item ${item.id} of type ${item.type}`);
             this.currentItems[item.type] = item;
             this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
         }
-        this.reorderLayers();
+        this.layerManager.scheduleReorder();
     }
-
+    
      removeItem(type) {
         console.log(`Removing item of type: ${type}`);
         const layerElement = this.svgContainer.querySelector(`g[data-body-part="${type.toLowerCase()}"]`);
@@ -412,22 +414,26 @@ blendColors(color1, color2, ratio) {
         let layerElement = this.svgContainer.querySelector(`g[data-body-part="${type.toLowerCase()}"]`);
         
         if (!layerElement) {
+            console.log(`AvatarDisplay: Creating new layer for ${type}`);
             layerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
             layerElement.setAttribute('data-body-part', type.toLowerCase());
             this.svgContainer.appendChild(layerElement);
         }
 
         if (src) {
+            console.log(`AvatarDisplay: Fetching SVG content for ${type} from ${src}`);
             fetch(src)
                 .then(response => response.text())
                 .then(svgContent => {
+                    console.log(`AvatarDisplay: SVG content loaded for ${type}`);
                     layerElement.innerHTML = svgContent;
                     layerElement.style.display = 'block';
                     this.applySkinTone(layerElement, type);
                     this.layerManager.scheduleReorder();
                 })
-                .catch(error => console.error(`Failed to load SVG for ${type}:`, error));
+                .catch(error => console.error(`AvatarDisplay: Failed to load SVG for ${type}:`, error));
         } else {
+            console.log(`AvatarDisplay: Hiding layer for ${type}`);
             layerElement.style.display = 'none';
             layerElement.innerHTML = '';
         }
