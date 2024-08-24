@@ -97,12 +97,10 @@ class AvatarDisplay {
         this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
         this.lipColor = localStorage.getItem(`lipColor_${this.username}`) || '#E6998F';
         this.hairColor = localStorage.getItem(`hairColor_${this.username}`) || '#1E1E1E';
-
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
         this.container.style.height = '100%';
-
         const bodyParts = [
             { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
             { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
@@ -120,8 +118,7 @@ class AvatarDisplay {
             { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
             { name: 'Hair', file: '', type: 'Hair', isBase: false }
         ];
-
-        bodyParts.forEach(part => {
+       bodyParts.forEach(part => {
             const obj = document.createElement('object');
             obj.type = 'image/svg+xml';
             obj.data = '';
