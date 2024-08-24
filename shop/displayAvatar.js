@@ -367,9 +367,44 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-   
-  
-  updateAvatarDisplay(type, src) {
+   tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    // If the item is already tried on, remove it
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        this.removeItem(item.type);
+    } else {
+        // Apply the new item
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    }
+    this.reorderLayers();
+}
+
+   removeItem(type) {
+    console.log(`Removing item of type: ${type}`);
+    if (this.layers[type]) {
+        this.layers[type].style.display = 'none';
+        this.layers[type].data = ''; // Clear the source
+    }
+    delete this.currentItems[type];
+    
+    // If this is not a base part, check if there's an equipped item to display
+    if (!this.baseParts.includes(type) && this.equippedItems[type]) {
+        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+        if (equippedItem) {
+            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+        }
+    }
+    
+    // Ensure base parts are always visible
+    this.baseParts.forEach(basePart => {
+        if (this.layers[basePart]) {
+            this.layers[basePart].style.display = 'block';
+        }
+    });
+}
+    updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
         if (src) {
@@ -392,39 +427,8 @@ blendColors(color1, color2, ratio) {
     } else {
         console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
     }
-    this.reorderLayers();
 }
 
-tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // Item is already tried on, so remove it
-        delete this.currentItems[item.type];
-        
-        // If there's an equipped item for this type, show it instead
-        if (this.equippedItems[item.type]) {
-            const equippedItem = shopItems.find(i => i.id === this.equippedItems[item.type]);
-            if (equippedItem) {
-                this.updateAvatarDisplay(item.type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-            } else {
-                this.updateAvatarDisplay(item.type, '');
-            }
-        } else {
-            this.updateAvatarDisplay(item.type, '');
-        }
-    } else {
-        // Apply the new item
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-    }
-    this.reorderLayers();
-    
-    // Don't update equippedItems here, as it should represent the wardrobe state
-    // Instead, update a separate property for tried on items
-    localStorage.setItem(`triedOnItems_${this.username}`, JSON.stringify(this.currentItems));
-}
-    
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
@@ -446,7 +450,7 @@ tryOnItem(item) {
         }
     }
 
-  isItemEquipped(item) {
+    isItemEquipped(item) {
         return this.equippedItems[item.type] === item.id;
     }
 
@@ -466,8 +470,6 @@ tryOnItem(item) {
     }
 }
 
-
-  
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
