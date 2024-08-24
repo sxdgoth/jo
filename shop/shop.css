@@ -59,18 +59,22 @@ main {
 }
 
 .avatar-container {
+    flex: 0 0 400px; /* Increased from 300px to 400px */
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 400px;
+    height: 500px; /* Increased from 400px to 500px for better proportion */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    position: relative;
     overflow: hidden;
+    position: relative;
+    margin-right: 20px; /* Add some space between avatar and shop items */
 }
+
+
 
 #avatar-display {
     width: 100%;
