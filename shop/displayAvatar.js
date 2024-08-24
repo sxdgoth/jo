@@ -97,10 +97,12 @@ class AvatarDisplay {
         this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
         this.lipColor = localStorage.getItem(`lipColor_${this.username}`) || '#E6998F';
         this.hairColor = localStorage.getItem(`hairColor_${this.username}`) || '#1E1E1E';
+
         this.container.innerHTML = '';
         this.container.style.position = 'relative';
         this.container.style.width = '100%';
         this.container.style.height = '100%';
+
         const bodyParts = [
             { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
             { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
@@ -130,6 +132,7 @@ class AvatarDisplay {
             obj.style.left = '0';
             obj.style.width = '100%';
             obj.style.height = '100%';
+
             if (part.isBase) {
                 obj.data = this.baseUrl + part.file;
                 obj.style.display = 'block';
@@ -148,13 +151,16 @@ class AvatarDisplay {
                 obj.style.display = 'none';
                 console.log(`No equipped item for: ${part.name}`);
             }
+
             obj.onload = () => {
                 this.applySkinTone(obj, part.type);
             };
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
+
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
         });
+
         this.reorderLayers();
     }
 
@@ -170,6 +176,7 @@ class AvatarDisplay {
     applySkinTone(obj, type) {
         const svgDoc = obj.contentDocument;
         if (!svgDoc || !this.skinTones[this.skinTone]) return;
+
         const tone = this.skinTones[this.skinTone];
         const defaultColors = {
             light: ['#FEE2CA', '#EFC1B7', '#B37E78'],
@@ -253,12 +260,13 @@ class AvatarDisplay {
             }
             Array.from(element.children).forEach(replaceColor);
         };
+
         if (type === 'Hair') {
             this.applyHairColor(obj);
         } else {
             replaceColor(svgDoc.documentElement);
         }
-        console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
+          console.log(`Applied skin tone ${this.skinTone}, eye color ${this.eyeColor}, and lip color palette ${lipPalette.join(', ')} to ${type}`);
     }
 
     applyHairColor(obj) {
@@ -286,7 +294,8 @@ class AvatarDisplay {
         };
         replaceColor(svgDoc.documentElement);
     }
-     blendColors(color1, color2, ratio) {
+
+blendColors(color1, color2, ratio) {
         const rgb1 = this.hexToRgb(color1);
         const rgb2 = this.hexToRgb(color2);
         const brightness1 = (rgb1[0] * 299 + rgb1[1] * 587 + rgb1[2] * 114) / 1000;
@@ -328,8 +337,7 @@ class AvatarDisplay {
         });
         localStorage.setItem(`skinTone_${this.username}`, newTone);
     }
-
-    changeEyeColor(newColor) {
+  changeEyeColor(newColor) {
         this.eyeColor = newColor;
         Object.values(this.layers).forEach(obj => {
             if (obj.contentDocument) {
@@ -359,25 +367,67 @@ class AvatarDisplay {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-    removeItem(type) {
-        console.log(`Removing item of type: ${type}`);
-        if (window.avatarBody) {
-            window.avatarBody.updateLayer(type, '');
-        } else {
-            console.error('AvatarBody not initialized');
-        }
-        delete this.currentItems[type];
+   tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    // If the item is already tried on, remove it
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        this.removeItem(item.type);
+    } else {
+        // Apply the new item
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
+    this.reorderLayers();
+}
 
-   updateAvatarDisplay(type, src) {
-        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
-        if (window.avatarBody) {
-            window.avatarBody.updateLayer(type, src);
-        } else {
-            console.error('AvatarBody not initialized');
-        }
-        this.currentItems[type] = src;
+   removeItem(type) {
+    console.log(`Removing item of type: ${type}`);
+    if (this.layers[type]) {
+        this.layers[type].style.display = 'none';
+        this.layers[type].data = ''; // Clear the source
     }
+    delete this.currentItems[type];
+    
+    // If this is not a base part, check if there's an equipped item to display
+    if (!this.baseParts.includes(type) && this.equippedItems[type]) {
+        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+        if (equippedItem) {
+            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+        }
+    }
+    
+    // Ensure base parts are always visible
+    this.baseParts.forEach(basePart => {
+        if (this.layers[basePart]) {
+            this.layers[basePart].style.display = 'block';
+        }
+    });
+}
+    updateAvatarDisplay(type, src) {
+    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+    if (this.layers[type]) {
+        if (src) {
+            this.layers[type].data = src;
+            this.layers[type].style.display = 'block';
+            this.layers[type].onload = () => {
+                console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
+                this.applySkinTone(this.layers[type], type);
+                if (type === 'Eyes') {
+                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
+                }
+            };
+            this.layers[type].onerror = () => {
+                console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
+            };
+        } else {
+            this.layers[type].style.display = 'none';
+            this.layers[type].data = '';
+        }
+    } else {
+        console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
+    }
+}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
@@ -409,15 +459,14 @@ class AvatarDisplay {
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
-     resetTriedOnItems() {
+    resetTriedOnItems() {
         console.log('Resetting tried on items');
         Object.keys(this.currentItems).forEach(type => {
             this.removeItem(type);
         });
         this.currentItems = {};
-        if (window.avatarBody) {
-            window.avatarBody.loadAvatar();
-        }
+        this.loadEquippedItems();
+        this.loadAvatar();
     }
 }
 
@@ -428,15 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
-        console.log('AvatarDisplay initialized:', window.avatarDisplay);
-        
-        // Initialize ItemSelector after AvatarDisplay
-        if (window.ItemSelector) {
-            window.itemSelector = new ItemSelector(window.avatarDisplay);
-            console.log('ItemSelector initialized:', window.itemSelector);
-        } else {
-            console.error('ItemSelector class not found');
-        }
+        window.avatarManager = window.avatarDisplay; // For compatibility with existing code
     } else {
         console.error('No logged in user found');
     }
