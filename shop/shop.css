@@ -48,7 +48,7 @@ nav {
 }
 
 main {
-    max-width: 1200px;
+    max-width: 1300px; /* Increased from 1200px to 1300px */
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -88,6 +88,7 @@ main {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0; /* This ensures the shop section can shrink if needed */
 }
 
 .shop-section h2 {
