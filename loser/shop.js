@@ -2,10 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
-        document.getElementById('user-coins').textContent = `Coins: ${loggedInUser.coins.toLocaleString()}`;
-        
-        // Initialize user's inventory
-        window.createUserInventory(loggedInUser.username);
+        // Initialize AvatarDisplay
+        window.avatarDisplay = new AvatarDisplay();
+        window.avatarDisplay.initialize();
         
         // Render shop items
         renderShopItems();
@@ -36,4 +35,8 @@ function renderShopItems() {
 function buyItem(itemId) {
     // Implement buying logic here
     console.log(`Buying item: ${itemId}`);
+    // After buying, update the avatar display
+    if (window.avatarDisplay) {
+        window.avatarDisplay.updateDisplay();
+    }
 }
