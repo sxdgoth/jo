@@ -1,156 +1,122 @@
 class AvatarDisplay {
-    constructor() {
-        this.displayContainer = document.getElementById('avatar-display');
-        this.avatarManager = null;
-        this.currentUser = null;
+    constructor(containerId, username) {
+        console.log('AvatarDisplay: Initializing for user', username);
+        this.username = username;
+        this.container = document.getElementById(containerId);
+        this.baseUrl = 'https://sxdgoth.github.io/jo/';
+        this.layers = {};
+        this.equippedItems = {};
+        this.skinTone = 'light';
+        this.eyeColor = '#3FA2FF';
+        this.lipColor = '#E6998F';
+        this.hairColor = '#1E1E1E';
+        this.loadSavedState();
     }
 
-    initialize() {
-        console.log('Initializing AvatarDisplay');
-        this.currentUser = this.getCurrentUser();
-        if (this.currentUser) {
-            console.log('Current user:', this.currentUser);
-            this.loadAvatarState();
-            this.createDisplayElements();
-            this.updateDisplay();
-        } else {
-            console.error('No user logged in');
-            this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
-        }
+    loadSavedState() {
+        this.skinTone = localStorage.getItem(`skinTone_${this.username}`) || 'light';
+        this.eyeColor = localStorage.getItem(`eyeColor_${this.username}`) || '#3FA2FF';
+        this.lipColor = localStorage.getItem(`lipColor_${this.username}`) || '#E6998F';
+        this.hairColor = localStorage.getItem(`hairColor_${this.username}`) || '#1E1E1E';
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
-    getCurrentUser() {
-        const userJson = sessionStorage.getItem('loggedInUser');
-        return userJson ? JSON.parse(userJson) : null;
-    }
+    loadAvatar() {
+        console.log("Loading avatar...");
+        this.container.innerHTML = '';
+        this.container.style.position = 'relative';
+        this.container.style.width = '100%';
+        this.container.style.height = '100%';
 
-    loadAvatarState() {
-        const avatarState = JSON.parse(localStorage.getItem('avatarState') || '{}');
-        this.avatarManager = new AvatarManager(this.currentUser.username);
-        this.avatarManager.initialize(avatarState);
-    }
+        const bodyParts = [
+            { name: 'Legs', file: 'home/assets/body/avatar-legsandfeet.svg', type: 'Legs', isBase: true },
+            { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
+            { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
+            { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
+            { name: 'Nose', file: '', type: 'Nose', isBase: false },
+            { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
+            { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+            { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
+            { name: 'Pants', file: '', type: 'Pants', isBase: false },
+            { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
+            { name: 'Eyebrows', file: '', type: 'Eyebrows', isBase: false },
+            { name: 'Cheeks', file: '', type: 'Cheeks', isBase: false },
+            { name: 'Accessories', file: '', type: 'Accessories', isBase: false },
+            { name: 'Hair', file: '', type: 'Hair', isBase: false }
+        ];
 
-    createDisplayElements() {
-        console.log('Creating display elements');
-        this.displayContainer.innerHTML = `
-            <h2>Welcome, ${this.currentUser.username}!</h2>
-            <div id="avatar-image"></div>
-            <div id="avatar-details">
-                <p id="skin-tone-display"></p>
-                <p id="eye-color-display"></p>
-                <p id="lip-color-display"></p>
-                <p id="hair-color-display"></p>
-                <h3>Applied Items:</h3>
-                <ul id="applied-items-list"></ul>
-            </div>
-            <p id="user-coins">Coins: ${this.currentUser.coins || 0}</p>
-        `;
-    }
+        bodyParts.forEach(part => {
+            const obj = document.createElement('object');
+            obj.type = 'image/svg+xml';
+            obj.data = part.isBase ? this.baseUrl + part.file : '';
+            obj.alt = part.name;
+            obj.dataset.type = part.type;
+            obj.style.position = 'absolute';
+            obj.style.top = '0';
+            obj.style.left = '0';
+            obj.style.width = '100%';
+            obj.style.height = '100%';
+            obj.style.display = part.isBase ? 'block' : 'none';
 
-    updateDisplay() {
-        console.log('Updating display');
-        if (!this.currentUser) {
-            console.error('No current user, cannot update display');
-            return;
-        }
-
-        this.updateAvatarImage();
-        this.updateSkinTone();
-        this.updateEyeColor();
-        this.updateLipColor();
-        this.updateHairColor();
-        this.updateAppliedItems();
-        this.updateUserCoins();
-    }
-
-    updateAvatarImage() {
-        console.log('Updating avatar image');
-        if (window.avatarBody) {
-            // Update each layer based on the equipped items
-            Object.entries(this.avatarManager.equippedItems).forEach(([type, itemId]) => {
-                const item = window.userInventory.getItems().find(i => i.id === itemId);
+            if (!part.isBase && this.equippedItems[part.type]) {
+                const item = shopItems.find(item => item.id === this.equippedItems[part.type]);
                 if (item) {
-                    window.avatarBody.updateLayer(type, item.path + item.id);
+                    obj.data = `${this.baseUrl}${item.path}${item.id}`;
+                    obj.style.display = 'block';
                 }
-            });
+            }
 
-            // Update skin tone
-            window.avatarBody.updateSkinTone(this.avatarManager.skinTone);
-        } else {
-            console.error('AvatarBody not initialized');
-        }
+            obj.onload = () => this.applySkinTone(obj, part.type);
+            obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
+            this.container.appendChild(obj);
+            this.layers[part.type] = obj;
+        });
+
+        this.reorderLayers();
     }
 
-    updateSkinTone() {
-        const skinToneDisplay = document.getElementById('skin-tone-display');
-        skinToneDisplay.textContent = `Skin Tone: ${this.avatarManager.skinTone}`;
-        console.log('Updated skin tone:', this.avatarManager.skinTone);
-    }
-
-    updateEyeColor() {
-        const eyeColorDisplay = document.getElementById('eye-color-display');
-        eyeColorDisplay.textContent = `Eye Color: ${this.avatarManager.eyeColor}`;
-        eyeColorDisplay.style.backgroundColor = this.avatarManager.eyeColor;
-        console.log('Updated eye color:', this.avatarManager.eyeColor);
-    }
-
-    updateLipColor() {
-        const lipColorDisplay = document.getElementById('lip-color-display');
-        lipColorDisplay.textContent = `Lip Color: ${this.avatarManager.lipColor}`;
-        lipColorDisplay.style.backgroundColor = this.avatarManager.lipColor;
-        console.log('Updated lip color:', this.avatarManager.lipColor);
-    }
-
-    updateHairColor() {
-        const hairColorDisplay = document.getElementById('hair-color-display');
-        if (this.avatarManager.hairColorChanger) {
-            hairColorDisplay.textContent = `Hair Color: ${this.avatarManager.hairColorChanger.hairColor}`;
-            hairColorDisplay.style.backgroundColor = this.avatarManager.hairColorChanger.hairColor;
-            console.log('Updated hair color:', this.avatarManager.hairColorChanger.hairColor);
-        } else {
-            hairColorDisplay.textContent = 'Hair Color: Not set';
-            console.log('Hair color not set');
-        }
-    }
-
-    updateAppliedItems() {
-        console.log('Updating applied items');
-        const appliedItemsList = document.getElementById('applied-items-list');
-        appliedItemsList.innerHTML = '';
-        const equippedItems = this.avatarManager.equippedItems;
-        console.log('Equipped items:', equippedItems);
-
-        if (Object.keys(equippedItems).length === 0) {
-            console.log('No items equipped');
-            appliedItemsList.innerHTML = '<li>No items equipped</li>';
-            return;
-        }
-
-        Object.entries(equippedItems).forEach(([type, itemId]) => {
-            console.log(`Processing item: ${type} - ${itemId}`);
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
-            if (item) {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${type}: ${item.name}`;
-                appliedItemsList.appendChild(listItem);
-                console.log(`Added item to list: ${type} - ${item.name}`);
-            } else {
-                console.error(`Item not found in inventory: ${type} - ${itemId}`);
+    reorderLayers() {
+        const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair', 'Neck', 'Hoodie', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
+        order.forEach((type, index) => {
+            if (this.layers[type]) {
+                this.layers[type].style.zIndex = index + 1;
             }
         });
     }
 
-    updateUserCoins() {
-        const userCoinsDisplay = document.getElementById('user-coins');
-        const coins = this.currentUser.coins || 0;
-        userCoinsDisplay.textContent = `Coins: ${coins}`;
-        console.log('Updated user coins:', coins);
+    applySkinTone(obj, type) {
+        // Implement skin tone application logic here
+        // This should include applying eye color, lip color, and hair color as well
+    }
+
+    updateAvatarDisplay(type, src) {
+        if (this.layers[type]) {
+            if (src) {
+                this.layers[type].data = src;
+                this.layers[type].style.display = 'block';
+                this.layers[type].onload = () => this.applySkinTone(this.layers[type], type);
+            } else {
+                this.layers[type].style.display = 'none';
+                this.layers[type].data = '';
+            }
+        }
+    }
+
+    isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
     }
 }
 
-// Initialize the AvatarDisplay when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing AvatarDisplay');
-    window.avatarDisplay = new AvatarDisplay();
-    window.avatarDisplay.initialize();
+// Initialize the avatar display when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, initializing AvatarDisplay");
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+        window.avatarDisplay.loadAvatar();
+    } else {
+        console.error('No logged in user found');
+    }
 });
