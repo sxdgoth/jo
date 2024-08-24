@@ -60,16 +60,30 @@
     <script src="https://sxdgoth.github.io/jo/shop/itemPositioning.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shopManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shop.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (loggedInUser) {
-                window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
-                window.avatarDisplay.loadAvatar();
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+            window.avatarDisplay.loadAvatar();
+
+            // Set up the clear button
+            const clearButton = document.getElementById('clearSelectedItems');
+            if (clearButton) {
+                clearButton.addEventListener('click', function() {
+                    if (typeof window.avatarDisplay.clearSelectedItems === 'function') {
+                        window.avatarDisplay.clearSelectedItems();
+                    } else {
+                        console.error('clearSelectedItems is not a function');
+                    }
+                });
             } else {
-                console.error('No logged in user found');
+                console.warn('Clear button not found');
             }
-        });
-    </script>
+        } else {
+            console.error('No logged in user found');
+        }
+    });
+</script>
 </body>
 </html>
