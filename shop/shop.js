@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
 
-        // Initialize AvatarDisplay
-        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
-        window.avatarDisplay.loadAvatar();
+        // Initialize ShopAvatarDisplay
+        window.shopAvatarDisplay = new ShopAvatarDisplay('avatar-display', loggedInUser.username);
+        window.shopAvatarDisplay.loadAvatar();
 
         // Initialize ShopManager
         console.log("Initializing ShopManager");
@@ -70,6 +70,11 @@ function addCategoryListeners() {
     const categoryButtons = document.querySelectorAll('.category-btn');
     categoryButtons.forEach(button => {
         button.addEventListener('click', function() {
+            // Remove 'active' class from all buttons
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            // Add 'active' class to clicked button
+            this.classList.add('active');
+
             const category = this.dataset.category;
             if (window.shopManager) {
                 window.shopManager.filterItemsByCategory(category);
@@ -78,5 +83,44 @@ function addCategoryListeners() {
     });
 }
 
-// Expose the function to the global scope
+// Function to handle item purchase
+function buyItem(itemId) {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    const item = shopItems.find(i => i.id === itemId);
+
+    if (loggedInUser && item) {
+        if (loggedInUser.coins >= item.price) {
+            // Deduct coins
+            const newCoins = loggedInUser.coins - item.price;
+            updateUserCoinsAfterPurchase(newCoins);
+
+            // Add item to user's inventory
+            addItemToInventory(loggedInUser.username, item);
+
+            // Update the shop display (optional)
+            if (window.shopManager) {
+                window.shopManager.renderShopItems();
+            }
+
+            console.log(`Item ${item.name} purchased successfully!`);
+        } else {
+            console.log("Not enough coins to purchase this item.");
+            // You might want to show this message to the user in the UI
+        }
+    }
+}
+
+// Function to add item to user's inventory
+function addItemToInventory(username, item) {
+    let inventory = JSON.parse(localStorage.getItem(`inventory_${username}`)) || [];
+    inventory.push(item);
+    localStorage.setItem(`inventory_${username}`, JSON.stringify(inventory));
+    console.log(`Item ${item.name} added to ${username}'s inventory`);
+}
+
+// Expose necessary functions to the global scope
 window.updateUserCoinsAfterPurchase = updateUserCoinsAfterPurchase;
+window.buyItem = buyItem;
+
+
+
