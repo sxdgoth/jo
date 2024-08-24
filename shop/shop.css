@@ -48,7 +48,7 @@ nav {
 }
 
 main {
-    max-width: 1300px; /* Increased from 1200px to 1300px */
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -59,22 +59,19 @@ main {
 }
 
 .avatar-container {
-    flex: 0 0 400px; /* Increased from 300px to 400px */
+    flex: 0 0 300px;
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 500px; /* Increased from 400px to 500px for better proportion */
+    height: 400px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     position: relative;
-    margin-right: 20px; /* Add some space between avatar and shop items */
 }
-
-
 
 #avatar-display {
     width: 100%;
@@ -88,7 +85,6 @@ main {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0; /* This ensures the shop section can shrink if needed */
 }
 
 .shop-section h2 {
@@ -276,26 +272,6 @@ main {
 
 
 
-
-
-
-
-#reset-avatar-button {
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-#reset-avatar-button:hover {
-    background-color: #d32f2f;
-}
 
 
 
