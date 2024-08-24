@@ -101,9 +101,9 @@
 <body>
     <div id="welcome-message">
         <h1>Welcome, <span id="user-name">Guest</span>!</h1>
+        <p>Coins: <span id="user-coins">0</span></p>
         <button id="logout-btn" onclick="logout()">Logout</button>
     </div>
-
 
     <main>
         <div class="avatar-container">
@@ -170,7 +170,7 @@
             });
         }
 
-       // Initialize shop items and check login status
+    // Initialize shop items and check login status
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM content loaded');
 
@@ -180,9 +180,12 @@
 
             if (loggedInUser) {
                 document.getElementById('user-name').textContent = loggedInUser.username;
+                document.getElementById('user-coins').textContent = loggedInUser.coins;
                 console.log('User logged in:', loggedInUser.username);
             } else {
                 console.log('No user logged in');
+                // Redirect to login page if no user is logged in
+                window.location.href = '../index.html';
             }
 
             // Initialize shop items
@@ -202,7 +205,8 @@
         function logout() {
             console.log('Logout function called');
             sessionStorage.removeItem('loggedInUser');
-            document.getElementById('user-name').textContent = 'Guest';
+            // Redirect to login page after logout
+            window.location.href = '../index.html';
         }
     </script>
 </body>
