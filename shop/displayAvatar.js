@@ -381,7 +381,7 @@ blendColors(color1, color2, ratio) {
     this.reorderLayers();
 }
 
-   removeItem(type) {
+removeItem(type) {
     console.log(`Removing item of type: ${type}`);
     if (this.layers[type]) {
         this.layers[type].style.display = 'none';
@@ -404,6 +404,7 @@ blendColors(color1, color2, ratio) {
         }
     });
 }
+
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
