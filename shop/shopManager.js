@@ -4,11 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
     let selectedItems = {};
-
     const resetButton = document.getElementById('reset-selected-items');
     resetButton.addEventListener('click', resetSelectedItems);
-
-    const nonRemovableTypes = ['Pants', 'Shirt', 'Mouth', 'Eyes', 'Eyebrows'];
+    const nonRemovableTypes = ['Pants', 'Shirt', 'Mouth', 'Eyes', 'Eyebrows', 'Hair'];
 
     function resetSelectedItems() {
         console.log('Resetting selected items');
@@ -64,22 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleItem(itemId) {
+     function toggleItem(itemId) {
         console.log('toggleItem called with itemId:', itemId);
         const item = shopItems.find(i => i.id === itemId);
         if (item) {
             console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
             if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-                if (nonRemovableTypes.includes(item.type)) {
-                    window.avatarDisplay.tryOnItem(item);
-                } else {
+                window.avatarDisplay.tryOnItem(item);
+                if (!nonRemovableTypes.includes(item.type)) {
                     if (selectedItems[item.type] && selectedItems[item.type].id === item.id) {
                         delete selectedItems[item.type];
-                        window.avatarDisplay.removeItem(item.type);
                     } else {
                         selectedItems[item.type] = item;
-                        window.avatarDisplay.tryOnItem(item);
                     }
+                } else {
+                    selectedItems[item.type] = item;
                 }
             } else {
                 console.error('avatarDisplay not found or tryOnItem is not a function');
