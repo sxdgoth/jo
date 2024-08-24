@@ -128,6 +128,16 @@
         }
     }
 
+tryOnItem(item) {
+        console.log('Trying on item:', item);
+        this.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+    }
+
+    removeItem(type) {
+        console.log('Removing item:', type);
+        this.updateLayer(type, '');
+    }
+     
     function updateShopItemSelection() {
         shopItemsContainer.querySelectorAll('.shop-item').forEach(shopItem => {
             const itemName = shopItem.querySelector('p').textContent;
@@ -139,7 +149,11 @@
             }
         });
     }
+     
 
+
+
+     
     // Initialize shop items
     document.addEventListener('DOMContentLoaded', function() {
         shopItems.forEach(item => {
