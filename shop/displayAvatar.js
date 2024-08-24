@@ -370,17 +370,10 @@ blendColors(color1, color2, ratio) {
   tryOnItem(item) {
     console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
     
-    // List of items that should not be unselected
-    const nonUnselectableItems = ['Pants', 'Shirt', 'Hair', 'Eyes', 'Mouth', 'Nose', 'Eyebrows'];
-    
     if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // If the item is already applied and it's not in the non-unselectable list, remove it
-        if (!nonUnselectableItems.includes(item.type)) {
-            console.log(`Removing item ${item.id} of type ${item.type}`);
-            this.removeItem(item.type);
-        } else {
-            console.log(`Cannot unselect item of type ${item.type}`);
-        }
+        // If the item is already applied, remove it
+        console.log(`Removing item ${item.id} of type ${item.type}`);
+        this.removeItem(item.type);
     } else {
         // Apply the new item
         console.log(`Applying new item ${item.id} of type ${item.type}`);
@@ -389,6 +382,7 @@ blendColors(color1, color2, ratio) {
     }
     this.layerManager.scheduleReorder();
 }
+
 
    removeItem(type) {
     console.log(`Removing item of type ${type}`);
@@ -467,7 +461,25 @@ blendColors(color1, color2, ratio) {
         this.loadEquippedItems();
         this.loadAvatar();
     }
+
+    clearSelectedItems() {
+    console.log('Clearing all selected items');
+    
+    // Reset current items
+    this.currentItems = {};
+    
+    // Reload the equipped items
+    this.loadEquippedItems();
+    
+    // Reload the avatar to show only equipped items
+    this.loadAvatar();
+    
+    console.log('Selected items cleared, reverted to applied avatar');
 }
+    
+}
+
+
 
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
