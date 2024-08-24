@@ -273,19 +273,21 @@ main {
 
 
 
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
 #clearSelectedItems {
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
-#clearSelectedItems:hover {
-    background-color: #d32f2f;
+@media (max-width: 768px) {
+    .avatar-section {
+        width: 100%;
+        margin-bottom: 20px;
+    }
 }
-
