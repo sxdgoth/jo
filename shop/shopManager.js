@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
 
-
     function renderShopItems() {
         console.log('Rendering shop items. Current category:', currentCategory);
         console.log('Total shop items:', shopItems.length);
@@ -70,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
             if (itemImage) {
                 itemImage.classList.add('equipped');
-                itemImage.classList.remove('selected');
             }
             alert(`You have successfully purchased ${item.name}!`);
         } else {
@@ -98,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event delegation for item clicks
- document.addEventListener('click', function(e) {
+    document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
         if (e.target.closest('.item-image')) {
             const itemImage = e.target.closest('.item-image');
@@ -106,8 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('ShopManager: Item clicked:', itemId);
             if (window.itemSelector) {
                 window.itemSelector.toggleItem(itemId);
-            } else {
-                console.error('ItemSelector not initialized');
             }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
@@ -121,15 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.shopManager = {
-        buyItem,
         renderShopItems,
+        buyItem,
         filterItemsByCategory
     };
 
     // Initialize the shop
     renderShopItems();
 
-    // Log avatarDisplay and itemSelector for debugging
-   console.log('avatarDisplay:', window.avatarDisplay);
-    console.log('itemSelector:', window.itemSelector);
+    // Log avatarDisplay for debugging
+    console.log('avatarDisplay:', window.avatarDisplay);
 });
