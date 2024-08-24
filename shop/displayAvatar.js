@@ -370,40 +370,32 @@ blendColors(color1, color2, ratio) {
    tryOnItem(item) {
     console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
     
-    // If the item is already tried on, remove it
     if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        // If the item is already applied, remove it
+        console.log(`Removing item ${item.id} of type ${item.type}`);
         this.removeItem(item.type);
     } else {
         // Apply the new item
+        console.log(`Applying new item ${item.id} of type ${item.type}`);
         this.currentItems[item.type] = item;
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
-    this.reorderLayers();
+    this.layerManager.scheduleReorder();
 }
 
    removeItem(type) {
-    console.log(`Removing item of type: ${type}`);
+    console.log(`Removing item of type ${type}`);
     if (this.layers[type]) {
         this.layers[type].style.display = 'none';
-        this.layers[type].data = ''; // Clear the source
     }
     delete this.currentItems[type];
     
-    // If this is not a base part, check if there's an equipped item to display
-    if (!this.baseParts.includes(type) && this.equippedItems[type]) {
-        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-        if (equippedItem) {
-            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-        }
+    // If it's a base part, show the default
+    if (this.baseParts.includes(type)) {
+        this.updateAvatarDisplay(type, `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`);
     }
-    
-    // Ensure base parts are always visible
-    this.baseParts.forEach(basePart => {
-        if (this.layers[basePart]) {
-            this.layers[basePart].style.display = 'block';
-        }
-    });
 }
+    
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
