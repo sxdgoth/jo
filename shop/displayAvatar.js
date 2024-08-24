@@ -5,6 +5,7 @@ class AvatarDisplay {
         this.container = document.getElementById(containerId);
         this.triedOnItems = {};
         this.currentItems = {};
+        this.timestamp = Date.now(); // Add this line
         
         if (!this.container) {
             console.error(`Container with id "${containerId}" not found`);
@@ -357,30 +358,36 @@ class AvatarDisplay {
         }
     }
 
-    tryOnItem(item) {
+     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
 
-        // If the item is already tried on, remove it (unselect)
         if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            // Unselect the item
             this.unselectItem(item.type);
         } else {
-            // Apply the new item
-            this.currentItems[item.type] = item;
-            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+            // Select the item
+            this.selectItem(item);
         }
 
         this.reorderLayers();
     }
 
-    unselectItem(type) {
+   selectItem(item) {
+        console.log(`Selecting item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        this.currentItems[item.type] = item;
+        const src = `${this.baseUrl}${item.path}${item.id}?t=${this.timestamp}`;
+        this.updateAvatarDisplay(item.type, src);
+    }
+    
+   unselectItem(type) {
         console.log(`Unselecting item of type: ${type}`);
         delete this.currentItems[type];
 
-        // Check if there's an equipped item to display
         if (this.equippedItems[type]) {
             const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
             if (equippedItem) {
-                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+                const src = `${this.baseUrl}${equippedItem.path}${equippedItem.id}?t=${this.timestamp}`;
+                this.updateAvatarDisplay(type, src);
             } else {
                 this.hideLayer(type);
             }
@@ -390,29 +397,30 @@ class AvatarDisplay {
     }
 
     hideLayer(type) {
+        console.log(`Hiding layer: ${type}`);
         if (this.layers[type]) {
             this.layers[type].style.display = 'none';
             this.layers[type].data = '';
         }
     }
 
-    updateAvatarDisplay(type, src) {
-        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+ updateAvatarDisplay(type, src) {
+        console.log(`Updating avatar display for ${type} with src: ${src}`);
         if (this.layers[type]) {
             this.layers[type].data = src;
             this.layers[type].style.display = 'block';
             this.layers[type].onload = () => {
-                console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
+                console.log(`Layer ${type} loaded successfully`);
                 this.applySkinTone(this.layers[type], type);
                 if (type === 'Eyes') {
                     setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
                 }
             };
             this.layers[type].onerror = () => {
-                console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
+                console.error(`Failed to load layer ${type} from ${src}`);
             };
         } else {
-            console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
+            console.warn(`Layer not found for type: ${type}`);
         }
     }
     
