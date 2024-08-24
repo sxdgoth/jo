@@ -94,55 +94,69 @@
 
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
-  <script>
-        const shopItemsContainer = document.getElementById('shop-items');
-        let currentItems = {};
+ <script>
+    const shopItemsContainer = document.getElementById('shop-items');
+    let currentItems = {};
 
-        function createShopItem(item) {
-            const shopItem = document.createElement('div');
-            shopItem.className = 'shop-item';
-            shopItem.innerHTML = `
-                <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}">
-                <p>${item.name}</p>
-                <p>Price: $${item.price}</p>
-            `;
-            shopItem.addEventListener('click', () => toggleItem(item));
-            return shopItem;
-        }
+    function createShopItem(item) {
+        const shopItem = document.createElement('div');
+        shopItem.className = 'shop-item';
+        shopItem.innerHTML = `
+            <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}">
+            <p>${item.name}</p>
+            <p>Price: $${item.price}</p>
+        `;
+        shopItem.addEventListener('click', () => toggleItem(item, shopItem));
+        return shopItem;
+    }
 
-        function toggleItem(item) {
-            if (window.avatarDisplay) {
-                window.avatarDisplay.tryOnItem(item);
-                updateShopItemSelection();
+    function toggleItem(item, shopItemElement) {
+        if (window.avatarDisplay) {
+            if (currentItems[item.type] && currentItems[item.type].id === item.id) {
+                // If the item is already selected, remove it
+                window.avatarDisplay.removeItem(item.type);
+                delete currentItems[item.type];
+                shopItemElement.classList.remove('selected');
             } else {
-                console.error('avatarDisplay not found');
+                // If the item is not selected, add it
+                window.avatarDisplay.tryOnItem(item);
+                currentItems[item.type] = item;
+                updateShopItemSelection();
             }
+        } else {
+            console.error('avatarDisplay not found');
         }
+    }
 
-        function updateShopItemSelection() {
-            shopItemsContainer.querySelectorAll('.shop-item').forEach(shopItem => {
-                const itemName = shopItem.querySelector('p').textContent;
-                const item = shopItems.find(i => i.name === itemName);
-                if (window.avatarDisplay && window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === item.id) {
-                    shopItem.classList.add('selected');
-                } else {
-                    shopItem.classList.remove('selected');
-                }
-            });
-        }
-
-        // Initialize shop items
-        document.addEventListener('DOMContentLoaded', function() {
-            shopItems.forEach(item => {
-                const shopItem = createShopItem(item);
-                shopItemsContainer.appendChild(shopItem);
-            });
-
-            // Ensure a user is "logged in" for testing purposes
-            if (!sessionStorage.getItem('loggedInUser')) {
-                sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'testUser' }));
+    function updateShopItemSelection() {
+        shopItemsContainer.querySelectorAll('.shop-item').forEach(shopItem => {
+            const itemName = shopItem.querySelector('p').textContent;
+            const item = shopItems.find(i => i.name === itemName);
+            if (currentItems[item.type] && currentItems[item.type].id === item.id) {
+                shopItem.classList.add('selected');
+            } else {
+                shopItem.classList.remove('selected');
             }
         });
-    </script>
+    }
+
+    // Initialize shop items
+    document.addEventListener('DOMContentLoaded', function() {
+        shopItems.forEach(item => {
+            const shopItem = createShopItem(item);
+            shopItemsContainer.appendChild(shopItem);
+        });
+
+        // Ensure a user is "logged in" for testing purposes
+        if (!sessionStorage.getItem('loggedInUser')) {
+            sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'testUser' }));
+        }
+
+        // Initialize avatarDisplay if it's not already initialized
+        if (!window.avatarDisplay) {
+            window.avatarDisplay = new AvatarDisplay(document.getElementById('avatar-display'));
+        }
+    });
+</script>
 </body>
 </html>
