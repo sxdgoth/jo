@@ -367,11 +367,11 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-  tryOnItem(item) {
+   tryOnItem(item) {
     console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
     
     if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // If the item is already tried on, remove it
+        // If the item is already applied, remove it
         console.log(`Removing item ${item.id} of type ${item.type}`);
         this.removeItem(item.type);
     } else {
@@ -382,8 +382,8 @@ blendColors(color1, color2, ratio) {
     }
     this.layerManager.scheduleReorder();
 }
-    
-removeItem(type) {
+
+   removeItem(type) {
     console.log(`Removing item of type ${type}`);
     if (this.layers[type]) {
         this.layers[type].style.display = 'none';
@@ -393,12 +393,6 @@ removeItem(type) {
     // If it's a base part, show the default
     if (this.baseParts.includes(type)) {
         this.updateAvatarDisplay(type, `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`);
-    } else if (this.equippedItems[type]) {
-        // If there's an equipped item, show it
-        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-        if (equippedItem) {
-            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
-        }
     }
 }
     
