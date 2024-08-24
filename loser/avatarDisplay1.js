@@ -9,17 +9,25 @@ class AvatarDisplay {
 
     initialize() {
         console.log('Initializing AvatarDisplay');
-        this.currentUser = UserManager.getCurrentUser();
+        this.currentUser = this.getCurrentUser();
         if (this.currentUser) {
             console.log('Current user:', this.currentUser);
-            this.avatarManager = new AvatarManager(this.currentUser.username);
-            this.avatarManager.initialize();
+            this.avatarManager = window.avatarManager; // Use the existing avatarManager
+            if (!this.avatarManager) {
+                console.error('AvatarManager not found');
+                return;
+            }
             this.createDisplayElements();
             this.updateDisplay();
         } else {
             console.error('No user logged in');
             this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
         }
+    }
+
+    getCurrentUser() {
+        const userJson = sessionStorage.getItem('loggedInUser');
+        return userJson ? JSON.parse(userJson) : null;
     }
 
     createDisplayElements() {
@@ -35,7 +43,7 @@ class AvatarDisplay {
                 <h3>Applied Items:</h3>
                 <ul id="applied-items-list"></ul>
             </div>
-            <p id="user-coins">Coins: ${UserManager.getUserCoins()}</p>
+            <p id="user-coins">Coins: ${this.currentUser.coins || 0}</p>
         `;
     }
 
@@ -109,21 +117,21 @@ class AvatarDisplay {
 
         Object.entries(equippedItems).forEach(([type, itemId]) => {
             console.log(`Processing item: ${type} - ${itemId}`);
-            const item = window.userInventory.getItems().find(i => i.id === itemId);
+            const item = window.shopItems.find(i => i.id === itemId);
             if (item) {
                 const listItem = document.createElement('li');
                 listItem.textContent = `${type}: ${item.name}`;
                 appliedItemsList.appendChild(listItem);
                 console.log(`Added item to list: ${type} - ${item.name}`);
             } else {
-                console.error(`Item not found in inventory: ${type} - ${itemId}`);
+                console.error(`Item not found in shop items: ${type} - ${itemId}`);
             }
         });
     }
 
     updateUserCoins() {
         const userCoinsDisplay = document.getElementById('user-coins');
-        const coins = UserManager.getUserCoins();
+        const coins = this.currentUser.coins || 0;
         userCoinsDisplay.textContent = `Coins: ${coins}`;
         console.log('Updated user coins:', coins);
     }
