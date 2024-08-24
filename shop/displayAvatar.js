@@ -422,7 +422,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loggedInUser) {
         window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
         window.avatarDisplay.loadAvatar();
-        window.avatarManager = window.avatarDisplay; // For compatibility with existing code
+        console.log('AvatarDisplay initialized:', window.avatarDisplay);
+        
+        // Initialize ItemSelector after AvatarDisplay
+        if (window.ItemSelector) {
+            window.itemSelector = new ItemSelector(window.avatarDisplay);
+            console.log('ItemSelector initialized:', window.itemSelector);
+        } else {
+            console.error('ItemSelector class not found');
+        }
     } else {
         console.error('No logged in user found');
     }
