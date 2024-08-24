@@ -2,11 +2,22 @@
 
 class ShopManager {
     constructor() {
-        this.shopItems = []; // This should be populated with your shop items
+        this.shopItems = window.shopItems || [];
     }
 
     renderShopItems() {
+        console.log("Rendering shop items");
         const shopContainer = document.querySelector('.shop-container');
+        if (!shopContainer) {
+            console.error("Shop container not found");
+            return;
+        }
+        
+        if (this.shopItems.length === 0) {
+            console.warn("No shop items to display");
+            return;
+        }
+
         shopContainer.innerHTML = ''; // Clear existing items
 
         this.shopItems.forEach(item => {
@@ -20,44 +31,49 @@ class ShopManager {
             `;
             shopContainer.appendChild(itemElement);
         });
+        console.log(`Rendered ${this.shopItems.length} shop items`);
+
+        // Add event listeners
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        const shopContainer = document.querySelector('.shop-container');
+        shopContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('item-image')) {
+                const itemId = event.target.dataset.id;
+                this.toggleItem(itemId);
+            } else if (event.target.classList.contains('buy-btn')) {
+                const itemId = event.target.dataset.id;
+                this.buyItem(itemId);
+            }
+        });
     }
 
     toggleItem(itemId) {
-        console.log('toggleItem called with itemId:', itemId);
+        console.log('Toggling item:', itemId);
         const item = this.shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            if (window.shopAvatarDisplay && typeof window.shopAvatarDisplay.tryOnItem === 'function') {
-                console.log('Calling shopAvatarDisplay.tryOnItem');
-                window.shopAvatarDisplay.tryOnItem(item);
-            } else {
-                console.error('shopAvatarDisplay not found or tryOnItem is not a function');
-            }
+        if (item && window.shopAvatarDisplay) {
+            window.shopAvatarDisplay.tryOnItem(item);
             this.updateSelectedItems();
-        } else {
-            console.error('Item not found for id:', itemId);
         }
     }
 
     updateSelectedItems() {
-        console.log('Updating selected items');
         document.querySelectorAll('.shop-item').forEach(shopItem => {
             const image = shopItem.querySelector('.item-image');
             const itemId = image.dataset.id;
             const item = this.shopItems.find(i => i.id === itemId);
             
             if (window.shopAvatarDisplay.triedOnItems[item.type] && window.shopAvatarDisplay.triedOnItems[item.type].id === itemId) {
-                console.log(`Adding 'selected' class to item: ${itemId}`);
                 shopItem.classList.add('selected');
             } else {
-                console.log(`Removing 'selected' class from item: ${itemId}`);
                 shopItem.classList.remove('selected');
             }
         });
     }
 
     resetAvatarDisplay() {
-        console.log('Resetting avatar display');
         if (window.shopAvatarDisplay) {
             window.shopAvatarDisplay.resetTriedOnItems();
         }
@@ -65,13 +81,8 @@ class ShopManager {
     }
 
     buyItem(itemId) {
+        console.log('Buying item:', itemId);
         // Implement buying logic here
-        console.log(`Buying item with ID: ${itemId}`);
-    }
-
-    filterItemsByCategory(category) {
-        // Implement category filtering logic here
-        console.log(`Filtering items by category: ${category}`);
     }
 }
 
@@ -79,31 +90,4 @@ class ShopManager {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Initializing ShopManager");
     window.shopManager = new ShopManager();
-    window.shopManager.renderShopItems();
-
-    // Event delegation for shop interactions
-    document.querySelector('.shop-container').addEventListener('click', function(e) {
-        if (e.target.classList.contains('item-image')) {
-            const itemId = e.target.dataset.id;
-            window.shopManager.toggleItem(itemId);
-        } else if (e.target.classList.contains('buy-btn')) {
-            const itemId = e.target.dataset.id;
-            window.shopManager.buyItem(itemId);
-        }
-    });
-
-    // Add category filter buttons if needed
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const category = this.dataset.category;
-            window.shopManager.filterItemsByCategory(category);
-        });
-    });
-
-    // Add reset button
-    const resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset Tried-On Items';
-    resetButton.addEventListener('click', () => window.shopManager.resetAvatarDisplay());
-    document.querySelector('.shop-container').prepend(resetButton);
 });
