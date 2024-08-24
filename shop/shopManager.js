@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Event delegation for item clicks
-    document.addEventListener('click', function(e) {
+  document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
         if (e.target.closest('.item-image')) {
             const itemImage = e.target.closest('.item-image');
@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the shop
     renderShopItems();
 
-    // Log avatarDisplay for debugging
+    // Log avatarDisplay and itemSelector for debugging
     console.log('avatarDisplay:', window.avatarDisplay);
+    console.log('itemSelector:', window.itemSelector);
 });
