@@ -71,7 +71,10 @@ class AvatarDisplay {
                 }
             }
 
-            obj.onload = () => this.applySkinTone(obj, part.type);
+            obj.onload = () => {
+                console.log(`${part.name} loaded, applying colors`);
+                this.applySkinTone(obj, part.type);
+            };
             obj.onerror = () => console.error(`Failed to load SVG: ${obj.data}`);
             this.container.appendChild(obj);
             this.layers[part.type] = obj;
@@ -81,11 +84,52 @@ class AvatarDisplay {
     }
 
     applySkinTone(obj, type) {
-        // Implement skin tone application logic here
-        // This should include applying eye color, lip color, and hair color as well
-        console.log(`Applying skin tone to ${type}`);
-        // For now, just log the colors
-        console.log(`Skin Tone: ${this.skinTone}`);
+        console.log(`Applying colors to ${type}`);
+        const svgDoc = obj.contentDocument;
+        if (!svgDoc) {
+            console.error(`SVG document not loaded for ${type}`);
+            return;
+        }
+
+        const skinTones = {
+            light: '#FEE2CA',
+            medium: '#FFE0BD',
+            tan: '#F1C27D',
+            dark: '#8D5524'
+        };
+
+        const skinColor = skinTones[this.skinTone] || skinTones.light;
+
+        if (type === 'Head' || type === 'Arms' || type === 'Legs' || type === 'Body') {
+            const skinElements = svgDoc.querySelectorAll('.skin, .bodySkin');
+            skinElements.forEach(element => {
+                element.style.fill = skinColor;
+            });
+        }
+
+        if (type === 'Eyes') {
+            const eyeElements = svgDoc.querySelectorAll('.eye, .iris');
+            eyeElements.forEach(element => {
+                element.style.fill = this.eyeColor;
+            });
+        }
+
+        if (type === 'Mouth') {
+            const lipElements = svgDoc.querySelectorAll('.lips, .mouth');
+            lipElements.forEach(element => {
+                element.style.fill = this.lipColor;
+            });
+        }
+
+        if (type === 'Hair') {
+            const hairElements = svgDoc.querySelectorAll('.hair');
+            hairElements.forEach(element => {
+                element.style.fill = this.hairColor;
+            });
+        }
+
+        console.log(`Applied colors to ${type}`);
+        console.log(`Skin Tone: ${skinColor}`);
         console.log(`Eye Color: ${this.eyeColor}`);
         console.log(`Lip Color: ${this.lipColor}`);
         console.log(`Hair Color: ${this.hairColor}`);
@@ -98,5 +142,22 @@ class AvatarDisplay {
                 this.layers[type].style.zIndex = index + 1;
             }
         });
+    }
+
+    updateAvatarDisplay(type, src) {
+        if (this.layers[type]) {
+            if (src) {
+                this.layers[type].data = src;
+                this.layers[type].style.display = 'block';
+                this.layers[type].onload = () => this.applySkinTone(this.layers[type], type);
+            } else {
+                this.layers[type].style.display = 'none';
+                this.layers[type].data = '';
+            }
+        }
+    }
+
+    isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
     }
 }
