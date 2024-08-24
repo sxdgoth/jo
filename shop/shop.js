@@ -10,6 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
         window.avatarManager = new AvatarManager();
         window.avatarManager.initialize();
         
+         // Initialize ItemSelector
+        if (window.avatarDisplay) {
+            window.itemSelector = new ItemSelector(window.avatarDisplay);
+            console.log('ItemSelector initialized:', window.itemSelector);
+        } else {
+            console.error('AvatarDisplay not initialized');
+        }
+
         // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
             window.shopManager.renderShopItems();
