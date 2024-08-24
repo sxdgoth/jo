@@ -382,28 +382,35 @@ blendColors(color1, color2, ratio) {
     }
 
     removeItem(type) {
-        console.log(`Removing item of type: ${type}`);
+    console.log(`Removing item of type: ${type}`);
+    if (this.layers[type]) {
+        this.layers[type].style.display = 'none';
+        this.layers[type].data = ''; // Clear the source
+    }
+    delete this.currentItems[type];
+    
+    // If this is a base part, make sure it's visible
+    if (this.baseParts.includes(type)) {
         if (this.layers[type]) {
-            this.layers[type].style.display = 'none';
-            this.layers[type].data = ''; // Clear the source
+            this.layers[type].style.display = 'block';
+            this.layers[type].data = `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`;
         }
-        delete this.currentItems[type];
-        
-        // If this is not a base part, check if there's an equipped item to display
-        if (!this.baseParts.includes(type) && this.equippedItems[type]) {
+    } else {
+        // If it's not a base part, check if there's an equipped item to display
+        if (this.equippedItems[type]) {
             const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
             if (equippedItem) {
                 this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
             }
         } else {
-            // If there's no equipped item, ensure the base part is visible
-            if (this.baseParts.includes(type) && this.layers[type]) {
-                this.layers[type].style.display = 'block';
-                this.layers[type].data = `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`;
+            // If there's no equipped item, ensure the layer is hidden
+            if (this.layers[type]) {
+                this.layers[type].style.display = 'none';
             }
         }
     }
-
+    this.reorderLayers(); // Make sure to reorder layers after removing an item
+}
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
