@@ -52,27 +52,27 @@ class AvatarBody {
         this.reorderLayers();
     }
 
-     updateLayer(type, src) {
+    updateLayer(type, src) {
         console.log('Updating layer:', type, src);
         if (this.layers[type]) {
+            const bodyPart = this.bodyParts.find(part => part.type === type);
             if (src) {
-                this.layers[type].data = src;
+                this.layers[type].src = src;
                 this.layers[type].style.display = 'block';
                 console.log(`Updated ${type} layer with ${src}`);
-            } else {
+            } else if (!bodyPart.isBase) {
                 this.layers[type].style.display = 'none';
-                this.layers[type].data = '';
                 console.log(`Removed ${type} layer`);
+            } else {
+                this.layers[type].src = this.baseUrl + bodyPart.file;
+                this.layers[type].style.display = 'block';
+                console.log(`Reverted ${type} to base layer`);
             }
-            this.layers[type].onload = () => {
-                this.applySkinTone(this.layers[type], type);
-            };
         } else {
             console.warn(`Layer ${type} not found`);
         }
         this.reorderLayers();
     }
-}
 
    reorderLayers() {
     const order = ['Legs', 'Arms', 'Body', 'Shoes', 'Pants', 'Dress', 'Shirt', 'Jacket', 'Backhair',  'Neck', 'Hoodie', 'Head', 'Cheeks', 'Eyes', 'Mouth', 'Nose', 'Face', 'Eyebrows', 'Accessories', 'Hair'];
