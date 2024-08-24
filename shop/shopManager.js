@@ -25,17 +25,19 @@ class ShopManager {
             const itemElement = document.createElement('div');
             itemElement.className = 'shop-item';
             itemElement.innerHTML = `
-                <div class="item-image-container" data-id="${item.id}">
-                    <object type="image/svg+xml" data="${item.path}${item.id}" class="item-image"></object>
+                <div class="item-image" data-id="${item.id}">
+                    <svg width="100%" height="100%">
+                        <use href="${item.path}${item.id}#svgView(viewBox(0,0,100,100))" />
+                    </svg>
                 </div>
-                <p>${item.name}</p>
+                <h3>${item.name}</h3>
                 <p>Price: ${item.price} coins</p>
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopContainer.appendChild(itemElement);
             
             // Apply item positioning
-            const imageContainer = itemElement.querySelector('.item-image-container');
+            const imageContainer = itemElement.querySelector('.item-image');
             this.applyItemPosition(imageContainer, item.type);
             
             // Update buy button state
@@ -49,14 +51,14 @@ class ShopManager {
 
     applyItemPosition(itemElement, itemType) {
         if (window.applyItemPosition) {
-            window.applyItemPosition(itemElement, itemType);
+            window.applyItemPosition(itemElement, itemType.toLowerCase());
         }
     }
 
     addEventListeners() {
         const shopContainer = document.querySelector('.shop-items');
         shopContainer.addEventListener('click', (event) => {
-            const itemContainer = event.target.closest('.item-image-container');
+            const itemContainer = event.target.closest('.item-image');
             if (itemContainer) {
                 const itemId = itemContainer.dataset.id;
                 this.toggleItem(itemId);
