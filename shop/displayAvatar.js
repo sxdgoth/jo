@@ -364,19 +364,21 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-   tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    // If the item is already tried on, remove it
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        this.removeItem(item.type);
-    } else {
-        // Apply the new item
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    tryOnItem(item) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        const nonRemovableTypes = ['Pants', 'Shirt', 'Eyes', 'Mouth', 'Eyebrows', 'Hair'];
+        
+        // If the item is already tried on and it's not a non-removable type, remove it
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id && !nonRemovableTypes.includes(item.type)) {
+            this.removeItem(item.type);
+        } else {
+            // Apply the new item
+            this.currentItems[item.type] = item;
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+        }
+        this.reorderLayers();
     }
-    this.reorderLayers();
-}
 
    removeItem(type) {
     console.log(`Removing item of type: ${type}`);
