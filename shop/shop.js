@@ -6,28 +6,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     console.log("Logged in user:", loggedInUser);
 
-    if (loggedInUser) {
+     if (loggedInUser) {
         document.getElementById('user-name').textContent = loggedInUser.username;
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
 
-        // Initialize ShopAvatarDisplay
-        if (typeof ShopAvatarDisplay !== 'undefined') {
-            console.log("Initializing ShopAvatarDisplay");
-            window.shopAvatarDisplay = new ShopAvatarDisplay('avatar-display', loggedInUser.username);
-            window.shopAvatarDisplay.loadAvatar();
-        } else {
-            console.error("ShopAvatarDisplay class is not defined");
-        }
+        // Initialize AvatarDisplay
+        window.avatarDisplay = new AvatarDisplay('avatar-display', loggedInUser.username);
+        window.avatarDisplay.loadAvatar();
 
         // Initialize ShopManager
-        if (typeof ShopManager !== 'undefined') {
-            console.log("Initializing ShopManager");
-            window.shopManager = new ShopManager();
-            window.shopManager.renderShopItems();
-        } else {
-            console.error("ShopManager class is not defined");
-        }
+        console.log("Initializing ShopManager");
+        window.shopManager = new ShopManager();
+        window.shopManager.renderShopItems();
 
         // Add reset button for tried-on items
         addResetButton();
