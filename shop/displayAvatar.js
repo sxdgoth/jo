@@ -395,6 +395,36 @@ blendColors(color1, color2, ratio) {
     this.reorderLayers();
 }
 
+tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        // Item is already tried on, so remove it
+        delete this.currentItems[item.type];
+        
+        // If there's an equipped item for this type, show it instead
+        if (this.equippedItems[item.type]) {
+            const equippedItem = shopItems.find(i => i.id === this.equippedItems[item.type]);
+            if (equippedItem) {
+                this.updateAvatarDisplay(item.type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+            } else {
+                this.updateAvatarDisplay(item.type, '');
+            }
+        } else {
+            this.updateAvatarDisplay(item.type, '');
+        }
+    } else {
+        // Apply the new item
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    }
+    this.reorderLayers();
+    
+    // Don't update equippedItems here, as it should represent the wardrobe state
+    // Instead, update a separate property for tried on items
+    localStorage.setItem(`triedOnItems_${this.username}`, JSON.stringify(this.currentItems));
+}
+    
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
             if (this.layers[type].style.display === 'none') {
@@ -436,23 +466,7 @@ blendColors(color1, color2, ratio) {
     }
 }
 
-tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // Item is already tried on, so remove it
-        delete this.currentItems[item.type];
-        this.updateAvatarDisplay(item.type, '');
-    } else {
-        // Apply the new item
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
-    }
-    this.reorderLayers();
-    
-    // Update localStorage
-    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.currentItems));
-}   
+
   
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
