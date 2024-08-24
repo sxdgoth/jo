@@ -367,43 +367,42 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-   tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    // If the item is already tried on, remove it
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        this.removeItem(item.type);
-    } else {
-        // Apply the new item
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+  tryOnItem(item) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            // If the item is already tried on, remove it
+            this.removeItem(item.type);
+        } else {
+            // Apply the new item
+            this.currentItems[item.type] = item;
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+        }
+        this.reorderLayers();
     }
-    this.reorderLayers();
-}
 
-removeItem(type) {
-    console.log(`Removing item of type: ${type}`);
-    if (this.layers[type]) {
-        this.layers[type].style.display = 'none';
-        this.layers[type].data = ''; // Clear the source
-    }
-    delete this.currentItems[type];
-    
-    // If this is not a base part, check if there's an equipped item to display
-    if (!this.baseParts.includes(type) && this.equippedItems[type]) {
-        const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
-        if (equippedItem) {
-            this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+    removeItem(type) {
+        console.log(`Removing item of type: ${type}`);
+        if (this.layers[type]) {
+            this.layers[type].style.display = 'none';
+            this.layers[type].data = ''; // Clear the source
+        }
+        delete this.currentItems[type];
+        
+        // If this is not a base part, check if there's an equipped item to display
+        if (!this.baseParts.includes(type) && this.equippedItems[type]) {
+            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+            if (equippedItem) {
+                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+            }
+        } else {
+            // If there's no equipped item, ensure the base part is visible
+            if (this.baseParts.includes(type) && this.layers[type]) {
+                this.layers[type].style.display = 'block';
+                this.layers[type].data = `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`;
+            }
         }
     }
-    
-    // Ensure base parts are always visible
-    this.baseParts.forEach(basePart => {
-        if (this.layers[basePart]) {
-            this.layers[basePart].style.display = 'block';
-        }
-    });
-}
 
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
