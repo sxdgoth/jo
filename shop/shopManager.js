@@ -5,6 +5,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCategory = 'All';
     let selectedItems = {};
 
+    const resetButton = document.getElementById('reset-selected-items');
+    resetButton.addEventListener('click', resetSelectedItems);
+
+    const nonRemovableTypes = ['Pants', 'Shirt', 'Mouth', 'Eyes', 'Eyebrows'];
+
+    function resetSelectedItems() {
+        console.log('Resetting selected items');
+        Object.keys(selectedItems).forEach(type => {
+            if (!nonRemovableTypes.includes(type)) {
+                delete selectedItems[type];
+                if (window.avatarDisplay) {
+                    window.avatarDisplay.removeItem(type);
+                }
+            }
+        });
+        updateSelectedItems();
+    }
+
     function renderShopItems() {
         console.log('Rendering shop items. Current category:', currentCategory);
         console.log('Total shop items:', shopItems.length);
@@ -47,38 +65,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleItem(itemId) {
-    console.log('toggleItem called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            console.log('Calling avatarDisplay.tryOnItem');
-            window.avatarDisplay.tryOnItem(item);
-        } else {
-            console.error('avatarDisplay not found or tryOnItem is not a function');
-        }
-        updateSelectedItems();
-    } else {
-        console.error('Item not found for id:', itemId);
-    }
-}
-
-   function updateSelectedItems() {
-    console.log('Updating selected items');
-    document.querySelectorAll('.shop-item').forEach(shopItem => {
-        const image = shopItem.querySelector('.item-image');
-        const itemId = image.dataset.id;
+        console.log('toggleItem called with itemId:', itemId);
         const item = shopItems.find(i => i.id === itemId);
-        
-        if (window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === itemId) {
-            console.log(`Adding 'selected' class to item: ${itemId}`);
-            shopItem.classList.add('selected');
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+                if (nonRemovableTypes.includes(item.type)) {
+                    window.avatarDisplay.tryOnItem(item);
+                } else {
+                    if (selectedItems[item.type] && selectedItems[item.type].id === item.id) {
+                        delete selectedItems[item.type];
+                        window.avatarDisplay.removeItem(item.type);
+                    } else {
+                        selectedItems[item.type] = item;
+                        window.avatarDisplay.tryOnItem(item);
+                    }
+                }
+            } else {
+                console.error('avatarDisplay not found or tryOnItem is not a function');
+            }
+            updateSelectedItems();
         } else {
-            console.log(`Removing 'selected' class from item: ${itemId}`);
-            shopItem.classList.remove('selected');
+            console.error('Item not found for id:', itemId);
         }
-    });
-}
+    }
+
+    function updateSelectedItems() {
+        console.log('Updating selected items');
+        document.querySelectorAll('.shop-item').forEach(shopItem => {
+            const image = shopItem.querySelector('.item-image');
+            const itemId = image.dataset.id;
+            const item = shopItems.find(i => i.id === itemId);
+            
+            if (window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === itemId) {
+                console.log(`Adding 'selected' class to item: ${itemId}`);
+                shopItem.classList.add('selected');
+            } else {
+                console.log(`Removing 'selected' class from item: ${itemId}`);
+                shopItem.classList.remove('selected');
+            }
+        });
+    }
       
     function buyItem(itemId) {
         console.log('Attempting to buy item:', itemId);
