@@ -1,22 +1,27 @@
-// File: layerManager.js
-
 class LayerManager {
     constructor() {
         this.svgContainer = document.getElementById('body-svg');
         this.layerOrder = [
-            'Legs', 
-            'Arms', 
-            'Body', 
-            'Jacket', 
-            'Head'
+            'legs', 
+            'arms', 
+            'body', 
+            'jacket', 
+            'shirt',
+            'pants',
+            'shoes',
+            'head',
+            'eyes',
+            'nose',
+            'mouth',
+            'eyebrows',
+            'hair',
+            'accessories'
         ];
         this.reorderTimeout = null;
     }
 
     initialize() {
         this.reorderLayers();
-        const observer = new MutationObserver(() => this.scheduleReorder());
-        observer.observe(this.svgContainer, { childList: true, subtree: true });
     }
 
     scheduleReorder() {
@@ -27,16 +32,12 @@ class LayerManager {
     }
 
     reorderLayers() {
-        const headElement = this.svgContainer.querySelector('g[data-body-part="head"]');
-        const hoodieElement = this.svgContainer.querySelector('g[data-body-part="hoodie"]');
-
-        if (headElement) {
-            this.svgContainer.appendChild(headElement);
-        }
-
-        if (hoodieElement && headElement) {
-            this.svgContainer.insertBefore(hoodieElement, headElement);
-        }
+        this.layerOrder.forEach(type => {
+            const element = this.svgContainer.querySelector(`g[data-body-part="${type}"]`);
+            if (element) {
+                this.svgContainer.appendChild(element);
+            }
+        });
     }
 }
 
