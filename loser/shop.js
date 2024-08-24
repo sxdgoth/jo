@@ -9,8 +9,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update user coins display
         updateUserCoinsDisplay(loggedInUser.coins);
         
-        // Initialize user's inventory
-        window.createUserInventory(loggedInUser.username);
+        // Initialize user's inventory (if this function exists)
+        if (typeof window.createUserInventory === 'function') {
+            window.createUserInventory(loggedInUser.username);
+        } else {
+            console.warn('createUserInventory function not found');
+        }
         
         // Render shop items
         renderShopItems();
@@ -28,6 +32,10 @@ function updateUserCoinsDisplay(coins) {
 
 function renderShopItems() {
     const shopItemsContainer = document.getElementById('shop-items');
+    if (!shopItemsContainer) {
+        console.error('Shop items container not found');
+        return;
+    }
     
     shopItems.forEach(item => {
         const itemElement = document.createElement('div');
@@ -59,15 +67,23 @@ function buyItem(itemId) {
         loggedInUser.coins -= item.price;
         sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         
-        // Add item to inventory
-        window.userInventory.addItem(item);
+        // Add item to inventory (if userInventory exists)
+        if (window.userInventory && typeof window.userInventory.addItem === 'function') {
+            window.userInventory.addItem(item);
+        } else {
+            console.warn('userInventory or addItem function not found');
+        }
         
         // Update avatar display
-        window.avatarDisplay.equippedItems[item.type] = item.id;
-        window.avatarDisplay.updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-        
-        // Save equipped items
-        localStorage.setItem(`equippedItems_${loggedInUser.username}`, JSON.stringify(window.avatarDisplay.equippedItems));
+        if (window.avatarDisplay && typeof window.avatarDisplay.updateAvatarDisplay === 'function') {
+            window.avatarDisplay.equippedItems[item.type] = item.id;
+            window.avatarDisplay.updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+            
+            // Save equipped items
+            localStorage.setItem(`equippedItems_${loggedInUser.username}`, JSON.stringify(window.avatarDisplay.equippedItems));
+        } else {
+            console.warn('avatarDisplay or updateAvatarDisplay function not found');
+        }
         
         // Update coins display
         updateUserCoinsDisplay(loggedInUser.coins);
