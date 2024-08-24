@@ -1,5 +1,3 @@
-// avatarDisplay.js
-
 class AvatarDisplay {
     constructor() {
         this.displayContainer = document.getElementById('avatar-display');
@@ -8,28 +6,28 @@ class AvatarDisplay {
     }
 
     initialize() {
-    console.log('Initializing AvatarDisplay');
-    this.currentUser = this.getCurrentUser();
-    if (this.currentUser) {
-        console.log('Current user:', this.currentUser);
-        this.loadAvatarState();
-        this.createDisplayElements();
-        this.updateDisplay();
-    } else {
-        console.error('No user logged in');
-        this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
+        console.log('Initializing AvatarDisplay');
+        this.currentUser = this.getCurrentUser();
+        if (this.currentUser) {
+            console.log('Current user:', this.currentUser);
+            this.loadAvatarState();
+            this.createDisplayElements();
+            this.updateDisplay();
+        } else {
+            console.error('No user logged in');
+            this.displayContainer.innerHTML = '<p>Please log in to view your avatar.</p>';
+        }
     }
-}
-
-loadAvatarState() {
-    const avatarState = JSON.parse(localStorage.getItem('avatarState') || '{}');
-    this.avatarManager = new AvatarManager(this.currentUser.username);
-    this.avatarManager.initialize(avatarState);
-}
 
     getCurrentUser() {
         const userJson = sessionStorage.getItem('loggedInUser');
         return userJson ? JSON.parse(userJson) : null;
+    }
+
+    loadAvatarState() {
+        const avatarState = JSON.parse(localStorage.getItem('avatarState') || '{}');
+        this.avatarManager = new AvatarManager(this.currentUser.username);
+        this.avatarManager.initialize(avatarState);
     }
 
     createDisplayElements() {
@@ -66,10 +64,21 @@ loadAvatarState() {
     }
 
     updateAvatarImage() {
-        // This method should update the avatar image based on the current state
-        // You may need to implement this based on how your avatar is rendered
         console.log('Updating avatar image');
-        this.avatarManager.updateAvatarDisplay();
+        if (window.avatarBody) {
+            // Update each layer based on the equipped items
+            Object.entries(this.avatarManager.equippedItems).forEach(([type, itemId]) => {
+                const item = window.userInventory.getItems().find(i => i.id === itemId);
+                if (item) {
+                    window.avatarBody.updateLayer(type, item.path + item.id);
+                }
+            });
+
+            // Update skin tone
+            window.avatarBody.updateSkinTone(this.avatarManager.skinTone);
+        } else {
+            console.error('AvatarBody not initialized');
+        }
     }
 
     updateSkinTone() {
