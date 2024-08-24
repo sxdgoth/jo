@@ -1,23 +1,38 @@
+// shop.js
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded");
+
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    
+    console.log("Logged in user:", loggedInUser);
+
     if (loggedInUser) {
         document.getElementById('user-name').textContent = loggedInUser.username;
         updateUserCoins(loggedInUser.coins);
         window.createUserInventory(loggedInUser.username);
-        
-        // Initialize AvatarManager
-        window.avatarManager = new AvatarManager();
-        window.avatarManager.initialize();
-        
-        // Call shopManager to render items after user is verified
-        if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
+
+        // Initialize ShopAvatarDisplay
+        if (typeof ShopAvatarDisplay !== 'undefined') {
+            console.log("Initializing ShopAvatarDisplay");
+            window.shopAvatarDisplay = new ShopAvatarDisplay('avatar-display', loggedInUser.username);
+            window.shopAvatarDisplay.loadAvatar();
+        } else {
+            console.error("ShopAvatarDisplay class is not defined");
+        }
+
+        // Initialize ShopManager
+        if (typeof ShopManager !== 'undefined') {
+            console.log("Initializing ShopManager");
+            window.shopManager = new ShopManager();
             window.shopManager.renderShopItems();
+        } else {
+            console.error("ShopManager class is not defined");
         }
 
         // Add reset button for tried-on items
         addResetButton();
     } else {
+        console.error("No logged in user found");
         window.location.href = '../index.html';
     }
 });
@@ -37,7 +52,6 @@ function updateUserCoinsAfterPurchase(newCoins) {
         loggedInUser.coins = newCoins;
         sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
         updateUserCoins(newCoins);
-
         // Update the user's coins in localStorage as well
         const users = JSON.parse(localStorage.getItem('users')) || [];
         const updatedUsers = users.map(user => 
