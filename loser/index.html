@@ -94,7 +94,8 @@
 
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
-   <script>
+    <script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
+  <script>
         const shopItemsContainer = document.getElementById('shop-items');
         let currentItems = {};
 
@@ -111,23 +112,19 @@
         }
 
         function toggleItem(item) {
-            if (currentItems[item.type] === item.id) {
-                // Unselect item
-                delete currentItems[item.type];
-                window.avatarBody.updateLayer(item.type, '');
+            if (window.avatarDisplay) {
+                window.avatarDisplay.tryOnItem(item);
+                updateShopItemSelection();
             } else {
-                // Select item
-                currentItems[item.type] = item.id;
-                window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
+                console.error('avatarDisplay not found');
             }
-            updateShopItemSelection();
         }
 
         function updateShopItemSelection() {
             shopItemsContainer.querySelectorAll('.shop-item').forEach(shopItem => {
                 const itemName = shopItem.querySelector('p').textContent;
                 const item = shopItems.find(i => i.name === itemName);
-                if (currentItems[item.type] === item.id) {
+                if (window.avatarDisplay && window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === item.id) {
                     shopItem.classList.add('selected');
                 } else {
                     shopItem.classList.remove('selected');
@@ -141,6 +138,11 @@
                 const shopItem = createShopItem(item);
                 shopItemsContainer.appendChild(shopItem);
             });
+
+            // Ensure a user is "logged in" for testing purposes
+            if (!sessionStorage.getItem('loggedInUser')) {
+                sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'testUser' }));
+            }
         });
     </script>
 </body>
