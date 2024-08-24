@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   function toggleItem(itemId) {
+  function toggleItem(itemId) {
     console.log('toggleItem called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
 
-  function updateSelectedItems() {
+ function updateSelectedItems() {
     console.log('Updating selected items');
     document.querySelectorAll('.shop-item').forEach(shopItem => {
         const image = shopItem.querySelector('.item-image');
