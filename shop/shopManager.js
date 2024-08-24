@@ -75,11 +75,14 @@ class ShopManager {
     }
 
 
-    toggleItem(itemId) {
+     toggleItem(itemId) {
         console.log('Toggling item:', itemId);
         const item = this.shopItems.find(i => i.id === itemId);
         if (item && window.shopAvatarDisplay) {
+            console.log('Calling tryOnItem on shopAvatarDisplay');
             window.shopAvatarDisplay.tryOnItem(item);
+        } else {
+            console.error('shopAvatarDisplay not found or item not found');
         }
     }
 
