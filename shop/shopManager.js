@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleItem(itemId) {
+   function toggleItem(itemId) {
     console.log('toggleItem called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('avatarDisplay not found or tryOnItem is not a function');
         }
         updateSelectedItems();
+        // Add this line to refresh the avatar display
+        window.avatarDisplay.loadAvatar();
     } else {
         console.error('Item not found for id:', itemId);
     }
