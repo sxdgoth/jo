@@ -63,22 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
 
-    function updateSelectedItems() {
-        console.log('Updating selected items');
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (selectedItems[item.type] === itemId) {
-                console.log(`Adding 'selected' class to item: ${itemId}`);
-                shopItem.classList.add('selected');
-            } else {
-                console.log(`Removing 'selected' class from item: ${itemId}`);
-                shopItem.classList.remove('selected');
-            }
-        });
-    }
+   function updateSelectedItems() {
+    console.log('Updating selected items');
+    document.querySelectorAll('.shop-item').forEach(shopItem => {
+        const image = shopItem.querySelector('.item-image');
+        const itemId = image.dataset.id;
+        const item = shopItems.find(i => i.id === itemId);
+        
+        if (window.avatarDisplay.currentItems[item.type] && window.avatarDisplay.currentItems[item.type].id === itemId) {
+            console.log(`Adding 'selected' class to item: ${itemId}`);
+            shopItem.classList.add('selected');
+        } else {
+            console.log(`Removing 'selected' class from item: ${itemId}`);
+            shopItem.classList.remove('selected');
+        }
+    });
+}
       
     function buyItem(itemId) {
         console.log('Attempting to buy item:', itemId);
