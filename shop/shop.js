@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
         window.avatarManager = new AvatarManager();
         window.avatarManager.initialize();
         
+        // Initialize AvatarDisplay
+        window.avatarDisplay = new AvatarDisplay();
+        
+        // Initialize ItemSelector
+        window.itemSelector = new ItemSelector(window.avatarDisplay);
+        
         // Call shopManager to render items after user is verified
         if (window.shopManager && typeof window.shopManager.renderShopItems === 'function') {
             window.shopManager.renderShopItems();
@@ -51,8 +57,8 @@ function addResetButton() {
     const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset Tried-On Items';
     resetButton.addEventListener('click', () => {
-        if (window.shopManager && typeof window.shopManager.resetAvatarDisplay === 'function') {
-            window.shopManager.resetAvatarDisplay();
+        if (window.itemSelector && typeof window.itemSelector.resetAvatarDisplay === 'function') {
+            window.itemSelector.resetAvatarDisplay();
         }
     });
     document.querySelector('.shop-container').prepend(resetButton);
