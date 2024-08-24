@@ -1,20 +1,7 @@
-// itemSelector.js
-
 class ItemSelector {
-    constructor() {
+    constructor(avatarDisplay) {
+        this.avatarDisplay = avatarDisplay;
         this.selectedItems = {};
-        this.shopItemsContainer = document.querySelector('.shop-items');
-        this.initEventListeners();
-    }
-
-    initEventListeners() {
-        this.shopItemsContainer.addEventListener('click', (e) => {
-            const itemImage = e.target.closest('.item-image');
-            if (itemImage) {
-                const itemId = itemImage.dataset.id;
-                this.toggleItem(itemId);
-            }
-        });
     }
 
     toggleItem(itemId) {
@@ -25,49 +12,70 @@ class ItemSelector {
         }
 
         if (this.selectedItems[item.type] === itemId) {
-            // Unselect the item
-            delete this.selectedItems[item.type];
-            this.updateItemDisplay(itemId, false);
-            if (window.avatarDisplay) {
-                window.avatarDisplay.removeItem(item.type);
-            }
+            // Item is already selected, so remove it
+            this.removeItem(item.type);
         } else {
-            // Select the item
-            if (this.selectedItems[item.type]) {
-                // Unselect the previously selected item of the same type
-                this.updateItemDisplay(this.selectedItems[item.type], false);
-            }
-            this.selectedItems[item.type] = itemId;
-            this.updateItemDisplay(itemId, true);
-            if (window.avatarDisplay) {
-                window.avatarDisplay.tryOnItem(item);
-            }
+            // Item is not selected, so try it on
+            this.tryOnItem(item);
         }
     }
 
-    updateItemDisplay(itemId, isSelected) {
-        const itemElement = this.shopItemsContainer.querySelector(`.item-image[data-id="${itemId}"]`);
+    tryOnItem(item) {
+        console.log('Trying on item:', item.name);
+        
+        // Remove previously selected item of the same type
+        if (this.selectedItems[item.type]) {
+            this.removeItem(item.type);
+        }
+
+        // Update the avatar display
+        const itemSrc = `${this.avatarDisplay.baseUrl}${item.path}${item.id}`;
+        this.avatarDisplay.updateAvatarDisplay(item.type, itemSrc);
+
+        // Mark the item as selected
+        this.selectedItems[item.type] = item.id;
+
+        // Update UI to show the item as selected
+        this.updateItemSelection(item.id, true);
+    }
+
+    removeItem(type) {
+        console.log('Removing item of type:', type);
+        
+        // Remove the item from the avatar display
+        this.avatarDisplay.removeItem(type);
+
+        // Update UI to show the item as deselected
+        if (this.selectedItems[type]) {
+            this.updateItemSelection(this.selectedItems[type], false);
+        }
+
+        // Remove the item from selected items
+        delete this.selectedItems[type];
+    }
+
+    updateItemSelection(itemId, isSelected) {
+        const itemElement = document.querySelector(`.item-image[data-id="${itemId}"]`);
         if (itemElement) {
             itemElement.classList.toggle('selected', isSelected);
         }
     }
 
-    getSelectedItems() {
-        return this.selectedItems;
-    }
-
     resetSelection() {
         Object.keys(this.selectedItems).forEach(type => {
-            this.updateItemDisplay(this.selectedItems[type], false);
+            this.removeItem(type);
         });
         this.selectedItems = {};
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
-        }
+        this.avatarDisplay.resetTriedOnItems();
     }
 }
 
-// Initialize the ItemSelector when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.itemSelector = new ItemSelector();
+// Initialize ItemSelector when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser && window.avatarDisplay) {
+        window.itemSelector = new ItemSelector(window.avatarDisplay);
+    } else {
+        console.error('AvatarDisplay not initialized or no logged in user found');
+    }
 });
