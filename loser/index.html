@@ -94,7 +94,7 @@
 
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
- <script>
+<script>
     const shopItemsContainer = document.getElementById('shop-items');
     let currentItems = {};
 
@@ -111,33 +111,23 @@
     }
 
     function toggleItem(item, shopItemElement) {
-        if (window.avatarDisplay) {
+        if (window.avatarBody) {
             if (currentItems[item.type] && currentItems[item.type].id === item.id) {
                 // If the item is already selected, remove it
-                window.avatarDisplay.removeItem(item.type);
+                window.avatarBody.updateLayer(item.type, '');
                 delete currentItems[item.type];
                 shopItemElement.classList.remove('selected');
             } else {
                 // If the item is not selected, add it
-                window.avatarDisplay.tryOnItem(item);
+                window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
                 currentItems[item.type] = item;
                 updateShopItemSelection();
             }
         } else {
-            console.error('avatarDisplay not found');
+            console.error('avatarBody not found');
         }
     }
 
-tryOnItem(item) {
-        console.log('Trying on item:', item);
-        this.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
-    }
-
-    removeItem(type) {
-        console.log('Removing item:', type);
-        this.updateLayer(type, '');
-    }
-     
     function updateShopItemSelection() {
         shopItemsContainer.querySelectorAll('.shop-item').forEach(shopItem => {
             const itemName = shopItem.querySelector('p').textContent;
@@ -149,11 +139,7 @@ tryOnItem(item) {
             }
         });
     }
-     
 
-
-
-     
     // Initialize shop items
     document.addEventListener('DOMContentLoaded', function() {
         shopItems.forEach(item => {
@@ -166,9 +152,9 @@ tryOnItem(item) {
             sessionStorage.setItem('loggedInUser', JSON.stringify({ username: 'testUser' }));
         }
 
-        // Initialize avatarDisplay if it's not already initialized
-        if (!window.avatarDisplay) {
-            window.avatarDisplay = new AvatarDisplay(document.getElementById('avatar-display'));
+        // Make sure avatarBody is initialized
+        if (!window.avatarBody) {
+            console.error('avatarBody not found. Make sure avatarTemplate.js is loaded correctly.');
         }
     });
 </script>
