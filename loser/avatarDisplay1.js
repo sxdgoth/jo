@@ -8,8 +8,10 @@ class AvatarDisplay {
     }
 
     initialize() {
+        console.log('Initializing AvatarDisplay');
         this.currentUser = UserManager.getCurrentUser();
         if (this.currentUser) {
+            console.log('Current user:', this.currentUser);
             this.avatarManager = new AvatarManager(this.currentUser.username);
             this.avatarManager.initialize();
             this.createDisplayElements();
@@ -21,6 +23,7 @@ class AvatarDisplay {
     }
 
     createDisplayElements() {
+        console.log('Creating display elements');
         this.displayContainer.innerHTML = `
             <h2>Welcome, ${this.currentUser.username}!</h2>
             <div id="avatar-image"></div>
@@ -37,7 +40,11 @@ class AvatarDisplay {
     }
 
     updateDisplay() {
-        if (!this.currentUser) return;
+        console.log('Updating display');
+        if (!this.currentUser) {
+            console.error('No current user, cannot update display');
+            return;
+        }
 
         this.updateAvatarImage();
         this.updateSkinTone();
@@ -50,24 +57,29 @@ class AvatarDisplay {
 
     updateAvatarImage() {
         const avatarImage = document.getElementById('avatar-image');
-        avatarImage.style.backgroundImage = `url(${this.getAvatarImageUrl()})`;
+        const imageUrl = this.getAvatarImageUrl();
+        console.log('Updating avatar image with URL:', imageUrl);
+        avatarImage.style.backgroundImage = `url(${imageUrl})`;
     }
 
     updateSkinTone() {
         const skinToneDisplay = document.getElementById('skin-tone-display');
         skinToneDisplay.textContent = `Skin Tone: ${this.avatarManager.skinTone}`;
+        console.log('Updated skin tone:', this.avatarManager.skinTone);
     }
 
     updateEyeColor() {
         const eyeColorDisplay = document.getElementById('eye-color-display');
         eyeColorDisplay.textContent = `Eye Color: ${this.avatarManager.eyeColor}`;
         eyeColorDisplay.style.backgroundColor = this.avatarManager.eyeColor;
+        console.log('Updated eye color:', this.avatarManager.eyeColor);
     }
 
     updateLipColor() {
         const lipColorDisplay = document.getElementById('lip-color-display');
         lipColorDisplay.textContent = `Lip Color: ${this.avatarManager.lipColor}`;
         lipColorDisplay.style.backgroundColor = this.avatarManager.lipColor;
+        console.log('Updated lip color:', this.avatarManager.lipColor);
     }
 
     updateHairColor() {
@@ -75,27 +87,45 @@ class AvatarDisplay {
         if (this.avatarManager.hairColorChanger) {
             hairColorDisplay.textContent = `Hair Color: ${this.avatarManager.hairColorChanger.hairColor}`;
             hairColorDisplay.style.backgroundColor = this.avatarManager.hairColorChanger.hairColor;
+            console.log('Updated hair color:', this.avatarManager.hairColorChanger.hairColor);
         } else {
             hairColorDisplay.textContent = 'Hair Color: Not set';
+            console.log('Hair color not set');
         }
     }
 
     updateAppliedItems() {
+        console.log('Updating applied items');
         const appliedItemsList = document.getElementById('applied-items-list');
         appliedItemsList.innerHTML = '';
-        Object.entries(this.avatarManager.equippedItems).forEach(([type, itemId]) => {
+        const equippedItems = this.avatarManager.equippedItems;
+        console.log('Equipped items:', equippedItems);
+
+        if (Object.keys(equippedItems).length === 0) {
+            console.log('No items equipped');
+            appliedItemsList.innerHTML = '<li>No items equipped</li>';
+            return;
+        }
+
+        Object.entries(equippedItems).forEach(([type, itemId]) => {
+            console.log(`Processing item: ${type} - ${itemId}`);
             const item = window.userInventory.getItems().find(i => i.id === itemId);
             if (item) {
                 const listItem = document.createElement('li');
                 listItem.textContent = `${type}: ${item.name}`;
                 appliedItemsList.appendChild(listItem);
+                console.log(`Added item to list: ${type} - ${item.name}`);
+            } else {
+                console.error(`Item not found in inventory: ${type} - ${itemId}`);
             }
         });
     }
 
     updateUserCoins() {
         const userCoinsDisplay = document.getElementById('user-coins');
-        userCoinsDisplay.textContent = `Coins: ${UserManager.getUserCoins()}`;
+        const coins = UserManager.getUserCoins();
+        userCoinsDisplay.textContent = `Coins: ${coins}`;
+        console.log('Updated user coins:', coins);
     }
 
     getAvatarImageUrl() {
@@ -108,6 +138,7 @@ class AvatarDisplay {
 
 // Initialize the AvatarDisplay when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing AvatarDisplay');
     window.avatarDisplay = new AvatarDisplay();
     window.avatarDisplay.initialize();
 });
