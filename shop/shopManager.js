@@ -5,38 +5,34 @@ class ShopManager {
         this.shopItems = window.shopItems || [];
     }
 
-    renderShopItems() {
-        console.log("Rendering shop items");
-        const shopContainer = document.querySelector('.shop-container');
-        if (!shopContainer) {
-            console.error("Shop container not found");
-            return;
-        }
-        
-        if (this.shopItems.length === 0) {
-            console.warn("No shop items to display");
-            return;
-        }
-
-        shopContainer.innerHTML = ''; // Clear existing items
-
-        this.shopItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'shop-item';
-            itemElement.innerHTML = `
-                <img src="${item.imageSrc}" alt="${item.name}" class="item-image" data-id="${item.id}">
-                <p>${item.name}</p>
-                <p>Price: ${item.price} coins</p>
-                <button class="buy-btn" data-id="${item.id}">Buy</button>
-            `;
-            shopContainer.appendChild(itemElement);
-        });
-        console.log(`Rendered ${this.shopItems.length} shop items`);
-
-        // Add event listeners
-        this.addEventListeners();
+   renderShopItems() {
+    console.log("Rendering shop items");
+    const shopContainer = document.querySelector('.shop-items');
+    if (!shopContainer) {
+        console.error("Shop items container not found");
+        return;
+    }
+    
+    if (!this.shopItems || this.shopItems.length === 0) {
+        console.warn("No shop items to display");
+        return;
     }
 
+    shopContainer.innerHTML = ''; // Clear existing items
+
+    this.shopItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'shop-item';
+        itemElement.innerHTML = `
+            <img src="${item.imageSrc}" alt="${item.name}" class="item-image" data-id="${item.id}">
+            <p>${item.name}</p>
+            <p>Price: ${item.price} coins</p>
+            <button class="buy-btn" data-id="${item.id}">Buy</button>
+        `;
+        shopContainer.appendChild(itemElement);
+    });
+    console.log(`Rendered ${this.shopItems.length} shop items`);
+}
     addEventListeners() {
         const shopContainer = document.querySelector('.shop-container');
         shopContainer.addEventListener('click', (event) => {
