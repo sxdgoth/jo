@@ -435,7 +435,23 @@ blendColors(color1, color2, ratio) {
     }
 }
 
+tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
     
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        // Item is already tried on, so remove it
+        delete this.currentItems[item.type];
+        this.updateAvatarDisplay(item.type, '');
+    } else {
+        // Apply the new item
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    }
+    this.reorderLayers();
+    
+    // Update localStorage
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.currentItems));
+}   
   
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
