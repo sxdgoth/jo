@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const shopItemsContainer = document.querySelector('.shop-items');
     console.log('Shop items container:', shopItemsContainer);
     let currentCategory = 'All';
-    let selectedItems = {};
 
     function renderShopItems() {
         console.log('Rendering shop items. Current category:', currentCategory);
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         updateCategoryButtons();
-        updateSelectedItems();
     }
 
     function updateBuyButtonState(button, itemId) {
@@ -46,40 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleItem(itemId) {
-    console.log('toggleItem called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            console.log('Calling avatarDisplay.tryOnItem');
-            window.avatarDisplay.tryOnItem(item);
-        } else {
-            console.error('avatarDisplay not found or tryOnItem is not a function');
-        }
-        updateSelectedItems();
-    } else {
-        console.error('Item not found for id:', itemId);
-    }
-}
-
-    function updateSelectedItems() {
-        console.log('Updating selected items');
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (selectedItems[item.type] === itemId) {
-                console.log(`Adding 'selected' class to item: ${itemId}`);
-                shopItem.classList.add('selected');
-            } else {
-                console.log(`Removing 'selected' class from item: ${itemId}`);
-                shopItem.classList.remove('selected');
-            }
-        });
-    }
-      
     function buyItem(itemId) {
         console.log('Attempting to buy item:', itemId);
         const item = shopItems.find(i => i.id === itemId);
@@ -112,15 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error updating user coins. Please try again.');
         }
     }
-    
-    function resetAvatarDisplay() {
-        console.log('Resetting avatar display');
-        selectedItems = {};
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
-        }
-        updateSelectedItems();
-    }
 
     function filterItemsByCategory(category) {
         console.log('Filtering items by category:', category);
@@ -148,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemImage = e.target.closest('.item-image');
             const itemId = itemImage.dataset.id;
             console.log('ShopManager: Item clicked:', itemId);
-            toggleItem(itemId);
+            window.itemSelector.toggleItem(itemId);
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             console.log('ShopManager: Buy button clicked:', itemId);
@@ -161,10 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.shopManager = {
-        toggleItem,
         buyItem,
         renderShopItems,
-        resetAvatarDisplay,
         filterItemsByCategory
     };
 
