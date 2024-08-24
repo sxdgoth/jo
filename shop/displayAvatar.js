@@ -359,24 +359,25 @@ class AvatarDisplay {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-   removeItem(type) {
-    console.log(`Removing item of type: ${type}`);
-    if (window.avatarBody) {
-        window.avatarBody.updateLayer(type, '');
-    } else {
-        console.error('AvatarBody not initialized');
+    removeItem(type) {
+        console.log(`Removing item of type: ${type}`);
+        if (window.avatarBody) {
+            window.avatarBody.updateLayer(type, '');
+        } else {
+            console.error('AvatarBody not initialized');
+        }
+        delete this.currentItems[type];
     }
-    delete this.currentItems[type];
-}
 
    updateAvatarDisplay(type, src) {
-    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
-    if (window.avatarBody) {
-        window.avatarBody.updateLayer(type, src);
-    } else {
-        console.error('AvatarBody not initialized');
+        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+        if (window.avatarBody) {
+            window.avatarBody.updateLayer(type, src);
+        } else {
+            console.error('AvatarBody not initialized');
+        }
+        this.currentItems[type] = src;
     }
-}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
@@ -408,10 +409,15 @@ class AvatarDisplay {
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
-    resetTriedOnItems() {
+     resetTriedOnItems() {
         console.log('Resetting tried on items');
-        this.loadEquippedItems();
-        this.loadAvatar();
+        Object.keys(this.currentItems).forEach(type => {
+            this.removeItem(type);
+        });
+        this.currentItems = {};
+        if (window.avatarBody) {
+            window.avatarBody.loadAvatar();
+        }
     }
 }
 
