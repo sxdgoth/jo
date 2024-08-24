@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Initializing ShopManager");
         window.shopManager = new ShopManager(shopItems);
         window.shopManager.renderShopItems();
-
-        // ... (rest of your initialization code)
-    } else {
+        
+     
+   } else {
         console.error("No logged in user found");
         window.location.href = '../index.html';
     }
