@@ -381,61 +381,57 @@ blendColors(color1, color2, ratio) {
         this.reorderLayers();
     }
 
-    removeItem(type) {
-    console.log(`Removing item of type: ${type}`);
-    if (this.layers[type]) {
-        this.layers[type].style.display = 'none';
-        this.layers[type].data = ''; // Clear the source
-    }
-    delete this.currentItems[type];
-    
-    // If this is a base part, make sure it's visible
-    if (this.baseParts.includes(type)) {
-        if (this.layers[type]) {
-            this.layers[type].style.display = 'block';
-            this.layers[type].data = `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`;
+     removeItem(type) {
+        console.log(`Removing item of type: ${type}`);
+        const layerElement = this.svgContainer.querySelector(`g[data-body-part="${type.toLowerCase()}"]`);
+        
+        if (layerElement) {
+            layerElement.style.display = 'none';
+            layerElement.innerHTML = '';
         }
-    } else {
-        // If it's not a base part, check if there's an equipped item to display
-        if (this.equippedItems[type]) {
+        
+        delete this.currentItems[type];
+
+        if (this.baseParts.includes(type)) {
+            // If it's a base part, show the default
+            this.updateAvatarDisplay(type, `${this.baseUrl}home/assets/body/avatar-${type.toLowerCase()}.svg`);
+        } else if (this.equippedItems[type]) {
+            // If there's an equipped item, show it
             const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
             if (equippedItem) {
                 this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
             }
-        } else {
-            // If there's no equipped item, ensure the layer is hidden
-            if (this.layers[type]) {
-                this.layers[type].style.display = 'none';
-            }
         }
+
+        this.layerManager.scheduleReorder();
     }
-    this.reorderLayers(); // Make sure to reorder layers after removing an item
-}
-    updateAvatarDisplay(type, src) {
-    console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
-    if (this.layers[type]) {
+
+    
+     updateAvatarDisplay(type, src) {
+        console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
+        let layerElement = this.svgContainer.querySelector(`g[data-body-part="${type.toLowerCase()}"]`);
+        
+        if (!layerElement) {
+            layerElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            layerElement.setAttribute('data-body-part', type.toLowerCase());
+            this.svgContainer.appendChild(layerElement);
+        }
+
         if (src) {
-            this.layers[type].data = src;
-            this.layers[type].style.display = 'block';
-            this.layers[type].onload = () => {
-                console.log(`AvatarDisplay: Layer ${type} loaded successfully`);
-                this.applySkinTone(this.layers[type], type);
-                if (type === 'Eyes') {
-                    setTimeout(() => this.applySkinTone(this.layers[type], type), 100);
-                }
-            };
-            this.layers[type].onerror = () => {
-                console.error(`AvatarDisplay: Failed to load layer ${type} from ${src}`);
-            };
+            fetch(src)
+                .then(response => response.text())
+                .then(svgContent => {
+                    layerElement.innerHTML = svgContent;
+                    layerElement.style.display = 'block';
+                    this.applySkinTone(layerElement, type);
+                    this.layerManager.scheduleReorder();
+                })
+                .catch(error => console.error(`Failed to load SVG for ${type}:`, error));
         } else {
-            this.layers[type].style.display = 'none';
-            this.layers[type].data = '';
+            layerElement.style.display = 'none';
+            layerElement.innerHTML = '';
         }
-    } else {
-        console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
     }
-    this.reorderLayers(); // Make sure to reorder layers after updating
-}
 
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
