@@ -103,7 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemImage = e.target.closest('.item-image');
             const itemId = itemImage.dataset.id;
             console.log('ShopManager: Item clicked:', itemId);
-            window.itemSelector.toggleItem(itemId);
+            if (window.itemSelector) {
+                window.itemSelector.toggleItem(itemId);
+            } else {
+                console.error('ItemSelector not initialized');
+            }
         } else if (e.target.classList.contains('buy-btn')) {
             const itemId = e.target.dataset.id;
             console.log('ShopManager: Buy button clicked:', itemId);
