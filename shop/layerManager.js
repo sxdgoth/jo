@@ -1,6 +1,6 @@
 class LayerManager {
-    constructor() {
-        this.svgContainer = document.getElementById('body-svg');
+    constructor(svgContainer) {
+        this.svgContainer = svgContainer;
         this.layerOrder = [
             'legs', 
             'arms', 
