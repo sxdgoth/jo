@@ -6,11 +6,6 @@ class ShopAvatarDisplay extends AvatarDisplay {
         this.triedOnItems = {};
     }
 
-    loadAvatar() {
-        console.log("Loading avatar in ShopAvatarDisplay");
-        super.loadAvatar();
-    }
-
     tryOnItem(item) {
         console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
@@ -20,7 +15,7 @@ class ShopAvatarDisplay extends AvatarDisplay {
         } else {
             // Apply the new item
             this.triedOnItems[item.type] = item;
-            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+            this.updateAvatarDisplay(item.type, `${item.path}${item.id}`);
         }
         this.reorderLayers();
     }
@@ -31,9 +26,9 @@ class ShopAvatarDisplay extends AvatarDisplay {
         
         // Revert to equipped item if exists
         if (this.equippedItems[type]) {
-            const equippedItem = window.shopItems.find(item => item.id === this.equippedItems[type]);
+            const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
             if (equippedItem) {
-                this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+                this.updateAvatarDisplay(type, `${equippedItem.path}${equippedItem.id}`);
             }
         } else {
             // If no equipped item, hide the layer
