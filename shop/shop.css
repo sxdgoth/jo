@@ -274,9 +274,27 @@ main {
 
 
 
-#clearSelectedItems {
-    margin-top: 10px;
-    margin-bottom: 20px;
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#reset-avatar-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#reset-avatar-button:hover {
+    background-color: #d32f2f;
 }
 
 @media (max-width: 768px) {
@@ -285,3 +303,6 @@ main {
         margin-bottom: 20px;
     }
 }
+
+
+
