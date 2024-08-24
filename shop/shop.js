@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createUserInventory(loggedInUser.username);
 
         // Initialize ShopAvatarDisplay
+        console.log('Initializing ShopAvatarDisplay');
         window.shopAvatarDisplay = new ShopAvatarDisplay('avatar-display', loggedInUser.username);
         window.shopAvatarDisplay.loadAvatar();
 
@@ -20,14 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.shopManager = new ShopManager(shopItems);
         window.shopManager.renderShopItems();
 
-        // Add reset button for tried-on items
-        addResetButton();
-
-        // Add event listeners for category buttons
-        addCategoryListeners();
-
-        // Initialize inventory state
-        initializeInventoryState();
+        // ... (rest of your initialization code)
     } else {
         console.error("No logged in user found");
         window.location.href = '../index.html';
