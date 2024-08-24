@@ -75,12 +75,12 @@
             border-color: #007bff;
             background-color: #e6f2ff;
         }
-    </style>
+   </style>
 </head>
 <body>
     <main>
         <div class="avatar-container">
-            <div id="avatar-display"></div>
+            <div id="avatar-display" style="width: 200px; height: 400px;"></div>
         </div>
         <div class="shop-section">
             <h2>Shop Items</h2>
@@ -93,17 +93,16 @@
     </main>
 
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
-    <script>
-        const avatarDisplay = document.getElementById('avatar-display');
+    <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
+   <script>
         const shopItemsContainer = document.getElementById('shop-items');
-        const baseUrl = 'https://sxdgoth.github.io/jo/';
         let currentItems = {};
 
         function createShopItem(item) {
             const shopItem = document.createElement('div');
             shopItem.className = 'shop-item';
             shopItem.innerHTML = `
-                <img src="${baseUrl}${item.path}${item.id}" alt="${item.name}">
+                <img src="https://sxdgoth.github.io/jo/${item.path}${item.id}" alt="${item.name}">
                 <p>${item.name}</p>
                 <p>Price: $${item.price}</p>
             `;
@@ -115,24 +114,13 @@
             if (currentItems[item.type] === item.id) {
                 // Unselect item
                 delete currentItems[item.type];
-                updateAvatarDisplay(item.type, '');
+                window.avatarBody.updateLayer(item.type, '');
             } else {
                 // Select item
                 currentItems[item.type] = item.id;
-                updateAvatarDisplay(item.type, `${baseUrl}${item.path}${item.id}`);
+                window.avatarBody.updateLayer(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
             }
             updateShopItemSelection();
-        }
-
-        function updateAvatarDisplay(type, src) {
-            let layer = avatarDisplay.querySelector(`[data-type="${type}"]`);
-            if (!layer) {
-                layer = document.createElement('img');
-                layer.dataset.type = type;
-                avatarDisplay.appendChild(layer);
-            }
-            layer.src = src;
-            layer.style.display = src ? 'block' : 'none';
         }
 
         function updateShopItemSelection() {
@@ -148,9 +136,11 @@
         }
 
         // Initialize shop items
-        shopItems.forEach(item => {
-            const shopItem = createShopItem(item);
-            shopItemsContainer.appendChild(shopItem);
+        document.addEventListener('DOMContentLoaded', function() {
+            shopItems.forEach(item => {
+                const shopItem = createShopItem(item);
+                shopItemsContainer.appendChild(shopItem);
+            });
         });
     </script>
 </body>
