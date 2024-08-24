@@ -367,7 +367,8 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-
+   
+  
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
@@ -393,33 +394,44 @@ blendColors(color1, color2, ratio) {
     }
 }
 
-    tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // Item is already tried on, so remove it
-        delete this.currentItems[item.type];
-        this.updateAvatarDisplay(item.type, '');
-    } else {
-        // Apply the new item
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    toggleEquippedItem(type) {
+        if (this.layers[type] && this.equippedItems[type]) {
+            if (this.layers[type].style.display === 'none') {
+                const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
+                if (equippedItem) {
+                    this.layers[type].data = `${this.baseUrl}${equippedItem.path}${equippedItem.id}`;
+                    this.layers[type].style.display = 'block';
+                    this.lastAction[type] = 'shown';
+                    this.hiddenEquippedItems.delete(type);
+                    this.layers[type].onload = () => {
+                        this.applySkinTone(this.layers[type], type);
+                    };
+                }
+            } else {
+                this.layers[type].style.display = 'none';
+                this.lastAction[type] = 'hidden';
+                this.hiddenEquippedItems.add(type);
+            }
+        }
     }
-    this.reorderLayers();
-}
+
+    isItemEquipped(item) {
+        return this.equippedItems[item.type] === item.id;
+    }
 
     updateEquippedItems() {
-    this.equippedItems = { ...this.currentItems };
-    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
-}
+        const savedItems = localStorage.getItem(`equippedItems_${this.username}`);
+        this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
+    }
 
-    function toggleItem(item) {
-    if (window.avatarDisplay) {
-        window.avatarDisplay.tryOnItem(item);
-        window.avatarDisplay.updateEquippedItems();
-        updateShopItemSelection();
-    } else {
-        console.error('avatarDisplay not found');
+    resetTriedOnItems() {
+        console.log('Resetting tried on items');
+        Object.keys(this.currentItems).forEach(type => {
+            this.removeItem(type);
+        });
+        this.currentItems = {};
+        this.loadEquippedItems();
+        this.loadAvatar();
     }
 }
 
