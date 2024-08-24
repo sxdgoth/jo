@@ -23,7 +23,16 @@ function toggleItem(item, shopItemElement) {
             delete currentItems[item.type];
             shopItemElement.classList.remove('selected');
         } else {
-            // If the item is not selected, add it
+            // If a different item of the same type is already selected, remove it first
+            if (currentItems[item.type]) {
+                const oldItem = currentItems[item.type];
+                const oldShopItem = findShopItemElement(oldItem);
+                if (oldShopItem) {
+                    oldShopItem.classList.remove('selected');
+                }
+            }
+            
+            // Add the new item
             window.avatarDisplay.updateAvatarDisplay(item.type, `https://sxdgoth.github.io/jo/${item.path}${item.id}`);
             currentItems[item.type] = item;
             shopItemElement.classList.add('selected');
@@ -32,6 +41,13 @@ function toggleItem(item, shopItemElement) {
     } else {
         console.error('avatarDisplay not found');
     }
+}
+
+function findShopItemElement(item) {
+    return Array.from(shopItemsContainer.querySelectorAll('.shop-item')).find(shopItem => {
+        const itemName = shopItem.querySelector('p').textContent;
+        return itemName === item.name;
+    });
 }
 
 function updateShopItemSelection() {
