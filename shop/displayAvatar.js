@@ -369,7 +369,7 @@ blendColors(color1, color2, ratio) {
 
    
   
-    updateAvatarDisplay(type, src) {
+  updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
         if (src) {
@@ -392,6 +392,7 @@ blendColors(color1, color2, ratio) {
     } else {
         console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
     }
+    this.reorderLayers();
 }
 
     toggleEquippedItem(type) {
