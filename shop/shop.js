@@ -98,7 +98,10 @@ function buyItem(itemId) {
             updateUserCoinsAfterPurchase(newCoins);
 
             // Add item to user's inventory
-            onItemPurchased(item);
+            if (window.userInventory) {
+                window.userInventory.addItem(item);
+                console.log(`Item ${item.name} added to inventory`);
+            }
 
             // Update the shop display
             if (window.shopManager) {
@@ -108,7 +111,7 @@ function buyItem(itemId) {
             console.log(`Item ${item.name} purchased successfully!`);
         } else {
             console.log("Not enough coins to purchase this item.");
-            // You might want to show this message to the user in the UI
+            alert("Not enough coins to purchase this item.");
         }
     }
 }
