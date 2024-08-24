@@ -31,10 +31,17 @@ class ShopManager {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopContainer.appendChild(itemElement);
+            this.applyItemPosition(itemElement.querySelector('.item-image'), item.type);
         });
         console.log(`Rendered ${itemsToRender.length} shop items`);
 
         this.addEventListeners();
+    }
+
+    applyItemPosition(itemElement, itemType) {
+        if (window.applyItemPosition) {
+            window.applyItemPosition(itemElement, itemType);
+        }
     }
 
     addEventListeners() {
@@ -53,8 +60,8 @@ class ShopManager {
     toggleItem(itemId) {
         console.log('Toggling item:', itemId);
         const item = this.shopItems.find(i => i.id === itemId);
-        if (item && window.avatarDisplay) {
-            window.avatarDisplay.tryOnItem(item);
+        if (item && window.shopAvatarDisplay) {
+            window.shopAvatarDisplay.tryOnItem(item);
         }
     }
 
@@ -64,8 +71,8 @@ class ShopManager {
     }
 
     resetAvatarDisplay() {
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
+        if (window.shopAvatarDisplay) {
+            window.shopAvatarDisplay.resetTriedOnItems();
         }
     }
 
