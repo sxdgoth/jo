@@ -434,6 +434,7 @@ blendColors(color1, color2, ratio) {
     } else {
         console.warn(`AvatarDisplay: Layer not found for type: ${type}`);
     }
+    this.reorderLayers(); // Make sure to reorder layers after updating
 }
 
     toggleEquippedItem(type) {
