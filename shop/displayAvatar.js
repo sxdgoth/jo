@@ -393,6 +393,36 @@ blendColors(color1, color2, ratio) {
     }
 }
 
+    tryOnItem(item) {
+    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+    
+    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+        // Item is already tried on, so remove it
+        delete this.currentItems[item.type];
+        this.updateAvatarDisplay(item.type, '');
+    } else {
+        // Apply the new item
+        this.currentItems[item.type] = item;
+        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+    }
+    this.reorderLayers();
+}
+
+    updateEquippedItems() {
+    this.equippedItems = { ...this.currentItems };
+    localStorage.setItem(`equippedItems_${this.username}`, JSON.stringify(this.equippedItems));
+}
+
+    function toggleItem(item) {
+    if (window.avatarDisplay) {
+        window.avatarDisplay.tryOnItem(item);
+        window.avatarDisplay.updateEquippedItems();
+        updateShopItemSelection();
+    } else {
+        console.error('avatarDisplay not found');
+    }
+}
+
 // Initialize the avatar display when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, initializing AvatarDisplay");
