@@ -369,15 +369,23 @@ blendColors(color1, color2, ratio) {
 
    tryOnItem(item) {
     console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    // If the item is already tried on, remove it
+
+    // If the item is already tried on, remove it and show the equipped item (if any)
     if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
         this.removeItem(item.type);
+        // Check if there's an equipped item for this type
+        if (this.equippedItems[item.type]) {
+            const equippedItem = shopItems.find(i => i.id === this.equippedItems[item.type]);
+            if (equippedItem) {
+                this.updateAvatarDisplay(item.type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
+            }
+        }
     } else {
         // Apply the new item
         this.currentItems[item.type] = item;
         this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
     }
+
     this.reorderLayers();
 }
 
@@ -388,7 +396,7 @@ blendColors(color1, color2, ratio) {
         this.layers[type].data = ''; // Clear the source
     }
     delete this.currentItems[type];
-    
+
     // If this is not a base part, check if there's an equipped item to display
     if (!this.baseParts.includes(type) && this.equippedItems[type]) {
         const equippedItem = shopItems.find(item => item.id === this.equippedItems[type]);
@@ -396,7 +404,7 @@ blendColors(color1, color2, ratio) {
             this.updateAvatarDisplay(type, `${this.baseUrl}${equippedItem.path}${equippedItem.id}`);
         }
     }
-    
+
     // Ensure base parts are always visible
     this.baseParts.forEach(basePart => {
         if (this.layers[basePart]) {
@@ -404,6 +412,7 @@ blendColors(color1, color2, ratio) {
         }
     });
 }
+    
     updateAvatarDisplay(type, src) {
     console.log(`AvatarDisplay: Updating avatar display for ${type} with src: ${src}`);
     if (this.layers[type]) {
