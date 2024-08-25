@@ -63,7 +63,7 @@ main {
     border-radius: 10px;
     display: flex;
     gap: 20px;
-    height: calc(100vh - 220px); /* Adjusted for potential title space */
+    height: calc(100vh - 220px);
 }
 
 .avatar-and-clear {
@@ -75,7 +75,7 @@ main {
 
 .avatar-container {
     width: 100%;
-    height: calc(100% - 60px); /* Adjust based on the height of your reset button */
+    height: calc(100% - 60px);
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
@@ -101,22 +101,18 @@ main {
 }
 
 .shop-section h2 {
-    margin: 0;
+    margin: 0 0 15px 0;
     padding: 10px 0;
     font-size: 22px;
     color: #4CAF50;
     text-align: center;
-    background-color: #e8f5e9;
-    border-bottom: 2px solid #4CAF50;
-    border-radius: 8px 8px 0 0;
 }
 
 .shop-items-container {
     flex: 1;
     overflow-y: auto;
     border: 1px solid #e0e0e0;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 8px;
     background-color: #f9f9f9;
 }
 
