@@ -58,15 +58,21 @@ main {
     gap: 20px;
 }
 
+.avatar-and-clear {
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .avatar-container {
-    flex: 0 0 300px;
+    width: 100%;
+    height: 600px;
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 400px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: hidden;
@@ -74,11 +80,9 @@ main {
 }
 
 #avatar-display {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: 300px;
+    height: 550px;
+    position: relative;
 }
 
 .shop-section {
@@ -204,38 +208,10 @@ main {
     background: #555;
 }
 
-@media (max-width: 768px) {
-    main {
-        flex-direction: column;
-    }
-
-    .avatar-container {
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .shop-items-container {
-        max-height: 600px;
-    }
-
-    .shop-items {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
-
-    .shop-item {
-        height: 200px;
-    }
-
-    .item-image {
-        height: 100px;
-    }
-}
-
 .shop-item.highlighted {
-  border: 2px solid #007bff;
+    border: 2px solid #007bff;
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
-
 
 .category-buttons-container {
     display: flex;
@@ -245,7 +221,7 @@ main {
     padding: 10px;
     background-color: #f5f5f5;
     border-radius: 5px;
-    max-width: 1200px; /* Adjust this value to match your shop container width */
+    max-width: 1200px;
 }
 
 .category-btn {
@@ -270,11 +246,6 @@ main {
     border-color: #4CAF50;
 }
 
-
-
-
-
-
 #reset-avatar-button {
     display: block;
     margin: 10px auto;
@@ -292,4 +263,50 @@ main {
     background-color: #d32f2f;
 }
 
+@media (max-width: 1200px) {
+    main {
+        flex-direction: column;
+    }
 
+    .avatar-and-clear {
+        flex: none;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .avatar-container {
+        height: 500px;
+    }
+
+    #avatar-display {
+        width: 250px;
+        height: 450px;
+    }
+}
+
+@media (max-width: 768px) {
+    .avatar-container {
+        height: 400px;
+    }
+
+    #avatar-display {
+        width: 200px;
+        height: 350px;
+    }
+
+    .shop-items-container {
+        max-height: 600px;
+    }
+
+    .shop-items {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .shop-item {
+        height: 200px;
+    }
+
+    .item-image {
+        height: 100px;
+    }
+}
