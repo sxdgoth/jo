@@ -1,7 +1,7 @@
 // shopItems.js
 
 const shopItems = [
-    { id: 'avatar-jacket.svg', name: 'Jacket', type: 'Jacket', price: 100, path: 'home/assets/shirts/' },
+    { id: 'avatar-jacket.svg', name: 'Hoodie lol', type: 'Hoodie', price: 100, path: 'home/assets/shirts/' },
     { id: 'mostvaluableshirt.svg', name: 'Most Valuable Shirt', type: 'Shirt', price: 200, path: 'home/assets/shirts/' },
     { id: 'hrshirt.svg', name: 'HR Represent Shirt', type: 'Shirt', price: 100, path: 'home/assets/shirts/' },
     { id: 'svgexport-23.svg', name: 'Hemlock Snakeflame Shorts', type: 'Pants', price: 180, path: 'home/assets/pants/' },
