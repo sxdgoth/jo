@@ -7,65 +7,72 @@
     <link rel="stylesheet" href="https://sxdgoth.github.io/jo/wardrobe/wardrobe.css">
 </head>
 <body>
-   <header>
-    <div id="user-info">
-        <span id="user-greeting">Hello, <span id="user-name"></span>!</span>
-        <span id="user-coins">Coins: <span id="coins-value"></span></span>
+    <header>
+        <div id="user-info">
+            <span id="user-greeting">Hello, <span id="user-name"></span>!</span>
+            <span id="user-coins">Coins: <span id="coins-value"></span></span>
+        </div>
+        <nav>
+            <a href="https://sxdgoth.github.io/jo/home/index.html" class="nav-button">Home</a>
+            <a href="https://sxdgoth.github.io/jo/shop/index.html" class="nav-button">Shop</a>
+            <button onclick="logout()" class="nav-button">Logout</button>
+        </nav>
+    </header>
+
+    <div class="category-buttons-container">
+        <button class="category-btn active" data-category="All">All</button>
+        <button class="category-btn" data-category="Hair">Hair</button>
+        <button class="category-btn" data-category="Eyes">Eyes</button>
+        <button class="category-btn" data-category="Mouth">Mouth</button>
+        <button class="category-btn" data-category="Nose">Nose</button>
+        <button class="category-btn" data-category="Eyebrows">Eyebrows</button>
+        <button class="category-btn" data-category="Cheeks">Cheeks</button>
+        <button class="category-btn" data-category="Shirt">Shirts</button>
+        <button class="category-btn" data-category="Hoodie">Hoodies</button>
+        <button class="category-btn" data-category="Pants">Pants</button>
+        <button class="category-btn" data-category="Dress">Dresses</button>
+        <button class="category-btn" data-category="Shoes">Shoes</button>
+        <button class="category-btn" data-category="Accessories">Accessories</button>
     </div>
-    <nav>
-        <a href="https://sxdgoth.github.io/jo/home/index.html" class="nav-button">Home</a>
-        <a href="https://sxdgoth.github.io/jo/shop/index.html" class="nav-button">Shop</a>
-        <button onclick="logout()" class="nav-button">Logout</button>
-    </nav>
-    </div>
+
     <main>
-       <div class="avatar-section">
-    <div class="avatar-container">
-        <div id="avatar-display"></div>
-    </div>
-    <div class="avatar-buttons">
-        <button id="apply-avatar-btn">Apply</button>
-        <button id="clear-avatar-btn">Clear</button>
-    </div>
-           <div id="eye-color-picker">
-    <label for="eye-color-input">Color:</label>
-    <input type="color" id="eye-color-input" value="#3FA2FF">
-</div>
-           <div id="lip-color-picker">
-    <label for="lip-color-input">Lip Color:</label>
-    <input type="color" id="lip-color-input" value="#E6998F">
-</div>
-
-
-
-<div>
-    <label for="color-picker">Choose hair color:</label>
-    <input type="color" id="color-picker" value="#1E1E1E">
-</div>
-
-
-
-
-
-
-           
-           
-    <div id="skin-tone-buttons">
-        <button class="skin-tone-button" data-tone="light" title="Light"></button>
-        <button class="skin-tone-button" data-tone="medium" title="Medium"></button>
-        <button class="skin-tone-button" data-tone="tan" title="Tan"></button>
-        <button class="skin-tone-button" data-tone="dark" title="Dark"></button>
-    </div>
-           
-           
-</div>
+        <div class="avatar-and-clear">
+            <div class="avatar-container">
+                <div id="avatar-display"></div>
+            </div>
+            <div class="avatar-buttons">
+                <button id="apply-avatar-btn">Apply</button>
+                <button id="clear-avatar-btn">Clear</button>
+            </div>
+            <div id="eye-color-picker">
+                <label for="eye-color-input">Eye Color:</label>
+                <input type="color" id="eye-color-input" value="#3FA2FF">
+            </div>
+            <div id="lip-color-picker">
+                <label for="lip-color-input">Lip Color:</label>
+                <input type="color" id="lip-color-input" value="#E6998F">
+            </div>
+            <div id="hair-color-picker">
+                <label for="color-picker">Hair Color:</label>
+                <input type="color" id="color-picker" value="#1E1E1E">
+            </div>
+            <div id="skin-tone-buttons">
+                <button class="skin-tone-button" data-tone="light" title="Light"></button>
+                <button class="skin-tone-button" data-tone="medium" title="Medium"></button>
+                <button class="skin-tone-button" data-tone="tan" title="Tan"></button>
+                <button class="skin-tone-button" data-tone="dark" title="Dark"></button>
+            </div>
+        </div>
         <div class="wardrobe-section">
             <h2>Your Items</h2>
-            <div class="wardrobe-items">
-                <!-- Owned items will be dynamically added here -->
+            <div class="wardrobe-items-container">
+                <div class="wardrobe-items">
+                    <!-- Owned items will be dynamically added here -->
+                </div>
             </div>
         </div>
     </main>
+
     <!-- Scripts -->
     <script src="https://sxdgoth.github.io/jo/shop/inventory.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/avatarTemplate.js"></script>
@@ -76,14 +83,7 @@
     <script src="https://sxdgoth.github.io/jo/wardrobe/wardrobe.js"></script>
     <script src="https://sxdgoth.github.io/jo/wardrobe/eyeColorChanger.js"></script>
     <script src="https://sxdgoth.github.io/jo/wardrobe/avatarActions.js"></script>
-    <script src="https://sxdgoth.github.io/jo/wardrobe/hairColorChanger.js"></script>  
-
+    <script src="https://sxdgoth.github.io/jo/wardrobe/hairColorChanger.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/itemPositioning.js"></script>
-    
-
-
-
-
-    
 </body>
 </html>
