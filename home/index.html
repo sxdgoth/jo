@@ -1,34 +1,61 @@
-he<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Home - Avatar Shop</title>
     <link rel="stylesheet" href="home.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Avatar Shop</h1>
-        <div id="user-info">
-            <span>Welcome, <span id="user-name"></span>!</span>
-            <span>Coins: <span id="user-coins"></span></span>
-        </div>
-       <button onclick="logout()">Logout</button>
-    </header>
-<div id="avatar-display" style="width: 200px; height: 400px;"></div>
-   <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
-<script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
+    <div class="container">
+        <header>
+            <h1>Welcome to the Avatar Shop</h1>
+            <div id="user-info">
+                <span>Welcome, <span id="user-name"></span>!</span>
+                <span>Coins: <span id="user-coins"></span></span>
+            </div>
+        </header>
+
+        <main>
+            <div id="avatar-display"></div>
+        </main>
+
+        <nav>
+            <button onclick="goToWardrobe()">Wardrobe</button>
+            <button onclick="goToShop()">Shop</button>
+            <button onclick="logout()">Logout</button>
+        </nav>
+    </div>
+
+    <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
+    <script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/logout.js"></script>
-<script>
+ <script>
     document.addEventListener('DOMContentLoaded', function() {
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
         if (!loggedInUser) {
-            // If no user is logged in, redirect back to the login page
             window.location.href = '../index.html';
         } else {
-            // Display user information
             document.getElementById('user-name').textContent = loggedInUser.username;
             document.getElementById('user-coins').textContent = loggedInUser.coins;
         }
     });
+
+    function goToWardrobe() {
+        window.location.href = 'https://sxdgoth.github.io/jo/wardrobe/';
+    }
+
+    function goToShop() {
+        window.location.href = 'https://sxdgoth.github.io/jo/shop/';
+    }
+
+    function logout() {
+        // Your existing logout logic here
+        // After logout, redirect to the login page
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href = '../index.html';
+    }
 </script>
+    
+</body>
+</html>
