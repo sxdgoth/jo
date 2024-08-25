@@ -3,59 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Avatar Shop</title>
+    <title>Home</title>
     <link rel="stylesheet" href="home.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #avatar-display {
+            width: 150px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        nav {
+            margin-top: 20px;
+        }
+        button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Welcome to the Avatar Shop</h1>
-            <div id="user-info">
-                <span>Welcome, <span id="user-name"></span>!</span>
-                <span>Coins: <span id="user-coins"></span></span>
-            </div>
-        </header>
+    <header>
+        <h1>Welcome to the Avatar Shop</h1>
+        <div id="user-info">
+            <span>Welcome, <span id="user-name"></span>!</span>
+            <span>Coins: <span id="user-coins"></span></span>
+        </div>
+    </header>
 
-        <main>
-            <div id="avatar-display" style="width: 200px; height: 400px;"></div>
-        </main>
+    <div id="avatar-display"></div>
 
-        <nav>
-            <button onclick="goToWardrobe()">Wardrobe</button>
-            <button onclick="goToShop()">Shop</button>
-            <button onclick="logout()">Logout</button>
-        </nav>
-    </div>
+    <nav>
+        <button onclick="goToWardrobe()">Wardrobe</button>
+        <button onclick="goToShop()">Shop</button>
+        <button onclick="logout()">Logout</button>
+    </nav>
 
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
-    <script src="https://sxdgoth.github.io/jo/logout.js"></script>
- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (!loggedInUser) {
-            window.location.href = '../index.html';
-        } else {
-            document.getElementById('user-name').textContent = loggedInUser.username;
-            document.getElementById('user-coins').textContent = loggedInUser.coins;
+    <script src="https://sxdgoth.github.io/jo/shop/logout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedInUser) {
+                window.location.href = '../index.html';
+            } else {
+                document.getElementById('user-name').textContent = loggedInUser.username;
+                document.getElementById('user-coins').textContent = loggedInUser.coins;
+            }
+        });
+
+        function goToWardrobe() {
+            window.location.href = 'https://sxdgoth.github.io/jo/wardrobe/';
         }
-    });
 
-    function goToWardrobe() {
-        window.location.href = 'https://sxdgoth.github.io/jo/wardrobe/';
-    }
-
-    function goToShop() {
-        window.location.href = 'https://sxdgoth.github.io/jo/shop/';
-    }
-
-    function logout() {
-        // Your existing logout logic here
-        // After logout, redirect to the login page
-        sessionStorage.removeItem('loggedInUser');
-        window.location.href = '../index.html';
-    }
-</script>
-    
+        function goToShop() {
+            window.location.href = 'https://sxdgoth.github.io/jo/shop/';
+        }
+    </script>
 </body>
 </html>
