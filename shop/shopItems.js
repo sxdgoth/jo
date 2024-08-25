@@ -23,7 +23,7 @@ const shopItems = [
     { id: 'shorthairsnowflake.svg', name: 'Short Snowflake Hair', type: 'Hair', price: 150, path: 'home/assets/hair/' },
     { id: 'basementbuns.svg', name: 'Basement Buns', type: 'Hair', price: 180, path: 'output/' },
     { id: 'chromemarkrifle.svg', name: 'Chrome Mark Rifle', type: 'Accessories', price: 100, path: 'home/assets/accessories/' },
-    { id: 'pbhhoodie.svg', name: 'PBH Hoodie', type: 'Jacket', price: 100, path: 'home/assets/jacket/' },
+    { id: 'pbhhoodie.svg', name: 'PBH Hoodie', type: 'Hoodie', price: 100, path: 'home/assets/jacket/' },
     // Add more items as needed
 ];
 
