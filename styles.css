@@ -15,8 +15,17 @@ body {
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     text-align: center;
-    max-width: 350px;
+    max-width: 800px;
     width: 100%;
+}
+
+.form-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+#register-form, #login-form {
+    width: 45%;
 }
 
 h2 {
