@@ -113,6 +113,7 @@ class AvatarDisplay {
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
             { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+            { name: 'Hoodie', file: '', type: 'Hoodie', isBase: false },
             { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
             { name: 'Pants', file: '', type: 'Pants', isBase: false },
             { name: 'Shoes', file: '', type: 'Shoes', isBase: false },
