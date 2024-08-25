@@ -1,28 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing shop');
-
     const shopItemsContainer = document.querySelector('.shop-items');
-
     console.log('Shop items container:', shopItemsContainer);
-
     let currentCategory = 'All';
     let selectedItems = {};
-
-    function selectItem(itemElement, itemId) {
-        const item = shopItems.find(i => i.id === itemId);
-        if (!item) return;
-
-        // Remove 'selected' class from all items of the same type
-        document.querySelectorAll(`.shop-item[data-type="${item.type}"]`).forEach(item => {
-            item.classList.remove('selected');
-        });
-
-        // Add 'selected' class to the clicked item
-        itemElement.classList.add('selected');
-
-        // Update selectedItems
-        selectedItems[item.type] = itemId;
-    }
 
     function renderShopItems() {
         console.log('Rendering shop items. Current category:', currentCategory);
@@ -36,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Rendering item:', item.name);
             const itemElement = document.createElement('div');
             itemElement.classList.add('shop-item');
-            itemElement.dataset.type = item.type;
             const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
             itemElement.innerHTML = `
                 <div class="item-image" data-id="${item.id}">
@@ -47,23 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="buy-btn" data-id="${item.id}">Buy</button>
             `;
             shopItemsContainer.appendChild(itemElement);
-
             const buyButton = itemElement.querySelector('.buy-btn');
             updateBuyButtonState(buyButton, item.id);
-
             const imgElement = itemElement.querySelector('.item-image img');
             if (window.applyItemPosition) {
                 window.applyItemPosition(imgElement, item.type.toLowerCase());
             }
-
-   // Check if this item is selected and add the 'selected' class if it is
-            if (selectedItems[item.type] === item.id) {
-                itemElement.classList.add('selected');
-            }
         });
         updateCategoryButtons();
+        updateSelectedItems();
     }
-    
+
     function updateBuyButtonState(button, itemId) {
         if (window.userInventory && window.userInventory.hasItem(itemId)) {
             button.textContent = 'Owned';
@@ -73,25 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleItem(itemId) {
-        console.log('toggleItem called with itemId:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-                console.log('Calling avatarDisplay.tryOnItem');
-                window.avatarDisplay.tryOnItem(item);
-            } else {
-                console.error('avatarDisplay not found or tryOnItem is not a function');
-            }
-
-            // Select the item
-            const itemElement = document.querySelector(`.shop-item .item-image[data-id="${itemId}"]`).closest('.shop-item');
-            selectItem(itemElement, itemId);
+    console.log('toggleItem called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            console.log('Calling avatarDisplay.tryOnItem');
+            window.avatarDisplay.tryOnItem(item);
         } else {
-            console.error('Item not found for id:', itemId);
+            console.error('avatarDisplay not found or tryOnItem is not a function');
         }
+        updateSelectedItems();
+    } else {
+        console.error('Item not found for id:', itemId);
     }
-
+}
 
     function updateSelectedItems() {
         console.log('Updating selected items');
@@ -109,7 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-      function buyItem(itemId) {
+      
+    function buyItem(itemId) {
         console.log('Attempting to buy item:', itemId);
         const item = shopItems.find(i => i.id === itemId);
         if (!item) {
@@ -169,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
             coinsDisplay.textContent = newCoins;
         }
     }
-     // Event delegation for item clicks
+
+    // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
         if (e.target.closest('.item-image')) {
