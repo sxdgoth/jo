@@ -59,30 +59,32 @@
     <script src="https://sxdgoth.github.io/jo/shop/itemPositioning.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shopManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shop.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (loggedInUser) {
-                document.getElementById('user-name').textContent = loggedInUser.username;
-                document.getElementById('coins-value').textContent = loggedInUser.coins;
-                
-                // Set up the reset button
-                const resetButton = document.getElementById('reset-avatar-button');
-                if (resetButton) {
-                    resetButton.addEventListener('click', function() {
-                        if (window.avatarDisplay && typeof window.avatarDisplay.clearSelectedItems === 'function') {
-                            window.avatarDisplay.clearSelectedItems();
-                        } else {
-                            console.error('avatarDisplay not found or clearSelectedItems is not a function');
-                        }
-                    });
+   <script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded');
+    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+        console.log('Logged in user found:', loggedInUser.username);
+        
+        // Set up the reset button
+        const resetButton = document.getElementById('reset-avatar-button');
+        if (resetButton) {
+            console.log('Reset button found');
+            resetButton.addEventListener('click', function() {
+                console.log('Reset button clicked');
+                if (window.avatarDisplay && typeof window.avatarDisplay.clearSelectedItems === 'function') {
+                    window.avatarDisplay.clearSelectedItems();
                 } else {
-                    console.warn('Reset button not found');
+                    console.error('avatarDisplay not found or clearSelectedItems is not a function');
                 }
-            } else {
-                console.error('No logged in user found');
-            }
-        });
-    </script>
+            });
+        } else {
+            console.warn('Reset button not found');
+        }
+    } else {
+        console.error('No logged in user found');
+    }
+});
+</script>
 </body>
 </html>
