@@ -9,8 +9,8 @@ body {
 }
 
 header {
-    background-color: #ffffff;
-    color: #333;
+    background-color: #4CAF50;
+    color: white;
     padding: 15px;
     text-align: center;
 }
@@ -28,7 +28,7 @@ header {
 }
 
 #user-coins {
-    color: #333;
+    color: #FFD700;
     font-weight: bold;
 }
 
@@ -40,7 +40,7 @@ nav {
     display: inline-block;
     padding: 8px 12px;
     margin: 0 3px;
-    background-color: #4CAF50;
+    background-color: #45a049;
     color: white;
     text-decoration: none;
     border: none;
@@ -51,7 +51,7 @@ nav {
 }
 
 .nav-button:hover {
-    background-color: #45a049;
+    background-color: #3d8b3d;
 }
 
 main {
@@ -66,7 +66,7 @@ main {
     height: calc(100vh - 220px);
 }
 
-.avatar-section {
+.avatar-and-clear {
     flex: 0 0 350px;
     display: flex;
     flex-direction: column;
@@ -105,15 +105,15 @@ main {
     padding: 8px 16px;
     font-size: 14px;
     cursor: pointer;
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
     border-radius: 4px;
     transition: background-color 0.3s;
 }
 
 .avatar-buttons button:hover {
-    background-color: #e0e0e0;
+    background-color: #45a049;
 }
 
 .wardrobe-section {
@@ -127,7 +127,7 @@ main {
     margin: 0 0 10px 0;
     padding: 5px 0;
     font-size: 18px;
-    color: #333;
+    color: #4CAF50;
     text-align: center;
 }
 
@@ -212,7 +212,7 @@ main {
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
-#skin-tone-buttons, #eye-color-picker, #lip-color-picker {
+#skin-tone-buttons, #eye-color-picker, #lip-color-picker, #hair-color-picker {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -239,7 +239,7 @@ main {
     box-shadow: 0 0 5px #ff4500;
 }
 
-#eye-color-input, #lip-color-input {
+#eye-color-input, #lip-color-input, #color-picker {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -250,14 +250,47 @@ main {
     cursor: pointer;
 }
 
-#eye-color-input::-webkit-color-swatch, #lip-color-input::-webkit-color-swatch {
+#eye-color-input::-webkit-color-swatch, #lip-color-input::-webkit-color-swatch, #color-picker::-webkit-color-swatch {
     border-radius: 50%;
     border: 2px solid #ddd;
 }
 
-#eye-color-input::-moz-color-swatch, #lip-color-input::-moz-color-swatch {
+#eye-color-input::-moz-color-swatch, #lip-color-input::-moz-color-swatch, #color-picker::-moz-color-swatch {
     border-radius: 50%;
     border: 2px solid #ddd;
+}
+
+.category-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    max-width: 1200px;
+}
+
+.category-btn {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 14px;
+}
+
+.category-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.category-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
 }
 
 /* Scrollbar styles */
@@ -283,7 +316,7 @@ main {
         flex-direction: column;
         height: auto;
     }
-    .avatar-section {
+    .avatar-and-clear {
         flex: none;
         width: 100%;
         margin-bottom: 20px;
@@ -315,5 +348,55 @@ main {
     }
     .item-image {
         height: 100px;
+    }
+    .category-buttons-container {
+        padding: 5px;
+    }
+    .category-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 10px;
+    }
+    #user-info {
+        font-size: 16px;
+    }
+    .nav-button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    main {
+        padding: 10px;
+    }
+    .avatar-container {
+        height: 350px;
+    }
+    #avatar-display {
+        width: 180px;
+        height: 320px;
+    }
+    .wardrobe-items {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    .wardrobe-item {
+        height: 180px;
+    }
+    .item-image {
+        height: 80px;
+    }
+    .wardrobe-item h3 {
+        font-size: 12px;
+    }
+    .wardrobe-item p {
+        font-size: 10px;
+    }
+    .category-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+        margin: 3px;
     }
 }
