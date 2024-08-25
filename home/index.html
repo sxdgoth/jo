@@ -5,24 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="home.css">
-  
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Avatar Shop</h1>
-        <div id="user-info">
-            <span>Welcome, <span id="user-name"></span>!</span>
-            <span>Coins: <span id="user-coins"></span></span>
-        </div>
-    </header>
-
-    <div id="avatar-display"></div>
-
+    <div id="user-info">
+        <span>Welcome, <span id="user-name"></span>!</span>
+        <span>Coins: <span id="user-coins"></span></span>
+    </div>
+    
     <nav>
         <button onclick="goToWardrobe()">Wardrobe</button>
         <button onclick="goToShop()">Shop</button>
         <button onclick="logout()">Logout</button>
     </nav>
+
+    <div id="avatar-display"></div>
 
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/displayAvatar.js"></script>
