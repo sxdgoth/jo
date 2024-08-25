@@ -9,6 +9,7 @@ class AvatarBody {
     { name: 'Neck', file: 'avatar-neck.svg', type: 'Neck', isBase: true },  
     { name: 'Head', file: 'avatar-head.svg', type: 'Head', isBase: true },     
     { name: 'Jacket', file: '', type: 'Jacket', isBase: false },
+    { name: 'Jacket', file: '', type: 'Hoodie', isBase: false },
     { name: 'Shirt', file: '', type: 'Shirt', isBase: false },
     { name: 'Pants', file: '', type: 'Pants', isBase: false },
     { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
