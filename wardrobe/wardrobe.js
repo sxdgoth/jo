@@ -41,7 +41,7 @@ function renderOwnedItems(category = 'All') {
     wardrobeItemsContainer.innerHTML = ''; // Clear existing items
     
     ownedItems.forEach(item => {
-        if (category === 'All' || item.category === category) {
+        if (category === 'All' || item.type === category) {
             const itemElement = document.createElement('div');
             itemElement.classList.add('wardrobe-item');
             const imgSrc = `https://sxdgoth.github.io/jo/${item.path}${item.id}`;
@@ -50,7 +50,7 @@ function renderOwnedItems(category = 'All') {
                     <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150'; console.error('Failed to load image: ${imgSrc}');">
                 </div>
                 <h3>${item.name}</h3>
-                <p>${item.category}</p>
+                <p>${item.type}</p>
             `;
             wardrobeItemsContainer.appendChild(itemElement);
             
@@ -64,6 +64,11 @@ function renderOwnedItems(category = 'All') {
             itemElement.addEventListener('click', () => toggleItem(item));
         }
     });
+
+    // Update item visuals after rendering
+    if (window.avatarManager) {
+        window.avatarManager.updateItemVisuals();
+    }
 }
 
 function toggleItem(item) {
@@ -72,11 +77,6 @@ function toggleItem(item) {
     } else {
         console.error('AvatarManager not initialized');
     }
-}
-
-function logout() {
-    sessionStorage.removeItem('loggedInUser');
-    window.location.href = '../index.html';
 }
 
 function initializeCategoryButtons() {
@@ -88,4 +88,9 @@ function initializeCategoryButtons() {
             renderOwnedItems(this.dataset.category);
         });
     });
+}
+
+function logout() {
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href = '../index.html';
 }
