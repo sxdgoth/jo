@@ -13,7 +13,7 @@
             <input type="text" id="login-username" placeholder="Username">
             <input type="password" id="login-password" placeholder="Password">
             <button onclick="login()">Login</button>
-            <p>Don't have an account? <a href="#" onclick="showRegisterForm()">Register here</a></p>
+            <p>Don't have an account? <a href="#" onclick="toggleForms()">Register here</a></p>
         </div>
 
         <div id="register-form" style="display: none;">
@@ -21,7 +21,7 @@
             <input type="text" id="reg-username" placeholder="Username">
             <input type="password" id="reg-password" placeholder="Password">
             <button onclick="register()">Register</button>
-            <p>Already have an account? <a href="#" onclick="showLoginForm()">Login here</a></p>
+            <p>Already have an account? <a href="#" onclick="toggleForms()">Login here</a></p>
         </div>
 
         <div id="welcome-message" style="display: none;">
@@ -30,6 +30,17 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="login.js"></script>
+    <script src="register.js"></script>
+    <script src="welcome.js"></script>
+    <script src="userManager.js"></script>
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>
