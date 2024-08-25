@@ -8,7 +8,7 @@ body {
     color: #333;
 }
 
-.top-bar {
+header {
     background-color: #4CAF50;
     color: white;
     padding: 15px;
@@ -22,13 +22,14 @@ body {
     align-items: center;
 }
 
-#user-info span {
+#user-greeting {
+    font-weight: bold;
     margin-bottom: 5px;
 }
 
-#user-name, #user-coins {
+#user-coins {
+    color: #FFD700; /* Gold color for coins */
     font-weight: bold;
-    color: #FFD700;
 }
 
 nav {
@@ -281,17 +282,14 @@ main {
         flex-direction: column;
         height: auto;
     }
-
     .avatar-section {
         flex: none;
         width: 100%;
         margin-bottom: 20px;
     }
-
     .avatar-container {
         height: 500px;
     }
-
     .wardrobe-items-container {
         max-height: 600px;
     }
@@ -301,24 +299,19 @@ main {
     .avatar-container {
         height: 400px;
     }
-
     #avatar-display {
         width: 200px;
         height: 350px;
     }
-
     .wardrobe-items-container {
         max-height: 400px;
     }
-
     .wardrobe-items {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
-
     .wardrobe-item {
         height: 200px;
     }
-
     .item-image {
         height: 100px;
     }
