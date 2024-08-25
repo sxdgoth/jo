@@ -38,29 +38,16 @@ function applyAvatar() {
 
 function clearAvatar() {
     if (window.avatarManager) {
-        console.log("Clearing avatar");
+        console.log("Clearing avatar items");
+        
         // Clear all temp equipped items
         window.avatarManager.tempEquippedItems = {};
-        
-        // Reset skin tone, eye color, and lip color to defaults
-        window.avatarManager.skinTone = 'light';
-        window.avatarManager.eyeColor = '#3FA2FF';
-        window.avatarManager.lipColor = '#E6998F';
-        
-        // Reset hair color
-        if (window.avatarManager.hairColorChanger) {
-            window.avatarManager.hairColorChanger.hairColor = '#1E1E1E';
-            const hairColorPicker = document.getElementById('color-picker');
-            if (hairColorPicker) {
-                hairColorPicker.value = '#1E1E1E';
-            }
-        }
         
         // Update the avatar display to reflect the changes
         window.avatarManager.updateTempAvatarDisplay();
         window.avatarManager.updateItemVisuals();
         
-        console.log("Avatar cleared successfully");
+        console.log("Avatar items cleared successfully (colors preserved)");
     } else {
         console.error('Avatar manager not initialized');
     }
