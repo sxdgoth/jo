@@ -75,7 +75,7 @@ main {
 
 .avatar-container {
     width: 100%;
-    height: calc(100% - 60px);
+    height: 500px;
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
@@ -88,8 +88,8 @@ main {
 }
 
 #avatar-display {
-    width: 250px;
-    height: 450px;
+    width: 300px;
+    height: 500px;
     position: relative;
 }
 
@@ -114,6 +114,30 @@ main {
 
 .avatar-buttons button:hover {
     background-color: #45a049;
+}
+
+#customize-colors-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+#customize-colors-btn:hover {
+    background-color: #45a049;
+}
+
+#color-customization {
+    margin-top: 10px;
+    display: none;
+}
+
+#color-customization > div {
+    margin-bottom: 10px;
 }
 
 .wardrobe-section {
@@ -324,6 +348,10 @@ main {
     .avatar-container {
         height: 500px;
     }
+    #avatar-display {
+        width: 300px;
+        height: 500px;
+    }
     .wardrobe-items-container {
         max-height: 600px;
     }
@@ -334,8 +362,8 @@ main {
         height: 400px;
     }
     #avatar-display {
-        width: 200px;
-        height: 350px;
+        width: 240px;
+        height: 400px;
     }
     .wardrobe-items-container {
         max-height: 400px;
@@ -376,8 +404,8 @@ main {
         height: 350px;
     }
     #avatar-display {
-        width: 180px;
-        height: 320px;
+        width: 210px;
+        height: 350px;
     }
     .wardrobe-items {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
