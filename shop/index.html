@@ -18,7 +18,6 @@
             <button onclick="logout()" class="nav-button">Logout</button>
         </nav>
     </header>
-
     <div class="shop-container">
         <div class="category-buttons-container">
             <button class="category-btn active" data-category="All">All</button>
@@ -35,22 +34,22 @@
             <button class="category-btn" data-category="Shoes">Shoes</button>
             <button class="category-btn" data-category="Accessories">Accessories</button>
         </div>
-     <main>
-    <div class="avatar-and-clear">
-        <div class="avatar-container">
-            <div id="avatar-display" style="width: 200px; height: 400px;"></div>
-        </div>
-         <button id="reset-avatar-button">Clear Items Selected</button>
-    </div>
-    <div class="shop-section">
-        <h2>Shop Items</h2>
-        <div class="shop-items-container">
-            <div class="shop-items">
-                <!-- Shop items will be dynamically added here -->
+        <main>
+            <div class="avatar-and-clear">
+                <div class="avatar-container">
+                    <div id="avatar-display"></div>
+                </div>
+                <button id="reset-avatar-button">Clear Items Selected</button>
             </div>
-        </div>
-    </div>
-</main>
+            <div class="shop-section">
+                <h2>Shop Items</h2>
+                <div class="shop-items-container">
+                    <div class="shop-items">
+                        <!-- Shop items will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
     <!-- Scripts -->
     <script src="https://sxdgoth.github.io/jo/shop/shopItems.js"></script>
@@ -62,32 +61,32 @@
     <script src="https://sxdgoth.github.io/jo/shop/itemPositioning.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shopManager.js"></script>
     <script src="https://sxdgoth.github.io/jo/shop/shop.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
-    const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-    if (loggedInUser) {
-        console.log('Logged in user found:', loggedInUser.username);
-        
-        // Set up the reset button
-        const resetButton = document.getElementById('reset-avatar-button');
-        if (resetButton) {
-            console.log('Reset button found');
-            resetButton.addEventListener('click', function() {
-                console.log('Reset button clicked');
-                if (window.avatarDisplay && typeof window.avatarDisplay.clearSelectedItems === 'function') {
-                    window.avatarDisplay.clearSelectedItems();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM content loaded');
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                console.log('Logged in user found:', loggedInUser.username);
+                
+                // Set up the reset button
+                const resetButton = document.getElementById('reset-avatar-button');
+                if (resetButton) {
+                    console.log('Reset button found');
+                    resetButton.addEventListener('click', function() {
+                        console.log('Reset button clicked');
+                        if (window.avatarDisplay && typeof window.avatarDisplay.clearSelectedItems === 'function') {
+                            window.avatarDisplay.clearSelectedItems();
+                        } else {
+                            console.error('avatarDisplay not found or clearSelectedItems is not a function');
+                        }
+                    });
                 } else {
-                    console.error('avatarDisplay not found or clearSelectedItems is not a function');
+                    console.warn('Reset button not found');
                 }
-            });
-        } else {
-            console.warn('Reset button not found');
-        }
-    } else {
-        console.error('No logged in user found');
-    }
-});
-</script>
+            } else {
+                console.error('No logged in user found');
+            }
+        });
+    </script>
 </body>
 </html>
