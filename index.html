@@ -4,22 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register and Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div id="register-form">
-            <h2>Register</h2>
-            <input type="text" id="reg-username" placeholder="Username">
-            <input type="password" id="reg-password" placeholder="Password">
-            <button onclick="register()">Register</button>
-        </div>
+        <div class="form-container">
+            <div id="register-form">
+                <h2>Register</h2>
+                <input type="text" id="reg-username" placeholder="Username">
+                <input type="password" id="reg-password" placeholder="Password">
+                <button onclick="register()">Register</button>
+            </div>
 
-        <div id="login-form" style="display: none;">
-            <h2>Login</h2>
-            <input type="text" id="login-username" placeholder="Username">
-            <input type="password" id="login-password" placeholder="Password">
-            <button onclick="login()">Login</button>
+            <div id="login-form">
+                <h2>Login</h2>
+                <input type="text" id="login-username" placeholder="Username">
+                <input type="password" id="login-password" placeholder="Password">
+                <button onclick="login()">Login</button>
+            </div>
         </div>
 
         <div id="welcome-message" style="display: none;">
