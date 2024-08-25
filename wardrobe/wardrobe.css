@@ -1,3 +1,5 @@
+/* wardrobe.css */
+
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -9,28 +11,34 @@ body {
 .top-bar {
     background-color: #4CAF50;
     color: white;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
 }
 
 #user-info {
-    margin-top: 10px;
-    font-size: 16px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#user-info span {
+    margin-bottom: 5px;
 }
 
 #user-name, #user-coins {
     font-weight: bold;
-    color: #ffd700;
+    color: #FFD700;
 }
 
 nav {
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .nav-button {
     display: inline-block;
-    padding: 10px 15px;
-    margin: 0 5px;
+    padding: 8px 12px;
+    margin: 0 3px;
     background-color: #45a049;
     color: white;
     text-decoration: none;
@@ -38,7 +46,7 @@ nav {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .nav-button:hover {
@@ -54,29 +62,33 @@ main {
     border-radius: 10px;
     display: flex;
     gap: 20px;
+    height: calc(100vh - 220px);
 }
 
 .avatar-section {
-    flex: 0 0 300px;
+    flex: 0 0 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .avatar-container {
+    width: 100%;
+    height: calc(100% - 60px);
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 400px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    position: relative;
     overflow: hidden;
+    position: relative;
 }
 
 #avatar-display {
-    width: 100%;
-    height: calc(100% - 40px);
+    width: 250px;
+    height: 450px;
     position: relative;
 }
 
@@ -107,19 +119,20 @@ main {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .wardrobe-section h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 22px;
+    margin: 0 0 10px 0;
+    padding: 5px 0;
+    font-size: 18px;
     color: #4CAF50;
+    text-align: center;
 }
 
 .wardrobe-items-container {
     flex: 1;
     overflow-y: auto;
-    padding-right: 10px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background-color: #f9f9f9;
@@ -197,9 +210,10 @@ main {
     box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
-#skin-tone-buttons {
+#skin-tone-buttons, #eye-color-picker, #lip-color-picker {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 5px;
     margin-top: 10px;
     width: 100%;
@@ -221,17 +235,6 @@ main {
 .skin-tone-button.selected {
     border-color: #ff4500;
     box-shadow: 0 0 5px #ff4500;
-}
-
-#eye-color-picker, #lip-color-picker {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#eye-color-picker label, #lip-color-picker label {
-    margin-right: 10px;
 }
 
 #eye-color-input, #lip-color-input {
@@ -273,18 +276,39 @@ main {
     background: #555;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     main {
         flex-direction: column;
+        height: auto;
     }
 
     .avatar-section {
+        flex: none;
         width: 100%;
         margin-bottom: 20px;
     }
 
+    .avatar-container {
+        height: 500px;
+    }
+
     .wardrobe-items-container {
         max-height: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .avatar-container {
+        height: 400px;
+    }
+
+    #avatar-display {
+        width: 200px;
+        height: 350px;
+    }
+
+    .wardrobe-items-container {
+        max-height: 400px;
     }
 
     .wardrobe-items {
