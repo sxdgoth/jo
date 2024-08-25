@@ -216,7 +216,7 @@ main {
     margin: 5px 0;
     font-size: 14px;
     line-height: 1.2;
-    height: 2.4em;
+   height: 2.4em;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -427,4 +427,4 @@ main {
         font-size: 11px;
         margin: 3px;
     }
-}
+}  
