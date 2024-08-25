@@ -1,3 +1,5 @@
+// avatarActions.js
+
 function applyAvatar() {
     if (window.avatarManager) {
         console.log("Applying avatar changes");
@@ -10,7 +12,6 @@ function applyAvatar() {
                 window.avatarManager.equippedItems[type] = itemId;
             }
         });
-
         // Save to localStorage
         localStorage.setItem(`equippedItems_${window.avatarManager.username}`, JSON.stringify(window.avatarManager.equippedItems));
         localStorage.setItem(`skinTone_${window.avatarManager.username}`, window.avatarManager.skinTone);
@@ -21,7 +22,6 @@ function applyAvatar() {
         if (window.avatarManager.hairColorChanger) {
             window.avatarManager.hairColorChanger.applyHairColor();
         }
-
         // Update the avatar display to reflect the changes
         window.avatarManager.updateAvatarDisplay();
         window.avatarManager.updateItemVisuals();
@@ -36,6 +36,36 @@ function applyAvatar() {
     }
 }
 
+function clearAvatar() {
+    if (window.avatarManager) {
+        console.log("Clearing avatar");
+        // Clear all temp equipped items
+        window.avatarManager.tempEquippedItems = {};
+        
+        // Reset skin tone, eye color, and lip color to defaults
+        window.avatarManager.skinTone = 'light';
+        window.avatarManager.eyeColor = '#3FA2FF';
+        window.avatarManager.lipColor = '#E6998F';
+        
+        // Reset hair color
+        if (window.avatarManager.hairColorChanger) {
+            window.avatarManager.hairColorChanger.hairColor = '#1E1E1E';
+            const hairColorPicker = document.getElementById('color-picker');
+            if (hairColorPicker) {
+                hairColorPicker.value = '#1E1E1E';
+            }
+        }
+        
+        // Update the avatar display to reflect the changes
+        window.avatarManager.updateTempAvatarDisplay();
+        window.avatarManager.updateItemVisuals();
+        
+        console.log("Avatar cleared successfully");
+    } else {
+        console.error('Avatar manager not initialized');
+    }
+}
+
 // Make sure this event listener is set up correctly
 document.addEventListener('DOMContentLoaded', () => {
     const applyAvatarBtn = document.getElementById('apply-avatar-btn');
@@ -44,5 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Apply avatar button listener set up");
     } else {
         console.error('Apply Avatar button not found');
+    }
+
+    const clearAvatarBtn = document.getElementById('clear-avatar-btn');
+    if (clearAvatarBtn) {
+        clearAvatarBtn.addEventListener('click', clearAvatar);
+        console.log("Clear avatar button listener set up");
+    } else {
+        console.error('Clear Avatar button not found');
     }
 });
