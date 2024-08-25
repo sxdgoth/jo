@@ -108,6 +108,7 @@ class AvatarDisplay {
             { name: 'Arms', file: 'home/assets/body/avatar-armsandhands.svg', type: 'Arms', isBase: true },
             { name: 'Body', file: 'home/assets/body/avatar-body.svg', type: 'Body', isBase: true },
             { name: 'Head', file: 'home/assets/body/avatar-head.svg', type: 'Head', isBase: true },
+            { name: 'Neck', file: 'home/assets/body/avatar-neck.svg', type: 'Neck', isBase: true },  
             { name: 'Eyes', file: '', type: 'Eyes', isBase: false },
             { name: 'Nose', file: '', type: 'Nose', isBase: false },
             { name: 'Mouth', file: '', type: 'Mouth', isBase: false },
