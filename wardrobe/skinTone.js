@@ -29,7 +29,7 @@ class SkinToneManager {
     }
 };
         this.currentSkinTone = this.skinTones.light;
-        this.baseParts = ['Legs', 'Arms', 'Body', 'Head'];
+        this.baseParts = ['Legs', 'Arms', 'Body', 'Neck', 'Head'];
         this.originalColors = {};
     }
 
