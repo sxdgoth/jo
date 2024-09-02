@@ -46,22 +46,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function toggleItem(itemId) {
-        console.log('toggleItem called with itemId:', itemId);
+function calculateTotalValue() {
+    let totalValue = 0;
+    Object.values(selectedItems).forEach(itemId => {
         const item = shopItems.find(i => i.id === itemId);
-        if (item) {
-            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-            if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-                console.log('Calling avatarDisplay.tryOnItem');
-                window.avatarDisplay.tryOnItem(item);
-            } else {
-                console.error('avatarDisplay not found or tryOnItem is not a function');
-            }
-            updateSelectedItems();
-        } else {
-            console.error('Item not found for id:', itemId);
+        if (item && !window.userInventory.hasItem(itemId)) {
+            totalValue += item.price;
         }
+    });
+    return totalValue;
+}
+
+function updateTotalValueDisplay() {
+    const totalValue = calculateTotalValue();
+    const totalValueElement = document.getElementById('total-value');
+    if (totalValueElement) {
+        totalValueElement.textContent = totalValue.toLocaleString();
     }
+}
+    
+   function toggleItem(itemId) {
+    console.log('toggleItem called with itemId:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (item) {
+        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            console.log('Calling avatarDisplay.tryOnItem');
+            window.avatarDisplay.tryOnItem(item);
+        } else {
+            console.error('avatarDisplay not found or tryOnItem is not a function');
+        }
+        updateSelectedItems();
+        updateTotalValueDisplay(); // Add this line
+    } else {
+        console.error('Item not found for id:', itemId);
+    }
+}
 
     function updateSelectedItems() {
         console.log('Updating selected items');
@@ -113,14 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    function resetAvatarDisplay() {
-        console.log('Resetting avatar display');
-        selectedItems = {};
-        if (window.avatarDisplay) {
-            window.avatarDisplay.resetTriedOnItems();
-        }
-        updateSelectedItems();
+   function resetAvatarDisplay() {
+    console.log('Resetting avatar display');
+    selectedItems = {};
+    if (window.avatarDisplay) {
+        window.avatarDisplay.resetTriedOnItems();
     }
+    updateSelectedItems();
+    updateTotalValueDisplay(); // Add this line
+}
 
     function filterItemsByCategory(category) {
         console.log('Filtering items by category:', category);
@@ -212,9 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedItems
     };
 
-    // Initialize the shop
-    renderShopItems();
+   // Initialize the shop
+renderShopItems();
+updateTotalValueDisplay(); // Add this line
 
-    // Log avatarDisplay for debugging
-    console.log('avatarDisplay:', window.avatarDisplay);
+// Log avatarDisplay for debugging
+console.log('avatarDisplay:', window.avatarDisplay);
 });
