@@ -255,11 +255,18 @@ main {
     border-color: #4CAF50;
 }
 
-#reset-avatar-button {
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #f44336;
+.avatar-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    width: 100%; /* Ensure the container takes full width */
+}
+
+#reset-avatar-button,
+#buy-selected-items-button {
+    flex: 1; /* Make both buttons take equal space */
+    margin: 0 5px; /* Add some margin between buttons */
+    padding: 10px 15px;
     color: white;
     border: none;
     border-radius: 5px;
@@ -268,8 +275,20 @@ main {
     transition: background-color 0.3s ease;
 }
 
+#reset-avatar-button {
+    background-color: #f44336;
+}
+
 #reset-avatar-button:hover {
     background-color: #d32f2f;
+}
+
+#buy-selected-items-button {
+    background-color: #4CAF50;
+}
+
+#buy-selected-items-button:hover {
+    background-color: #45a049;
 }
 
 @media (max-width: 1200px) {
@@ -319,25 +338,3 @@ main {
         height: 100px;
     }
 }
-
-.avatar-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-#buy-selected-items-button {
-    /* Add styles similar to your other buttons */
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#buy-selected-items-button:hover {
-    background-color: #45a049;
-}
-
