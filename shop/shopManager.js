@@ -254,9 +254,9 @@ function updateTotalValueDisplay() {
         selectedItems
     };
 
-   // Initialize the shop
+  // Initialize the shop
 renderShopItems();
-updateTotalValueDisplay(); // Add this line
+updateTotalValueDisplay();
 
 // Log avatarDisplay for debugging
 console.log('avatarDisplay:', window.avatarDisplay);
