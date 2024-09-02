@@ -50,10 +50,11 @@ function calculateTotalValue() {
     let totalValue = 0;
     Object.values(selectedItems).forEach(itemId => {
         const item = shopItems.find(i => i.id === itemId);
-        if (item && !window.userInventory.hasItem(itemId)) {
+        if (item && (!window.userInventory || !window.userInventory.hasItem(itemId))) {
             totalValue += item.price;
         }
     });
+    console.log('Calculated total value:', totalValue);
     return totalValue;
 }
 
@@ -62,6 +63,9 @@ function updateTotalValueDisplay() {
     const totalValueElement = document.getElementById('total-value');
     if (totalValueElement) {
         totalValueElement.textContent = totalValue.toLocaleString();
+        console.log('Updated total value display:', totalValue);
+    } else {
+        console.error('Total value element not found');
     }
 }
     
@@ -70,13 +74,7 @@ function updateTotalValueDisplay() {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            console.log('Calling avatarDisplay.tryOnItem');
-            window.avatarDisplay.tryOnItem(item);
-        } else {
-            console.error('avatarDisplay not found or tryOnItem is not a function');
-        }
-
+        
         // Update selectedItems
         if (selectedItems[item.type] === itemId) {
             delete selectedItems[item.type];
@@ -84,9 +82,21 @@ function updateTotalValueDisplay() {
             selectedItems[item.type] = itemId;
         }
 
+        console.log('Updated selectedItems:', selectedItems);
+
+        // Try to update avatar display if available
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            try {
+                window.avatarDisplay.tryOnItem(item);
+            } catch (error) {
+                console.error('Error in avatarDisplay.tryOnItem:', error);
+            }
+        } else {
+            console.error('avatarDisplay not found or tryOnItem is not a function');
+        }
+
         updateSelectedItems();
         updateTotalValueDisplay();
-        console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
     }
