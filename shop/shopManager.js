@@ -143,14 +143,15 @@ function updateTotalValueDisplay() {
         }
     }
     
-   function resetAvatarDisplay() {
+  function resetAvatarDisplay() {
     console.log('Resetting avatar display');
     selectedItems = {};
     if (window.avatarDisplay) {
         window.avatarDisplay.resetTriedOnItems();
     }
     updateSelectedItems();
-    updateTotalValueDisplay(); // Add this line
+    updateTotalValueDisplay();
+    console.log('Reset selectedItems:', selectedItems);
 }
 
     function filterItemsByCategory(category) {
