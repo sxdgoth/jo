@@ -342,6 +342,7 @@ main {
 
 #selected-items-value {
     text-align: center;
+    margin-top: 15px; /* Add some space above the total value */
     margin-bottom: 10px;
     font-weight: bold;
     color: #4CAF50;
