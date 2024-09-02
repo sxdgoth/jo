@@ -319,3 +319,25 @@ main {
         height: 100px;
     }
 }
+
+.avatar-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+#buy-selected-items-button {
+    /* Add styles similar to your other buttons */
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#buy-selected-items-button:hover {
+    background-color: #45a049;
+}
+
