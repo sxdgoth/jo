@@ -79,7 +79,8 @@ main {
     background-color: white;
     border-radius: 10px;
     padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Remove or comment out the following line */
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
     display: flex;
     justify-content: center;
     align-items: center;
