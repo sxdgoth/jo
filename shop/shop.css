@@ -338,3 +338,11 @@ main {
         height: 100px;
     }
 }
+
+
+#selected-items-value {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #4CAF50;
+}
