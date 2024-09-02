@@ -369,28 +369,30 @@ blendColors(color1, color2, ratio) {
         localStorage.setItem(`hairColor_${this.username}`, newColor);
     }
 
-  tryOnItem(item) {
-    console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-    
-    // List of items that should not be unselected
-    const nonUnselectableItems = ['Pants', 'Shirt', 'Hair', 'Eyes', 'Mouth', 'Nose', 'Eyebrows'];
-    
-    if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
-        // If the item is already applied and it's not in the non-unselectable list, remove it
-        if (!nonUnselectableItems.includes(item.type)) {
-            console.log(`Removing item ${item.id} of type ${item.type}`);
-            this.removeItem(item.type);
+   tryOnItem(item) {
+        console.log(`Trying on ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+        
+        // List of items that should not be unselected
+        const nonUnselectableItems = ['Pants', 'Shirt', 'Hair', 'Eyes', 'Mouth', 'Nose', 'Eyebrows'];
+        
+        if (this.currentItems[item.type] && this.currentItems[item.type].id === item.id) {
+            // If the item is already applied and it's not in the non-unselectable list, remove it
+            if (!nonUnselectableItems.includes(item.type)) {
+                console.log(`Removing item ${item.id} of type ${item.type}`);
+                this.removeItem(item.type);
+                delete window.shopManager.selectedItems[item.type];
+            } else {
+                console.log(`Cannot unselect item of type ${item.type}`);
+            }
         } else {
-            console.log(`Cannot unselect item of type ${item.type}`);
+            // Apply the new item
+            console.log(`Applying new item ${item.id} of type ${item.type}`);
+            this.currentItems[item.type] = item;
+            this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+            window.shopManager.selectedItems[item.type] = item.id;
         }
-    } else {
-        // Apply the new item
-        console.log(`Applying new item ${item.id} of type ${item.type}`);
-        this.currentItems[item.type] = item;
-        this.updateAvatarDisplay(item.type, `${this.baseUrl}${item.path}${item.id}`);
+        this.layerManager.scheduleReorder();
     }
-    this.layerManager.scheduleReorder();
-}
 
    removeItem(type) {
     console.log(`Removing item of type ${type}`);
