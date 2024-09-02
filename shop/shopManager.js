@@ -134,13 +134,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateUserCoinsDisplay(newCoins) {
-        const coinsDisplay = document.getElementById('user-coins');
-        if (coinsDisplay) {
-            coinsDisplay.textContent = newCoins;
-        }
+  function updateUserCoinsDisplay(newCoins) {
+    const coinsValueElement = document.getElementById('coins-value');
+    if (coinsValueElement) {
+        coinsValueElement.textContent = newCoins;
+    } else {
+        console.error('Coins value element not found');
     }
-
+}
+    
     function buySelectedItems() {
         console.log('Buying selected items');
         const selectedItemIds = Object.values(selectedItems);
