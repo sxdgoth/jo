@@ -55,7 +55,7 @@ nav {
 }
 
 main {
-    max-width: 1200px;
+    max-width: 1300px; /* Increased from 1200px */
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -73,21 +73,28 @@ main {
     align-items: center;
 }
 
+.avatar-and-clear {
+    flex: 0 0 400px; /* Increased from 350px */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#avatar-display {
+    width: 420px; /* Increased from 360px */
+    height: 700px; /* Increased from 600px */
+    position: relative;
+}
+
 .avatar-container {
     width: 100%;
-    height: 600px; /* Increased from 500px */
+    height: 700px; /* Increased from 600px */
     background-color: white;
     padding: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    position: relative;
-}
-
-#avatar-display {
-    width: 360px; /* Increased from 300px */
-    height: 600px; /* Increased from 500px */
     position: relative;
 }
 
@@ -290,7 +297,7 @@ main {
     background-color: #45a049;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
     main {
         flex-direction: column;
         height: auto;
@@ -303,7 +310,12 @@ main {
     }
 
     .avatar-container {
-        height: 500px;
+        height: 600px;
+    }
+
+    #avatar-display {
+        width: 360px;
+        height: 600px;
     }
 
     .shop-items-container {
@@ -313,12 +325,12 @@ main {
 
 @media (max-width: 768px) {
     .avatar-container {
-        height: 400px;
+        height: 500px;
     }
 
     #avatar-display {
-        width: 200px;
-        height: 350px;
+        width: 300px;
+        height: 500px;
     }
 
     .shop-items-container {
@@ -337,7 +349,6 @@ main {
         height: 100px;
     }
 }
-
 
 #selected-items-value {
     text-align: center;
