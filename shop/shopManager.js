@@ -93,21 +93,22 @@ function updateTotalValueDisplay() {
 }
 
     function updateSelectedItems() {
-        console.log('Updating selected items');
-        document.querySelectorAll('.shop-item').forEach(shopItem => {
-            const image = shopItem.querySelector('.item-image');
-            const itemId = image.dataset.id;
-            const item = shopItems.find(i => i.id === itemId);
-            
-            if (selectedItems[item.type] === itemId) {
-                console.log(`Adding 'selected' class to item: ${itemId}`);
-                shopItem.classList.add('selected');
-            } else {
-                console.log(`Removing 'selected' class from item: ${itemId}`);
-                shopItem.classList.remove('selected');
-            }
-        });
-    }
+    console.log('Updating selected items');
+    document.querySelectorAll('.shop-item').forEach(shopItem => {
+        const image = shopItem.querySelector('.item-image');
+        const itemId = image.dataset.id;
+        const item = shopItems.find(i => i.id === itemId);
+        
+        if (selectedItems[item.type] === itemId) {
+            console.log(`Adding 'selected' class to item: ${itemId}`);
+            shopItem.classList.add('selected');
+        } else {
+            console.log(`Removing 'selected' class from item: ${itemId}`);
+            shopItem.classList.remove('selected');
+        }
+    });
+    updateTotalValueDisplay();
+}
       
     function buyItem(itemId) {
         console.log('Attempting to buy item:', itemId);
