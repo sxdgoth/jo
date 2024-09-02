@@ -134,10 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-  function updateUserCoinsDisplay(newCoins) {
+ function updateUserCoins(coins) {
     const coinsValueElement = document.getElementById('coins-value');
     if (coinsValueElement) {
-        coinsValueElement.textContent = newCoins;
+        coinsValueElement.textContent = coins.toLocaleString();
     } else {
         console.error('Coins value element not found');
     }
