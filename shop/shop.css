@@ -67,10 +67,10 @@ main {
 }
 
 .avatar-and-clear {
-    flex: 0 0 350px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px; /* Adds space between elements */
 }
 
 .avatar-container {
@@ -257,9 +257,7 @@ main {
 
 .avatar-buttons {
     display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    width: 100%; /* Ensure the container takes full width */
+    gap: 10px; /* Adds space between buttons */
 }
 
 #reset-avatar-button,
@@ -341,8 +339,8 @@ main {
 
 
 #selected-items-value {
+    margin-top: 10px; /* Adds space above the total value display */
     text-align: center;
-    margin-bottom: 10px;
     font-weight: bold;
-    color: #4CAF50;
+    color: #4CAF50; /* Or any color you prefer */
 }
