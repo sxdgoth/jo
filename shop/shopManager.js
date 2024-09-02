@@ -47,21 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleItem(itemId) {
-    console.log('toggleItem called with itemId:', itemId);
-    const item = shopItems.find(i => i.id === itemId);
-    if (item) {
-        console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            console.log('Calling avatarDisplay.tryOnItem');
-            window.avatarDisplay.tryOnItem(item);
+        console.log('toggleItem called with itemId:', itemId);
+        const item = shopItems.find(i => i.id === itemId);
+        if (item) {
+            console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
+            if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+                console.log('Calling avatarDisplay.tryOnItem');
+                window.avatarDisplay.tryOnItem(item);
+            } else {
+                console.error('avatarDisplay not found or tryOnItem is not a function');
+            }
+            updateSelectedItems();
         } else {
-            console.error('avatarDisplay not found or tryOnItem is not a function');
+            console.error('Item not found for id:', itemId);
         }
-        updateSelectedItems();
-    } else {
-        console.error('Item not found for id:', itemId);
     }
-}
 
     function updateSelectedItems() {
         console.log('Updating selected items');
@@ -141,6 +141,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function buySelectedItems() {
+        console.log('Buying selected items');
+        const selectedItemIds = Object.values(selectedItems);
+        let totalCost = 0;
+        let itemsToBuy = [];
+
+        selectedItemIds.forEach(itemId => {
+            const item = shopItems.find(i => i.id === itemId);
+            if (item && !window.userInventory.hasItem(itemId)) {
+                totalCost += item.price;
+                itemsToBuy.push(item);
+            }
+        });
+
+        const currentCoins = UserManager.getUserCoins();
+        if (currentCoins < totalCost) {
+            alert('Not enough coins to buy all selected items!');
+            return;
+        }
+
+        const newCoins = currentCoins - totalCost;
+        if (UserManager.updateUserCoins(newCoins)) {
+            itemsToBuy.forEach(item => {
+                window.userInventory.addItem(item);
+                updateBuyButtonState(document.querySelector(`.buy-btn[data-id="${item.id}"]`), item.id);
+            });
+
+            updateUserCoinsDisplay(newCoins);
+            alert(`You have successfully purchased ${itemsToBuy.length} item(s)!`);
+            resetAvatarDisplay();
+        } else {
+            alert('Error updating user coins. Please try again.');
+        }
+    }
+
     // Event delegation for item clicks
     document.addEventListener('click', function(e) {
         console.log('Click event triggered on:', e.target);
@@ -155,17 +190,24 @@ document.addEventListener('DOMContentLoaded', () => {
             buyItem(itemId);
         } else if (e.target.classList.contains('category-btn')) {
             const category = e.target.dataset.category;
-            console.log('ShopManager: Category button clicked:', category);
+               console.log('ShopManager: Category button clicked:', category);
             filterItemsByCategory(category);
         }
     });
+
+    // Add event listener for the new button
+    const buySelectedItemsButton = document.getElementById('buy-selected-items-button');
+    if (buySelectedItemsButton) {
+        buySelectedItemsButton.addEventListener('click', buySelectedItems);
+    }
 
     window.shopManager = {
         toggleItem,
         buyItem,
         renderShopItems,
         resetAvatarDisplay,
-        filterItemsByCategory
+        filterItemsByCategory,
+        selectedItems
     };
 
     // Initialize the shop
