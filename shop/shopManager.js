@@ -76,8 +76,17 @@ function updateTotalValueDisplay() {
         } else {
             console.error('avatarDisplay not found or tryOnItem is not a function');
         }
+
+        // Update selectedItems
+        if (selectedItems[item.type] === itemId) {
+            delete selectedItems[item.type];
+        } else {
+            selectedItems[item.type] = itemId;
+        }
+
         updateSelectedItems();
-        updateTotalValueDisplay(); // Add this line
+        updateTotalValueDisplay();
+        console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
     }
