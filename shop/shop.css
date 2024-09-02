@@ -67,18 +67,24 @@ main {
 }
 
 .avatar-and-clear {
+    flex: 0 0 350px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%; /* Ensure full width */
 }
 
-
-#avatar-container {
-    /* Preserve your original avatar container styles */
-    width: 100%; /* Or whatever width you had before */
-    height: auto; /* Maintain aspect ratio */
-    /* Add any other styles you had for the avatar container */
+.avatar-container {
+    width: 100%;
+    height: calc(100% - 60px);
+    background-color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
 }
 
 #avatar-display {
@@ -251,8 +257,9 @@ main {
 
 .avatar-buttons {
     display: flex;
-    gap: 10px; /* Adds space between buttons */
-    margin-top: 10px; /* Space between avatar and buttons */
+    justify-content: space-between;
+    margin-top: 10px;
+    width: 100%; /* Ensure the container takes full width */
 }
 
 #reset-avatar-button,
@@ -334,10 +341,8 @@ main {
 
 
 #selected-items-value {
-    margin-top: 10px; /* Space above the total value display */
     text-align: center;
+    margin-bottom: 10px;
     font-weight: bold;
-    color: #4CAF50; /* Or any color you prefer */
-    width: 100%; /* Full width to align with other elements */
+    color: #4CAF50;
 }
-
