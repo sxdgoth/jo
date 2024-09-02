@@ -23,7 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateUserCoins(coins) {
-    document.getElementById('user-coins').textContent = coins.toLocaleString();
+    const coinsValueElement = document.getElementById('coins-value');
+    if (coinsValueElement) {
+        coinsValueElement.textContent = coins.toLocaleString();
+    } else {
+        console.error('Coins value element not found');
+    }
 }
 
 function logout() {
