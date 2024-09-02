@@ -2,8 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
     
     if (loggedInUser) {
-        document.getElementById('user-name').textContent = loggedInUser.username;
-        updateUserCoins(loggedInUser.coins);
+        initializeUserInfo(loggedInUser);
         window.createUserInventory(loggedInUser.username);
         
         // Initialize AvatarManager
@@ -49,6 +48,16 @@ function updateUserCoinsAfterPurchase(newCoins) {
             user.username === loggedInUser.username ? {...user, coins: newCoins} : user
         );
         localStorage.setItem('users', JSON.stringify(updatedUsers));
+    }
+}
+
+function initializeUserInfo(user) {
+    document.getElementById('user-name').textContent = user.username;
+    const coinsValueElement = document.getElementById('coins-value');
+    if (coinsValueElement) {
+        coinsValueElement.textContent = user.coins.toLocaleString();
+    } else {
+        console.error('Coins value element not found');
     }
 }
 
