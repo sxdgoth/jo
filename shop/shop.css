@@ -30,11 +30,10 @@ header {
 #user-coins {
     color: #FFD700; /* Gold color for coins */
     font-weight: bold;
-    display: inline-block; /* Ensure it's displayed as a block */
 }
 
 #coins-value {
-    margin-left: 5px; /* Add a little space after "Coins:" */
+    margin-left: 5px;
 }
 
 nav {
