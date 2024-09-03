@@ -20,8 +20,3 @@ async function register() {
         alert('Please fill in all fields.');
     }
 }
-
-// These functions are no longer needed as they're handled by UserManager
-// async function usernameExists(username) { ... }
-// async function fetchUsers() { ... }
-// async function updateUsers(users) { ... }
