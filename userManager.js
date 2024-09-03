@@ -8,34 +8,22 @@ class UserManager {
     static async updateUserCoins(newCoins) {
         const loggedInUser = this.getCurrentUser();
         if (loggedInUser) {
+            loggedInUser.coins = newCoins;
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            
             try {
-                const response = await fetch('/api/updateCoins', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username: loggedInUser.username, coins: newCoins }),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.success) {
-                    loggedInUser.coins = newCoins;
-                    sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-                    console.log('Coins updated successfully');
-                    return true;
-                } else {
-                    throw new Error(data.message || 'Failed to update coins');
-                }
+                let users = await fetchUsers();
+                const updatedUsers = users.map(user => 
+                    user.username === loggedInUser.username ? {...user, coins: newCoins} : user
+                );
+                await updateUsers(updatedUsers);
+                console.log('Users file updated with new coin balance');
             } catch (error) {
-                console.error('Error updating coins:', error);
-                alert('Failed to update coins. Please try again.');
-                return false;
+                console.error('Error updating users file:', error);
+                alert('Coins updated locally. Failed to update the users.json file in the GitHub repository.');
             }
+            
+            return true;
         }
         return false;
     }
