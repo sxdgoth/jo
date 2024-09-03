@@ -5,7 +5,7 @@ async function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
     try {
-        const users = await fetchUsers();
+        const users = await UserManager.fetchUsers();
         const user = users.find(u => u.username === username && u.password === password);
         if (user) {
             console.log('User found:', user);
