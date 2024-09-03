@@ -1,5 +1,5 @@
 const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json';
-const GITHUB_TOKEN = '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';
+const GITHUB_TOKEN = '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';
 
 async function fetchUsers() {
     try {
