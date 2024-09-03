@@ -92,13 +92,13 @@ function updateTotalValueDisplay() {
 
         updateSelectedItems();
         updateTotalValueDisplay();
-        updateBuySelectedItemsButton();
+        updateBuySelectedItemsButton(); // Make sure this line is here
         console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
     }
 }
-
+    
     function updateSelectedItems() {
     console.log('Updating selected items');
     document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -156,9 +156,10 @@ function updateTotalValueDisplay() {
     if (window.avatarDisplay) {
         window.avatarDisplay.resetTriedOnItems();
     }
-    updateSelectedItems();
+     
+ updateSelectedItems();
     updateTotalValueDisplay();
-    updateBuySelectedItemsButton(); // Add this line
+    updateBuySelectedItemsButton(); // Make sure this line is here
     console.log('Reset selectedItems:', selectedItems);
 }
 
@@ -181,6 +182,13 @@ function updateBuySelectedItemsButton() {
     if (buySelectedItemsButton) {
         buySelectedItemsButton.disabled = !hasSelectedItems;
         buySelectedItemsButton.style.opacity = hasSelectedItems ? '1' : '0.5';
+        
+        // Add this console log to check the button state
+        console.log('Buy Selected Items button state:', {
+            disabled: buySelectedItemsButton.disabled,
+            opacity: buySelectedItemsButton.style.opacity,
+            hasSelectedItems: hasSelectedItems
+        });
     }
 }
 
@@ -289,12 +297,11 @@ initializeAvatarWithInventory();
         selectedItems
     };
 
-  // Initialize the shop
+// Initialize the shop
 renderShopItems();
 updateTotalValueDisplay();
 updateBuySelectedItemsButton(); // Add this line
-
-
+    
 // Log avatarDisplay for debugging
 console.log('avatarDisplay:', window.avatarDisplay);
 });
