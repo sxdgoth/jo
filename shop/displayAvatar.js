@@ -478,32 +478,6 @@ blendColors(color1, color2, ratio) {
         this.equippedItems = savedItems ? JSON.parse(savedItems) : {};
     }
 
-
-  revertItem(itemType) {
-        const inventoryItem = this.getInventoryItemByType(itemType);
-        if (inventoryItem) {
-            this.tryOnItem(inventoryItem);
-        } else {
-            this.removeItem(itemType);
-        }
-    }
-
-    getInventoryItemByType(itemType) {
-        if (window.userInventory) {
-            return window.userInventory.getItems().find(item => item.type === itemType);
-        }
-        return null;
-    }
-
-    removeItem(itemType) {
-        const layer = this.layers[itemType];
-        if (layer) {
-            layer.clear();
-            this.redrawAvatar();
-        }
-    }
-
-    
     resetTriedOnItems() {
         console.log('Resetting tried on items');
         Object.keys(this.currentItems).forEach(type => {
