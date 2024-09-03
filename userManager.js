@@ -36,7 +36,7 @@ class UserManager {
 
     static async fetchUsers() {
         try {
-            const response = await fetch(GITHUB_REPO, {
+            const response = await fetch(USER_REPO_URL, {
                 headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
             });
             if (!response.ok) {
@@ -55,7 +55,7 @@ class UserManager {
         try {
             const content = btoa(JSON.stringify(users, null, 2)); // Pretty print JSON
             const sha = await this.getFileSha();
-            const response = await fetch(GITHUB_REPO, {
+            const response = await fetch(USER_REPO_URL, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `token ${GITHUB_TOKEN}`,
@@ -79,7 +79,7 @@ class UserManager {
 
     static async getFileSha() {
         try {
-            const response = await fetch(GITHUB_REPO, {
+            const response = await fetch(USER_REPO_URL, {
                 headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
             });
             if (!response.ok) {
@@ -94,5 +94,5 @@ class UserManager {
     }
 }
 
-// Make UserManager globally accessible
 window.UserManager = UserManager;
+
