@@ -93,3 +93,6 @@ class UserManager {
         }
     }
 }
+
+// Make UserManager globally accessible
+window.UserManager = UserManager;
