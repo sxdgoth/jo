@@ -69,27 +69,27 @@ function updateTotalValueDisplay() {
     }
 }
     
-function toggleItem(itemId) {
+   function toggleItem(itemId) {
     console.log('toggleItem called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         
+        // Update selectedItems
         if (selectedItems[item.type] === itemId) {
-            // Item is being deselected
             delete selectedItems[item.type];
-            console.log('Item deselected:', item.type);
         } else {
-            // Item is being selected
             selectedItems[item.type] = itemId;
-            console.log('Item selected:', item.type, itemId);
         }
 
+        console.log('Updated selectedItems:', selectedItems);
+
+        // Try to update avatar display if available
         if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            if (selectedItems[item.type] === itemId) {
+            try {
                 window.avatarDisplay.tryOnItem(item);
-            } else {
-                window.avatarDisplay.revertItem(item.type);
+            } catch (error) {
+                console.error('Error in avatarDisplay.tryOnItem:', error);
             }
         } else {
             console.error('avatarDisplay not found or tryOnItem is not a function');
@@ -97,13 +97,11 @@ function toggleItem(itemId) {
 
         updateSelectedItems();
         updateTotalValueDisplay();
-        updateBuySelectedItemsButton();
-        console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
     }
 }
-    
+
     function updateSelectedItems() {
     console.log('Updating selected items');
     document.querySelectorAll('.shop-item').forEach(shopItem => {
@@ -155,16 +153,14 @@ function toggleItem(itemId) {
         }
     }
     
- function resetAvatarDisplay() {
+  function resetAvatarDisplay() {
     console.log('Resetting avatar display');
     selectedItems = {};
     if (window.avatarDisplay) {
         window.avatarDisplay.resetTriedOnItems();
     }
-     
- updateSelectedItems();
+    updateSelectedItems();
     updateTotalValueDisplay();
-    updateBuySelectedItemsButton(); // Make sure this line is here
     console.log('Reset selectedItems:', selectedItems);
 }
 
@@ -180,24 +176,6 @@ function toggleItem(itemId) {
         });
     }
 
-function updateBuySelectedItemsButton() {
-    const buySelectedItemsButton = document.getElementById('buy-selected-items-button');
-    const hasSelectedItems = Object.keys(selectedItems).length > 0;
-    
-    if (buySelectedItemsButton) {
-        buySelectedItemsButton.disabled = !hasSelectedItems;
-        buySelectedItemsButton.style.opacity = hasSelectedItems ? '1' : '0.5';
-        
-        // Add this console log to check the button state
-        console.log('Buy Selected Items button state:', {
-            disabled: buySelectedItemsButton.disabled,
-            opacity: buySelectedItemsButton.style.opacity,
-            hasSelectedItems: hasSelectedItems
-        });
-    }
-}
-
-    
  function updateUserCoinsDisplay(newCoins) {
     const coinsValueElement = document.getElementById('coins-value');
     if (coinsValueElement) {
@@ -207,51 +185,40 @@ function updateBuySelectedItemsButton() {
     }
 }
     
-  function buySelectedItems() {
-    console.log('Buying selected items');
-    const selectedItemIds = Object.values(selectedItems);
-    
-    if (selectedItemIds.length === 0) {
-        alert('Please select at least one item to purchase.');
-        return;
-    }
+    function buySelectedItems() {
+        console.log('Buying selected items');
+        const selectedItemIds = Object.values(selectedItems);
+        let totalCost = 0;
+        let itemsToBuy = [];
 
-    let totalCost = 0;
-    let itemsToBuy = [];
-
-    selectedItemIds.forEach(itemId => {
-        const item = shopItems.find(i => i.id === itemId);
-        if (item && !window.userInventory.hasItem(itemId)) {
-            totalCost += item.price;
-            itemsToBuy.push(item);
-        }
-    });
-
-    if (itemsToBuy.length === 0) {
-        alert('You already own all selected items.');
-        return;
-    }
-
-    const currentCoins = UserManager.getUserCoins();
-    if (currentCoins < totalCost) {
-        alert('Not enough coins to buy all selected items!');
-        return;
-    }
-
-    const newCoins = currentCoins - totalCost;
-    if (UserManager.updateUserCoins(newCoins)) {
-        itemsToBuy.forEach(item => {
-            window.userInventory.addItem(item);
-            updateBuyButtonState(document.querySelector(`.buy-btn[data-id="${item.id}"]`), item.id);
+        selectedItemIds.forEach(itemId => {
+            const item = shopItems.find(i => i.id === itemId);
+            if (item && !window.userInventory.hasItem(itemId)) {
+                totalCost += item.price;
+                itemsToBuy.push(item);
+            }
         });
 
-        updateUserCoinsDisplay(newCoins);
-        alert(`You have successfully purchased ${itemsToBuy.length} item(s)!`);
-        resetAvatarDisplay();
-    } else {
-        alert('Error updating user coins. Please try again.');
+        const currentCoins = UserManager.getUserCoins();
+        if (currentCoins < totalCost) {
+            alert('Not enough coins to buy all selected items!');
+            return;
+        }
+
+        const newCoins = currentCoins - totalCost;
+        if (UserManager.updateUserCoins(newCoins)) {
+            itemsToBuy.forEach(item => {
+                window.userInventory.addItem(item);
+                updateBuyButtonState(document.querySelector(`.buy-btn[data-id="${item.id}"]`), item.id);
+            });
+
+            updateUserCoinsDisplay(newCoins);
+            alert(`You have successfully purchased ${itemsToBuy.length} item(s)!`);
+            resetAvatarDisplay();
+        } else {
+            alert('Error updating user coins. Please try again.');
+        }
     }
-}
 
     // Event delegation for item clicks
     document.addEventListener('click', function(e) {
@@ -272,21 +239,6 @@ function updateBuySelectedItemsButton() {
         }
     });
 
-
-
-function initializeAvatarWithInventory() {
-    if (window.avatarDisplay && window.userInventory) {
-        const inventoryItems = window.userInventory.getItems();
-        inventoryItems.forEach(item => {
-            window.avatarDisplay.tryOnItem(item);
-        });
-    }
-}
-
-// Call this function after creating the avatarDisplay
-initializeAvatarWithInventory();
-
-    
     // Add event listener for the new button
     const buySelectedItemsButton = document.getElementById('buy-selected-items-button');
     if (buySelectedItemsButton) {
@@ -302,11 +254,10 @@ initializeAvatarWithInventory();
         selectedItems
     };
 
-// Initialize the shop
+  // Initialize the shop
 renderShopItems();
 updateTotalValueDisplay();
-updateBuySelectedItemsButton(); // Add this line
-    
+
 // Log avatarDisplay for debugging
 console.log('avatarDisplay:', window.avatarDisplay);
 });
