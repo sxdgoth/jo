@@ -1,4 +1,4 @@
-const GITHUB_TOKEN = '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';
+const GITHUB_TOKEN = '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';
 
 async function register() {
     const username = document.getElementById('reg-username').value;
