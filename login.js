@@ -4,7 +4,6 @@ async function login() {
     console.log('Login function called');
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
-    console.log('Username:', username, 'Password:', password);
 
     try {
         const users = await fetchUsers();
@@ -12,7 +11,7 @@ async function login() {
         if (user) {
             console.log('User found:', user);
             sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = 'https://sxdgoth.github.io/jo/home/index.html';
+            window.location.href = 'home/index.html';
         } else {
             console.log('Invalid login attempt');
             alert('Invalid username or password.');
