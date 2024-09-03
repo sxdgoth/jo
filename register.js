@@ -5,13 +5,13 @@ async function register() {
     const password = document.getElementById('reg-password').value;
     if (username && password) {
         try {
-            let users = await fetchUsers();
+            let users = await UserManager.fetchUsers();
             if (users.some(user => user.username === username)) {
                 alert('Username already exists. Please choose a different username.');
                 return;
             }
             users.push({ username, password, coins: 1000 });
-            await updateUsers(users);
+            await UserManager.updateUsers(users);
             alert('Registration successful! You have been awarded 1000 coins.');
             window.location.href = 'home/index.html';
         } catch (error) {
