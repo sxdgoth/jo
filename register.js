@@ -12,11 +12,12 @@ async function register() {
                 return;
             }
             users.push({ username, password, coins: 1000 });
-            console.log('New user registered:', { username, coins: 1000 });
-            alert('Registration successful! Please note that you need to manually update the users.json file in your GitHub repository.');
+            await updateUsers(users);
+            alert('Registration successful! You have been awarded 1000 coins.');
+            window.location.href = 'home/index.html';
         } catch (error) {
             console.error('Error during registration:', error);
-            alert('Error registering user. Please check the console for more details and try again.');
+            alert('Error registering user. Please try again.');
         }
     } else {
         alert('Please fill in all fields.');
