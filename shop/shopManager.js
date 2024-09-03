@@ -74,29 +74,23 @@ function updateTotalValueDisplay() {
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        
-        // Update selectedItems
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            console.log('Calling avatarDisplay.tryOnItem');
+            window.avatarDisplay.tryOnItem(item);
+        } else {
+            console.error('avatarDisplay not found or tryOnItem is not a function');
+        }
+
         if (selectedItems[item.type] === itemId) {
             delete selectedItems[item.type];
         } else {
             selectedItems[item.type] = itemId;
         }
 
-        console.log('Updated selectedItems:', selectedItems);
-
-        // Try to update avatar display if available
-        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            try {
-                window.avatarDisplay.tryOnItem(item);
-            } catch (error) {
-                console.error('Error in avatarDisplay.tryOnItem:', error);
-            }
-        } else {
-            console.error('avatarDisplay not found or tryOnItem is not a function');
-        }
-
         updateSelectedItems();
         updateTotalValueDisplay();
+        updateBuySelectedItemsButton(); // Add this line
+        console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
     }
@@ -153,7 +147,7 @@ function updateTotalValueDisplay() {
         }
     }
     
-  function resetAvatarDisplay() {
+ function resetAvatarDisplay() {
     console.log('Resetting avatar display');
     selectedItems = {};
     if (window.avatarDisplay) {
@@ -161,6 +155,7 @@ function updateTotalValueDisplay() {
     }
     updateSelectedItems();
     updateTotalValueDisplay();
+    updateBuySelectedItemsButton(); // Add this line
     console.log('Reset selectedItems:', selectedItems);
 }
 
@@ -279,6 +274,8 @@ function updateBuySelectedItemsButton() {
   // Initialize the shop
 renderShopItems();
 updateTotalValueDisplay();
+updateBuySelectedItemsButton(); // Add this line
+
 
 // Log avatarDisplay for debugging
 console.log('avatarDisplay:', window.avatarDisplay);
