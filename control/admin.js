@@ -1,5 +1,5 @@
-const GITHUB_REPO = 'https://raw.githubusercontent.com/sxdgoth/jo/main/users.json';
-const GITHUB_TOKEN = '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';
+const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json';
+const GITHUB_TOKEN = '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';
 
 async function loadUsers() {
     const userTableBody = document.getElementById('userTableBody');
@@ -27,39 +27,6 @@ async function loadUsers() {
     }
 }
 
-async function fetchUsers() {
-    const response = await fetch(GITHUB_REPO, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-    });
-    const data = await response.json();
-    const content = atob(data.content);
-    return JSON.parse(content);
-}
-
-async function updateUsers(users) {
-    const content = btoa(JSON.stringify(users));
-    await fetch(GITHUB_REPO, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            message: 'Update users',
-            content: content,
-            sha: await getFileSha()
-        })
-    });
-}
-
-async function getFileSha() {
-    const response = await fetch(GITHUB_REPO, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-    });
-    const data = await response.json();
-    return data.sha;
-}
-
 async function addCoins(username) {
     const coinsInput = document.getElementById(`coins_${username}`);
     const coinsToAdd = parseInt(coinsInput.value, 10);
@@ -68,7 +35,7 @@ async function addCoins(username) {
         return;
     }
 
-  try {
+    try {
         let users = await fetchUsers();
         const userIndex = users.findIndex(user => user.username === username);
         if (userIndex !== -1) {
