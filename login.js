@@ -1,5 +1,3 @@
-const GITHUB_TOKEN = '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';
-
 async function login() {
     console.log('Login function called');
     const username = document.getElementById('login-username').value;
