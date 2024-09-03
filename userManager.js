@@ -1,3 +1,4 @@
+const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json';
 const GITHUB_TOKEN = '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';
 
 class UserManager {
@@ -12,11 +13,11 @@ class UserManager {
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
             
             try {
-                let users = await fetchUsers();
+                let users = await this.fetchUsers();
                 const updatedUsers = users.map(user => 
                     user.username === loggedInUser.username ? {...user, coins: newCoins} : user
                 );
-                await updateUsers(updatedUsers);
+                await this.updateUsers(updatedUsers);
                 console.log('Users file updated with new coin balance');
             } catch (error) {
                 console.error('Error updating users file:', error);
@@ -32,8 +33,6 @@ class UserManager {
         const user = this.getCurrentUser();
         return user ? user.coins : 0;
     }
-}
-
 
     static async fetchUsers() {
         try {
