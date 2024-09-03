@@ -185,7 +185,7 @@ function updateTotalValueDisplay() {
     }
 }
     
-   function buySelectedItems() {
+  function buySelectedItems() {
     console.log('Buying selected items');
     const selectedItemIds = Object.values(selectedItems);
     let totalCost = 0;
@@ -201,13 +201,13 @@ function updateTotalValueDisplay() {
 
     // Check if there are any items to buy
     if (itemsToBuy.length === 0) {
-        alert('No items selected for purchase.');
+        window.notificationManager.show('No items selected for purchase.', 'error');
         return;
     }
 
     const currentCoins = UserManager.getUserCoins();
     if (currentCoins < totalCost) {
-        alert('Not enough coins to buy all selected items!');
+        window.notificationManager.show('Not enough coins to buy all selected items!', 'error');
         return;
     }
 
@@ -218,10 +218,10 @@ function updateTotalValueDisplay() {
             updateBuyButtonState(document.querySelector(`.buy-btn[data-id="${item.id}"]`), item.id);
         });
         updateUserCoinsDisplay(newCoins);
-        alert(`You have successfully purchased ${itemsToBuy.length} item(s)!`);
+        window.notificationManager.show(`You have successfully purchased ${itemsToBuy.length} item(s)!`, 'success');
         resetAvatarDisplay();
     } else {
-        alert('Error updating user coins. Please try again.');
+        window.notificationManager.show('Error updating user coins. Please try again.', 'error');
     }
 }
 
