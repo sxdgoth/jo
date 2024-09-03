@@ -55,7 +55,7 @@ nav {
 }
 
 main {
-    max-width: 1300px; /* Slightly increased */
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -67,23 +67,10 @@ main {
 }
 
 .avatar-and-clear {
-    flex: 0 0 400px; /* Increased from 350px */
+    flex: 0 0 350px;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.avatar-and-clear {
-    flex: 0 0 400px; /* Increased from 350px */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#avatar-display {
-    width: 300px;
-    height: 500px;
-    position: relative;
 }
 
 .avatar-container {
@@ -95,6 +82,12 @@ main {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    position: relative;
+}
+
+#avatar-display {
+    width: 360px; /* Increased from 300px */
+    height: 600px; /* Increased from 500px */
     position: relative;
 }
 
@@ -310,12 +303,7 @@ main {
     }
 
     .avatar-container {
-        height: 600px;
-    }
-
-    #avatar-display {
-        width: 360px;
-        height: 600px;
+        height: 500px;
     }
 
     .shop-items-container {
@@ -325,12 +313,12 @@ main {
 
 @media (max-width: 768px) {
     .avatar-container {
-        height: 500px;
+        height: 400px;
     }
 
     #avatar-display {
-        width: 300px;
-        height: 500px;
+        width: 200px;
+        height: 350px;
     }
 
     .shop-items-container {
@@ -349,6 +337,7 @@ main {
         height: 100px;
     }
 }
+
 
 #selected-items-value {
     text-align: center;
