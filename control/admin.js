@@ -1,4 +1,4 @@
-const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/myadminhighrise/contents/users.json';
+const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json';
 const GITHUB_TOKEN = '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';
 
 async function loadUsers() {
