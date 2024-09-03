@@ -259,6 +259,21 @@ function updateBuySelectedItemsButton() {
         }
     });
 
+
+
+function initializeAvatarWithInventory() {
+    if (window.avatarDisplay && window.userInventory) {
+        const inventoryItems = window.userInventory.getItems();
+        inventoryItems.forEach(item => {
+            window.avatarDisplay.tryOnItem(item);
+        });
+    }
+}
+
+// Call this function after creating the avatarDisplay
+initializeAvatarWithInventory();
+
+    
     // Add event listener for the new button
     const buySelectedItemsButton = document.getElementById('buy-selected-items-button');
     if (buySelectedItemsButton) {
