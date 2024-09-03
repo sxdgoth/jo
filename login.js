@@ -4,29 +4,16 @@ async function login() {
     console.log('Login function called');
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
-
     try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-            console.log('User logged in:', data.user);
-            sessionStorage.setItem('loggedInUser', JSON.stringify(data.user));
+        const users = await fetchUsers();
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            console.log('User found:', user);
+            sessionStorage.setItem('loggedInUser', JSON.stringify(user));
             window.location.href = 'home/index.html';
         } else {
             console.log('Invalid login attempt');
-            alert(data.message || 'Invalid username or password.');
+            alert('Invalid username or password.');
         }
     } catch (error) {
         console.error('Error during login:', error);
