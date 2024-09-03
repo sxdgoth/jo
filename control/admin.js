@@ -1,11 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
-    if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+    if (!isAdminLoggedIn()) {
         window.location.href = 'index.html';
         return;
     }
 
+    document.getElementById('admin-container').style.display = 'block';
     loadUsers();
 });
+
+function isAdminLoggedIn() {
+    const adminToken = localStorage.getItem('adminToken');
+    if (!adminToken) return false;
+    
+    // Add additional checks here if needed
+    // For example, you could check if the token is expired
+    
+    return true;
+}
 
 function loadUsers() {
     const users = JSON.parse(localStorage.getItem('users')) || [];
@@ -56,6 +67,6 @@ function sendCoins() {
 }
 
 function logout() {
-    sessionStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminToken');
     window.location.href = 'index.html';
 }
