@@ -134,25 +134,27 @@ function updateTotalValueDisplay() {
         return;
     }
 
-    const newCoins = currentCoins - item.price;
-    if (UserManager.updateUserCoins(newCoins)) {
-        if (window.userInventory) {
-            window.userInventory.addItem(item);
+    showConfirmationModal(`Are you sure you want to buy ${item.name} for ${item.price} coins?`, () => {
+        const newCoins = currentCoins - item.price;
+        if (UserManager.updateUserCoins(newCoins)) {
+            if (window.userInventory) {
+                window.userInventory.addItem(item);
+            }
+            updateUserCoinsDisplay(newCoins);
+            const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
+            if (buyButton) {
+                updateBuyButtonState(buyButton, itemId);
+            }
+            const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
+            if (itemImage) {
+                itemImage.classList.add('equipped');
+                itemImage.classList.remove('selected');
+            }
+            window.notificationManager.show(`You have successfully purchased ${item.name}!`, 'success');
+        } else {
+            window.notificationManager.show('Error updating user coins. Please try again.', 'error');
         }
-        updateUserCoinsDisplay(newCoins);
-        const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
-        if (buyButton) {
-            updateBuyButtonState(buyButton, itemId);
-        }
-        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
-        if (itemImage) {
-            itemImage.classList.add('equipped');
-            itemImage.classList.remove('selected');
-        }
-        window.notificationManager.show(`You have successfully purchased ${item.name}!`, 'success');
-    } else {
-        window.notificationManager.show('Error updating user coins. Please try again.', 'error');
-    }
+    });
 }
     
   function resetAvatarDisplay() {
@@ -201,7 +203,6 @@ function updateTotalValueDisplay() {
         }
     });
 
-    // Check if there are any items to buy
     if (itemsToBuy.length === 0) {
         window.notificationManager.show('No items selected for purchase.', 'error');
         return;
@@ -213,19 +214,90 @@ function updateTotalValueDisplay() {
         return;
     }
 
-    const newCoins = currentCoins - totalCost;
-    if (UserManager.updateUserCoins(newCoins)) {
-        itemsToBuy.forEach(item => {
-            window.userInventory.addItem(item);
-            updateBuyButtonState(document.querySelector(`.buy-btn[data-id="${item.id}"]`), item.id);
-        });
-        updateUserCoinsDisplay(newCoins);
-        window.notificationManager.show(`You have successfully purchased ${itemsToBuy.length} item(s)!`, 'success');
-        resetAvatarDisplay();
-    } else {
-        window.notificationManager.show('Error updating user coins. Please try again.', 'error');
-    }
+    showConfirmationModal(`Are you sure you want to buy ${itemsToBuy.length} item(s) for ${totalCost} coins?`, () => {
+        const newCoins = currentCoins - totalCost;
+        if (UserManager.updateUserCoins(newCoins)) {
+            itemsToBuy.forEach(item => {
+                window.userInventory.addItem(item);
+                updateBuyButtonState(document.querySelector(`.buy-btn[data-id="${item.id}"]`), item.id);
+            });
+            updateUserCoinsDisplay(newCoins);
+            window.notificationManager.show(`You have successfully purchased ${itemsToBuy.length} selected item(s)!`, 'success');
+            resetAvatarDisplay();
+        } else {
+            window.notificationManager.show('Error updating user coins. Please try again.', 'error');
+        }
+    });
 }
+
+    function showConfirmationModal(message, onConfirm) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 300px;
+    `;
+
+    const messageElement = document.createElement('p');
+    messageElement.textContent = message;
+
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = 'Confirm';
+    confirmButton.style.cssText = `
+        margin: 10px;
+        padding: 5px 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    `;
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Cancel';
+    cancelButton.style.cssText = `
+        margin: 10px;
+        padding: 5px 10px;
+        background-color: #F44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    `;
+
+    modalContent.appendChild(messageElement);
+    modalContent.appendChild(confirmButton);
+    modalContent.appendChild(cancelButton);
+    modal.appendChild(modalContent);
+
+    confirmButton.onclick = () => {
+        document.body.removeChild(modal);
+        onConfirm();
+    };
+
+    cancelButton.onclick = () => {
+        document.body.removeChild(modal);
+    };
+
+    document.body.appendChild(modal);
+}
+    
 
     // Event delegation for item clicks
     document.addEventListener('click', function(e) {
