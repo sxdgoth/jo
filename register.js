@@ -21,33 +21,7 @@ async function register() {
     }
 }
 
-async function usernameExists(username) {
-    const users = await fetchUsers();
-    return users.some(user => user.username === username);
-}
-
-async function fetchUsers() {
-    try {
-        const response = await fetch(GITHUB_REPO);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const content = await response.text();
-        console.log('Fetched content:', content);
-        const users = JSON.parse(content);
-        console.log('Parsed users:', users);
-        return users;
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        throw error;
-    }
-}
-
-
-
-async function updateUsers(users) {
-    console.log('Attempting to update users:', users);
-    alert('User registration successful! However, automatic updating of the users file is not possible. Please manually update the users.json file in your GitHub repository.');
-    // In a real application, you would send this data to a server to update the file
-}
-
+// These functions are no longer needed as they're handled by UserManager
+// async function usernameExists(username) { ... }
+// async function fetchUsers() { ... }
+// async function updateUsers(users) { ... }
