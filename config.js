@@ -43,3 +43,21 @@ async function updateUsers(users) {
         throw error;
     }
 }
+
+async function getFileSha() {
+    try {
+        const response = await fetch(GITHUB_REPO, {
+            headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.sha;
+    } catch (error) {
+        console.error('Error getting file SHA:', error);
+        throw error;
+    }
+}
+
+
