@@ -120,38 +120,40 @@ function updateTotalValueDisplay() {
     updateTotalValueDisplay();
 }
       
-    function buyItem(itemId) {
-        console.log('Attempting to buy item:', itemId);
-        const item = shopItems.find(i => i.id === itemId);
-        if (!item) {
-            console.error('Item not found');
-            return;
-        }
-        const currentCoins = UserManager.getUserCoins();
-        if (currentCoins < item.price) {
-            alert('Not enough coins to buy this item!');
-            return;
-        }
-        const newCoins = currentCoins - item.price;
-        if (UserManager.updateUserCoins(newCoins)) {
-            if (window.userInventory) {
-                window.userInventory.addItem(item);
-            }
-            updateUserCoinsDisplay(newCoins);
-            const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
-            if (buyButton) {
-                updateBuyButtonState(buyButton, itemId);
-            }
-            const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
-            if (itemImage) {
-                itemImage.classList.add('equipped');
-                itemImage.classList.remove('selected');
-            }
-            alert(`You have successfully purchased ${item.name}!`);
-        } else {
-            alert('Error updating user coins. Please try again.');
-        }
+   function buyItem(itemId) {
+    console.log('Attempting to buy item:', itemId);
+    const item = shopItems.find(i => i.id === itemId);
+    if (!item) {
+        console.error('Item not found');
+        return;
     }
+
+    const currentCoins = UserManager.getUserCoins();
+    if (currentCoins < item.price) {
+        window.notificationManager.show('Not enough coins to buy this item!', 'error');
+        return;
+    }
+
+    const newCoins = currentCoins - item.price;
+    if (UserManager.updateUserCoins(newCoins)) {
+        if (window.userInventory) {
+            window.userInventory.addItem(item);
+        }
+        updateUserCoinsDisplay(newCoins);
+        const buyButton = document.querySelector(`.buy-btn[data-id="${itemId}"]`);
+        if (buyButton) {
+            updateBuyButtonState(buyButton, itemId);
+        }
+        const itemImage = document.querySelector(`.item-image[data-id="${itemId}"]`);
+        if (itemImage) {
+            itemImage.classList.add('equipped');
+            itemImage.classList.remove('selected');
+        }
+        window.notificationManager.show(`You have successfully purchased ${item.name}!`, 'success');
+    } else {
+        window.notificationManager.show('Error updating user coins. Please try again.', 'error');
+    }
+}
     
   function resetAvatarDisplay() {
     console.log('Resetting avatar display');
