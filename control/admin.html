@@ -4,31 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        input[type="number"] { width: 80px; }
-        .warning { color: red; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-    <h1>Admin Panel</h1>
-    <p class="warning">Warning: Displaying passwords is not secure and should not be done in a production environment.</p>
-    <table id="userTable">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Password</th>
-                <th>Coins</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="userTableBody"></tbody>
-    </table>
-
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <div id="user-list">
+            <h2>Registered Users</h2>
+            <ul id="users"></ul>
+        </div>
+        <div id="send-coins">
+            <h2>Send Coins</h2>
+            <input type="text" id="recipient" placeholder="Recipient Username">
+            <input type="number" id="amount" placeholder="Amount">
+            <button onclick="sendCoins()">Send Coins</button>
+        </div>
+    </div>
     <script src="admin.js"></script>
-     <script src="https://sxdgoth.github.io/jo/config.js"></script>
 </body>
 </html>
