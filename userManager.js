@@ -1,4 +1,4 @@
-const GITHUB_TOKEN = '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';
+const GITHUB_TOKEN = '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';
 
 class UserManager {
     static getCurrentUser() {
@@ -10,14 +10,13 @@ class UserManager {
         if (loggedInUser) {
             loggedInUser.coins = newCoins;
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-            console.log('User coins updated:', newCoins);
             
             try {
-                let users = await this.fetchUsers();
+                let users = await fetchUsers();
                 const updatedUsers = users.map(user => 
                     user.username === loggedInUser.username ? {...user, coins: newCoins} : user
                 );
-                await this.updateUsers(updatedUsers);
+                await updateUsers(updatedUsers);
                 console.log('Users file updated with new coin balance');
             } catch (error) {
                 console.error('Error updating users file:', error);
@@ -33,6 +32,7 @@ class UserManager {
         const user = this.getCurrentUser();
         return user ? user.coins : 0;
     }
+
 
     static async fetchUsers() {
         try {
