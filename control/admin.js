@@ -1,22 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-    if (!isAdminLoggedIn()) {
+    if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
         window.location.href = 'index.html';
         return;
     }
 
-    document.getElementById('admin-container').style.display = 'block';
     loadUsers();
 });
-
-function isAdminLoggedIn() {
-    const adminToken = localStorage.getItem('adminToken');
-    if (!adminToken) return false;
-    
-    // Add additional checks here if needed
-    // For example, you could check if the token is expired
-    
-    return true;
-}
 
 function loadUsers() {
     const users = JSON.parse(localStorage.getItem('users')) || [];
@@ -66,7 +55,40 @@ function sendCoins() {
     alert(`Successfully sent ${amount} coins to ${recipient}.`);
 }
 
+function exportData() {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(users));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "users_data.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+function importData() {
+    const fileInput = document.getElementById('import-file');
+    const file = fileInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const users = JSON.parse(e.target.result);
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUsers();
+                alert('Data imported successfully!');
+            } catch (error) {
+                alert('Error importing data. Please make sure the file is valid JSON.');
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Please select a file to import.');
+    }
+}
+
 function logout() {
-    localStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminLoggedIn');
     window.location.href = 'index.html';
 }
+
