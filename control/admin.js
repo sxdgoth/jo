@@ -1,4 +1,4 @@
-const GITHUB_REPO = 'https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO_NAME/contents/users.json';
+const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/sxdgoth/contents/users.json';
 const GITHUB_TOKEN = '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';
 
 async function loadUsers() {
