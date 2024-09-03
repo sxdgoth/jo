@@ -2,35 +2,25 @@ const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json
 const GITHUB_TOKEN = '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';
 
 async function register() {
-    console.log('Register function called');
     const username = document.getElementById('reg-username').value;
     const password = document.getElementById('reg-password').value;
-    console.log('Username:', username, 'Password:', password);
 
     if (username && password) {
-        console.log('Checking if username exists...');
-        if (await usernameExists(username)) {
-            console.log('Username already exists');
-            alert('Username already exists. Please choose a different username.');
-            return;
-        }
-
-        const newUser = { username, password, coins: 1000 };
-        
         try {
             let users = await fetchUsers();
-            users.push(newUser);
+            if (users.some(user => user.username === username)) {
+                alert('Username already exists. Please choose a different username.');
+                return;
+            }
+            users.push({ username, password, coins: 1000 });
             await updateUsers(users);
-            
-            alert('Registration successful! You have been awarded 1000 coins. You will now be redirected to the home page.');
-            sessionStorage.setItem('loggedInUser', JSON.stringify(newUser));
-            window.location.href = 'home/index.html';
+            alert('Registration successful!');
+            // Redirect or update UI as needed
         } catch (error) {
-            console.error('Error registering user:', error);
+            console.error('Error during registration:', error);
             alert('Error registering user. Please try again.');
         }
     } else {
-        console.log('Empty fields');
         alert('Please fill in all fields.');
     }
 }
