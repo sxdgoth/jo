@@ -10,7 +10,7 @@ async function fetchUsers() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        const content = atob(data.content);
+        const content = Base64.decode(data.content);
         return JSON.parse(content);
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -20,7 +20,7 @@ async function fetchUsers() {
 
 async function updateUsers(users) {
     try {
-        const content = btoa(JSON.stringify(users, null, 2));
+        const content = Base64.encode(JSON.stringify(users, null, 2));
         const sha = await getFileSha();
         const response = await fetch(GITHUB_REPO, {
             method: 'PUT',
@@ -59,5 +59,3 @@ async function getFileSha() {
         throw error;
     }
 }
-
-
