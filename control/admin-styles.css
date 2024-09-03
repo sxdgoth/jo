@@ -1,0 +1,66 @@
+.container {
+    max-width: 800px;
+}
+
+#user-list {
+    margin-top: 20px;
+}
+
+#users {
+    list-style-type: none;
+    padding: 0;
+}
+
+#users li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#users li button {
+    width: auto;
+    background-color: #f44336;
+    margin: 0;
+    padding: 5px 10px;
+}
+
+#users li button:hover {
+    background-color: #d32f2f;
+}
+
+#send-coins {
+    margin-top: 20px;
+}
+
+#send-coins input {
+    width: calc(50% - 5px);
+    display: inline-block;
+}
+
+#send-coins input:first-child {
+    margin-right: 10px;
+}
+
+#send-coins button {
+    width: 100%;
+}
+
+#logout-btn {
+    background-color: #2196F3;
+    margin-top: 20px;
+}
+
+#logout-btn:hover {
+    background-color: #1976D2;
+}
+
+@media (max-width: 600px) {
+    #send-coins input {
+        width: 100%;
+        margin-right: 0;
+    }
+}
