@@ -1,5 +1,5 @@
-const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/sxdgoth/contents/users.json';
-const GITHUB_TOKEN = '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';
+const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/myadminhighrise/contents/users.json';
+const GITHUB_TOKEN = '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';
 
 async function loadUsers() {
     const userTableBody = document.getElementById('userTableBody');
