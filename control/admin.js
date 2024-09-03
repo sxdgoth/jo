@@ -1,25 +1,66 @@
-function loadUsers() {
+const GITHUB_REPO = 'https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO_NAME/contents/users.json';
+const GITHUB_TOKEN = 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN';
+
+async function loadUsers() {
     const userTableBody = document.getElementById('userTableBody');
     userTableBody.innerHTML = '';
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+    try {
+        const users = await fetchUsers();
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.password}</td>
+                <td>${user.coins}</td>
+                <td>
+                    <input type="number" id="coins_${user.username}" min="0" value="0">
+                    <button onclick="addCoins('${user.username}')">Add Coins</button>
+                    <button onclick="deleteUser('${user.username}')">Delete User</button>
+                </td>
+            `;
+            userTableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error loading users:', error);
+        alert('Error loading users. Please check the console for details.');
+    }
+}
 
-    users.forEach(user => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${user.username}</td>
-            <td>${user.password}</td>
-            <td>${user.coins}</td>
-            <td>
-                <input type="number" id="coins_${user.username}" min="0" value="0">
-                <button onclick="addCoins('${user.username}')">Add Coins</button>
-            </td>
-        `;
-        userTableBody.appendChild(row);
+async function fetchUsers() {
+    const response = await fetch(GITHUB_REPO, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    const data = await response.json();
+    const content = atob(data.content);
+    return JSON.parse(content);
+}
+
+async function updateUsers(users) {
+    const content = btoa(JSON.stringify(users));
+    await fetch(GITHUB_REPO, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${GITHUB_TOKEN}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            message: 'Update users',
+            content: content,
+            sha: await getFileSha()
+        })
     });
 }
 
-function addCoins(username) {
+async function getFileSha() {
+    const response = await fetch(GITHUB_REPO, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    const data = await response.json();
+    return data.sha;
+}
+
+async function addCoins(username) {
     const coinsInput = document.getElementById(`coins_${username}`);
     const coinsToAdd = parseInt(coinsInput.value, 10);
     if (isNaN(coinsToAdd) || coinsToAdd < 0) {
@@ -27,23 +68,35 @@ function addCoins(username) {
         return;
     }
 
-    let users = JSON.parse(localStorage.getItem('users')) || [];
-    const userIndex = users.findIndex(user => user.username === username);
-    if (userIndex !== -1) {
-        users[userIndex].coins += coinsToAdd;
-        localStorage.setItem('users', JSON.stringify(users));
-
-        // Update session storage if the user is currently logged in
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (loggedInUser && loggedInUser.username === username) {
-            loggedInUser.coins += coinsToAdd;
-            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+  try {
+        let users = await fetchUsers();
+        const userIndex = users.findIndex(user => user.username === username);
+        if (userIndex !== -1) {
+            users[userIndex].coins += coinsToAdd;
+            await updateUsers(users);
+            await loadUsers();
+            alert(`Added ${coinsToAdd} coins to ${username}`);
+        } else {
+            alert('User not found.');
         }
+    } catch (error) {
+        console.error('Error adding coins:', error);
+        alert('Error adding coins. Please check the console for details.');
+    }
+}
 
-        loadUsers();
-        alert(`Added ${coinsToAdd} coins to ${username}`);
-    } else {
-        alert('User not found.');
+async function deleteUser(username) {
+    if (confirm(`Are you sure you want to delete user ${username}?`)) {
+        try {
+            let users = await fetchUsers();
+            users = users.filter(user => user.username !== username);
+            await updateUsers(users);
+            await loadUsers();
+            alert(`User ${username} has been deleted.`);
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('Error deleting user. Please check the console for details.');
+        }
     }
 }
 
