@@ -1,4 +1,4 @@
-const GITHUB_REPO = 'https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO_NAME/contents/users.json';
+const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/sxdgoth/contents/users.json';
 const GITHUB_TOKEN = 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN';
 
 async function login() {
