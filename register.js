@@ -1,4 +1,3 @@
-const GITHUB_REPO = 'https://raw.githubusercontent.com/sxdgoth/jo/main/users.json';
 const GITHUB_TOKEN = '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';
 
 async function register() {
@@ -13,7 +12,7 @@ async function register() {
                 return;
             }
             users.push({ username, password, coins: 1000 });
-            await updateUsers(users);
+            console.log('New user registered:', { username, coins: 1000 });
             alert('Registration successful! Please note that you need to manually update the users.json file in your GitHub repository.');
         } catch (error) {
             console.error('Error during registration:', error);
