@@ -55,7 +55,7 @@ nav {
 }
 
 main {
-    max-width: 1300px; /* Increased from 1200px */
+    max-width: 1300px; /* Slightly increased */
     margin: 20px auto;
     padding: 20px;
     background-color: #ffffff;
@@ -67,7 +67,7 @@ main {
 }
 
 .avatar-and-clear {
-    flex: 0 0 350px;
+    flex: 0 0 400px; /* Increased from 350px */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -81,14 +81,14 @@ main {
 }
 
 #avatar-display {
-    width: 420px; /* Increased from 360px */
-    height: 700px; /* Increased from 600px */
+    width: 360px; /* Increased from 300px */
+    height: 600px; /* Increased from 500px */
     position: relative;
 }
 
 .avatar-container {
     width: 100%;
-    height: 700px; /* Increased from 600px */
+    height: 600px; /* Increased from 500px */
     background-color: white;
     padding: 1rem;
     display: flex;
@@ -297,7 +297,7 @@ main {
     background-color: #45a049;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1200px) {
     main {
         flex-direction: column;
         height: auto;
