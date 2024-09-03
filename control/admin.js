@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
-        window.location.href = 'admin-login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -57,5 +57,5 @@ function sendCoins() {
 
 function logout() {
     sessionStorage.removeItem('adminLoggedIn');
-    window.location.href = 'admin-login.html';
+    window.location.href = 'index.html';
 }
