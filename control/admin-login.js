@@ -7,7 +7,8 @@ function adminLogin() {
     const ADMIN_PASSWORD = 'adminpass123';
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        sessionStorage.setItem('adminLoggedIn', 'true');
+        // Use a more secure method to indicate admin login
+        localStorage.setItem('adminToken', btoa(username + ':' + new Date().getTime()));
         window.location.href = 'admin.html';
     } else {
         alert('Invalid admin credentials');
