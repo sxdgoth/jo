@@ -1,4 +1,3 @@
-const GITHUB_REPO = 'https://raw.githubusercontent.com/sxdgoth/jo/main/users.json';
 const GITHUB_TOKEN = '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';
 
 async function login() {
@@ -13,7 +12,7 @@ async function login() {
         if (user) {
             console.log('User found:', user);
             sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = 'home/index.html';
+            window.location.href = 'https://sxdgoth.github.io/jo/home/index.html';
         } else {
             console.log('Invalid login attempt');
             alert('Invalid username or password.');
