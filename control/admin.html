@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="admin-styles.css">
 </head>
 <body>
-    <div class="container" id="admin-container" style="display: none;">
+    <div class="container" id="admin-container">
         <h1>Admin Panel</h1>
         <div id="admin-content">
             <div id="user-list">
@@ -20,6 +20,12 @@
                 <input type="text" id="recipient" placeholder="Recipient Username">
                 <input type="number" id="amount" placeholder="Amount">
                 <button onclick="sendCoins()">Send Coins</button>
+            </div>
+            <div id="data-management">
+                <h2>Data Management</h2>
+                <button onclick="exportData()">Export Data</button>
+                <input type="file" id="import-file" accept=".json">
+                <button onclick="importData()">Import Data</button>
             </div>
             <button id="logout-btn" onclick="logout()">Logout</button>
         </div>
