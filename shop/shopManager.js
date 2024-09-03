@@ -85,13 +85,19 @@ function toggleItem(itemId) {
             console.log('Item selected:', item.type, itemId);
         }
 
+        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
+            if (selectedItems[item.type] === itemId) {
+                window.avatarDisplay.tryOnItem(item);
+            } else {
+                window.avatarDisplay.revertItem(item.type);
+            }
         } else {
             console.error('avatarDisplay not found or tryOnItem is not a function');
         }
 
         updateSelectedItems();
         updateTotalValueDisplay();
-        updateBuySelectedItemsButton(); // Make sure this line is here
+        updateBuySelectedItemsButton();
         console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
