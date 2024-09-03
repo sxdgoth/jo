@@ -29,6 +29,9 @@ async function fetchUsers() {
         headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
     });
     const data = await response.json();
+    console.log('Fetched data:', data);  // Log the fetched data
     const content = atob(data.content);
-    return JSON.parse(content);
+    const users = JSON.parse(content);
+    console.log('Parsed users:', users);  // Log the parsed users
+    return users;
 }
