@@ -1,13 +1,15 @@
-function register() {
-    console.log('Register function called');
+const GITHUB_REPO = 'https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO_NAME/contents/users.json';
+const GITHUB_TOKEN = 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN';
 
+async function register() {
+    console.log('Register function called');
     const username = document.getElementById('reg-username').value;
     const password = document.getElementById('reg-password').value;
     console.log('Username:', username, 'Password:', password);
 
     if (username && password) {
         console.log('Checking if username exists...');
-        if (usernameExists(username)) {
+        if (await usernameExists(username)) {
             console.log('Username already exists');
             alert('Username already exists. Please choose a different username.');
             return;
@@ -15,62 +17,58 @@ function register() {
 
         const newUser = { username, password, coins: 1000 };
         
-        let users = getUsersFromStorage();
-        console.log('Existing users:', users);
-        
-        users.push(newUser);
-        
-        localStorage.setItem('users', JSON.stringify(users));
-        console.log('Updated users:', users);
-        
-        alert('Registration successful! You have been awarded 1000 coins. You will now be redirected to the home page.');
-        sessionStorage.setItem('loggedInUser', JSON.stringify(newUser));
-        window.location.href = 'home/index.html';
+        try {
+            let users = await fetchUsers();
+            users.push(newUser);
+            await updateUsers(users);
+            
+            alert('Registration successful! You have been awarded 1000 coins. You will now be redirected to the home page.');
+            sessionStorage.setItem('loggedInUser', JSON.stringify(newUser));
+            window.location.href = 'home/index.html';
+        } catch (error) {
+            console.error('Error registering user:', error);
+            alert('Error registering user. Please try again.');
+        }
     } else {
         console.log('Empty fields');
         alert('Please fill in all fields.');
     }
 }
 
-function usernameExists(username) {
-    const users = getUsersFromStorage();
-    console.log('Users in usernameExists:', users);
-    console.log('Type of users:', typeof users);
-    if (!Array.isArray(users)) {
-        console.error('Users is not an array:', users);
-        return false;
-    }
+async function usernameExists(username) {
+    const users = await fetchUsers();
     return users.some(user => user.username === username);
 }
 
-function getUsersFromStorage() {
-    const usersData = localStorage.getItem('users');
-    if (!usersData) return [];
-    try {
-        const users = JSON.parse(usersData);
-        return Array.isArray(users) ? users : [];
-    } catch (error) {
-        console.error('Error parsing users data:', error);
-        return [];
-    }
+async function fetchUsers() {
+    const response = await fetch(GITHUB_REPO, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    const data = await response.json();
+    const content = atob(data.content);
+    return JSON.parse(content);
 }
 
-function usernameExists(username) {
-    const users = getUsersFromStorage();
-    for (let i = 0; i < users.length; i++) {
-        if (users[i].username === username) {
-            return true;
-        }
-    }
-    return false;
+async function updateUsers(users) {
+    const content = btoa(JSON.stringify(users));
+    await fetch(GITHUB_REPO, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `token ${GITHUB_TOKEN}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            message: 'Update users',
+            content: content,
+            sha: await getFileSha()
+        })
+    });
 }
 
-
-// Clear users data (use this carefully)
-function clearUsersData() {
-    localStorage.removeItem('users');
-    console.log('Users data cleared');
+async function getFileSha() {
+    const response = await fetch(GITHUB_REPO, {
+        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    const data = await response.json();
+    return data.sha;
 }
-
-// Expose the function globally
-window.clearUsersData = clearUsersData;
