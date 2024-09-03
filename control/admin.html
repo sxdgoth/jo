@@ -5,19 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="admin-styles.css">
 </head>
 <body>
     <div class="container">
         <h1>Admin Panel</h1>
-        <div id="user-list">
-            <h2>Registered Users</h2>
-            <ul id="users"></ul>
-        </div>
-        <div id="send-coins">
-            <h2>Send Coins</h2>
-            <input type="text" id="recipient" placeholder="Recipient Username">
-            <input type="number" id="amount" placeholder="Amount">
-            <button onclick="sendCoins()">Send Coins</button>
+        <div id="admin-content">
+            <div id="user-list">
+                <h2>Registered Users</h2>
+                <ul id="users"></ul>
+            </div>
+            <div id="send-coins">
+                <h2>Send Coins</h2>
+                <input type="text" id="recipient" placeholder="Recipient Username">
+                <input type="number" id="amount" placeholder="Amount">
+                <button onclick="sendCoins()">Send Coins</button>
+            </div>
+            <button id="logout-btn" onclick="logout()">Logout</button>
         </div>
     </div>
     <script src="admin.js"></script>
