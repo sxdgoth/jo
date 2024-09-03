@@ -1,4 +1,4 @@
-const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json';
+const GITHUB_REPO = 'https://raw.githubusercontent.com/sxdgoth/jo/main/users.json';
 const GITHUB_TOKEN = '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';
 
 async function login() {
@@ -25,13 +25,19 @@ async function login() {
 }
 
 async function fetchUsers() {
-    const response = await fetch(GITHUB_REPO, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-    });
-    const data = await response.json();
-    console.log('Fetched data:', data);  // Log the fetched data
-    const content = atob(data.content);
-    const users = JSON.parse(content);
-    console.log('Parsed users:', users);  // Log the parsed users
-    return users;
+    try {
+        const response = await fetch(GITHUB_REPO);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const content = await response.text();
+        console.log('Fetched content:', content);
+        const users = JSON.parse(content);
+        console.log('Parsed users:', users);
+        return users;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
 }
+
