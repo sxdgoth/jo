@@ -8,7 +8,7 @@ async function login() {
         if (user) {
             console.log('User found:', user);
             sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = 'home/index.html';
+            window.location.href = 'https://sxdgoth.github.io/jo/home/index.html';
         } else {
             console.log('Invalid login attempt');
             alert('Invalid username or password.');
