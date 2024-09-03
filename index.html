@@ -15,6 +15,7 @@
             <button onclick="login()">Login</button>
             <p>Don't have an account? <a href="#" onclick="toggleForms()">Register here</a></p>
         </div>
+
         <div id="register-form" style="display: none;">
             <h2>Register</h2>
             <input type="text" id="reg-username" placeholder="Username">
@@ -22,16 +23,17 @@
             <button onclick="register()">Register</button>
             <p>Already have an account? <a href="#" onclick="toggleForms()">Login here</a></p>
         </div>
+
         <div id="welcome-message" style="display: none;">
             <h2>Welcome, <span id="user-name"></span>!</h2>
             <button onclick="logout()">Logout</button>
         </div>
     </div>
-    
-    <script src="userManager.js"></script>
+
     <script src="login.js"></script>
     <script src="register.js"></script>
-    
+    <script src="welcome.js"></script>
+    <script src="userManager.js"></script>
     <script>
         function toggleForms() {
             const loginForm = document.getElementById('login-form');
