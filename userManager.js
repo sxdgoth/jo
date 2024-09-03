@@ -12,11 +12,11 @@ class UserManager {
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
             // Update in localStorage
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const updatedUsers = users.map(user => 
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users = users.map(user => 
                 user.username === loggedInUser.username ? {...user, coins: newCoins} : user
             );
-            localStorage.setItem('users', JSON.stringify(updatedUsers));
+            localStorage.setItem('users', JSON.stringify(users));
 
             return true;
         }
