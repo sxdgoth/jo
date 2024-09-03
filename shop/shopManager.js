@@ -69,23 +69,22 @@ function updateTotalValueDisplay() {
     }
 }
     
-  function toggleItem(itemId) {
+function toggleItem(itemId) {
     console.log('toggleItem called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
-        if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            if (selectedItems[item.type] === itemId) {
-                // Item is being deselected
-                delete selectedItems[item.type];
-                console.log('Reverting item:', item.type);
-                window.avatarDisplay.revertItem(item.type);
-            } else {
-                // Item is being selected
-                selectedItems[item.type] = itemId;
-                console.log('Trying on item:', item.name);
-                window.avatarDisplay.tryOnItem(item);
-            }
+        
+        if (selectedItems[item.type] === itemId) {
+            // Item is being deselected
+            delete selectedItems[item.type];
+            console.log('Item deselected:', item.type);
+        } else {
+            // Item is being selected
+            selectedItems[item.type] = itemId;
+            console.log('Item selected:', item.type, itemId);
+        }
+
         } else {
             console.error('avatarDisplay not found or tryOnItem is not a function');
         }
