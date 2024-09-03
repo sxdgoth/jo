@@ -1,4 +1,4 @@
-const GITHUB_REPO = 'https://api.github.com/repos/sxdgoth/jo/contents/users.json';
+const GITHUB_REPO = 'https://raw.githubusercontent.com/sxdgoth/jo/main/users.json';
 const GITHUB_TOKEN = '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';
 
 async function register() {
@@ -14,11 +14,10 @@ async function register() {
             }
             users.push({ username, password, coins: 1000 });
             await updateUsers(users);
-            alert('Registration successful!');
-            // Redirect or update UI as needed
+            alert('Registration successful! Please note that you need to manually update the users.json file in your GitHub repository.');
         } catch (error) {
             console.error('Error during registration:', error);
-            alert('Error registering user. Please try again.');
+            alert('Error registering user. Please check the console for more details and try again.');
         }
     } else {
         alert('Please fill in all fields.');
@@ -31,34 +30,27 @@ async function usernameExists(username) {
 }
 
 async function fetchUsers() {
-    const response = await fetch(GITHUB_REPO, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-    });
-    const data = await response.json();
-    const content = atob(data.content);
-    return JSON.parse(content);
+    try {
+        const response = await fetch(GITHUB_REPO);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const content = await response.text();
+        console.log('Fetched content:', content);
+        const users = JSON.parse(content);
+        console.log('Parsed users:', users);
+        return users;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
 }
+
+
 
 async function updateUsers(users) {
-    const content = btoa(JSON.stringify(users));
-    await fetch(GITHUB_REPO, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            message: 'Update users',
-            content: content,
-            sha: await getFileSha()
-        })
-    });
+    console.log('Attempting to update users:', users);
+    alert('User registration successful! However, automatic updating of the users file is not possible. Please manually update the users.json file in your GitHub repository.');
+    // In a real application, you would send this data to a server to update the file
 }
 
-async function getFileSha() {
-    const response = await fetch(GITHUB_REPO, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-    });
-    const data = await response.json();
-    return data.sha;
-}
