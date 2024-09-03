@@ -432,21 +432,24 @@ blendColors(color1, color2, ratio) {
     }
 }
 
- clearSelectedItems() {
-        console.log('Clearing all selected items');
-        
-        // Reset current items
-        this.currentItems = {};
-        console.log('Current items reset:', this.currentItems);
-        
-        // Reload the equipped items
-        this.loadEquippedItems();
-        console.log('Equipped items reloaded:', this.equippedItems);
-        
-        // Reload the avatar to show only equipped items
-        this.loadAvatar();
-        console.log('Avatar reloaded');
-    }
+clearSelectedItems() {
+    console.log('Clearing all selected items');
+    
+    // Reset current items
+    this.currentItems = {};
+    console.log('Current items reset:', this.currentItems);
+    
+    // Reload the equipped items
+    this.loadEquippedItems();
+    console.log('Equipped items reloaded:', this.equippedItems);
+    
+    // Reload the avatar to show only equipped items
+    this.loadAvatar();
+    console.log('Avatar reloaded');
+
+    // Show notification
+    window.notificationManager.show('Selected items cleared', 'info');
+}
     
     toggleEquippedItem(type) {
         if (this.layers[type] && this.equippedItems[type]) {
