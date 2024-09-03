@@ -6,15 +6,26 @@ async function register() {
 
     if (username && password) {
         try {
-            let users = await fetchUsers();
-            if (users.some(user => user.username === username)) {
-                alert('Username already exists. Please choose a different username.');
-                return;
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            users.push({ username, password, coins: 1000 });
-            await updateUsers(users);
-            alert('Registration successful! You have been awarded 1000 coins.');
-            window.location.href = 'home/index.html';
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Registration successful! You have been awarded 1000 coins.');
+                window.location.href = 'home/index.html';
+            } else {
+                alert(data.message || 'Error registering user. Please try again.');
+            }
         } catch (error) {
             console.error('Error during registration:', error);
             alert('Error registering user. Please try again.');
