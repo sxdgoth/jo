@@ -1,4 +1,11 @@
-document.addEventListener('DOMContentLoaded', loadUsers);
+document.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+        window.location.href = 'admin-login.html';
+        return;
+    }
+
+    loadUsers();
+});
 
 function loadUsers() {
     const users = JSON.parse(localStorage.getItem('users')) || [];
@@ -46,4 +53,9 @@ function sendCoins() {
     localStorage.setItem('users', JSON.stringify(users));
     loadUsers();
     alert(`Successfully sent ${amount} coins to ${recipient}.`);
+}
+
+function logout() {
+    sessionStorage.removeItem('adminLoggedIn');
+    window.location.href = 'admin-login.html';
 }
