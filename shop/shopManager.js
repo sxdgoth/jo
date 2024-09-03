@@ -69,27 +69,30 @@ function updateTotalValueDisplay() {
     }
 }
     
-   function toggleItem(itemId) {
+  function toggleItem(itemId) {
     console.log('toggleItem called with itemId:', itemId);
     const item = shopItems.find(i => i.id === itemId);
     if (item) {
         console.log(`Toggling item: ${item.name} (ID: ${item.id}, Type: ${item.type})`);
         if (window.avatarDisplay && typeof window.avatarDisplay.tryOnItem === 'function') {
-            console.log('Calling avatarDisplay.tryOnItem');
-            window.avatarDisplay.tryOnItem(item);
+            if (selectedItems[item.type] === itemId) {
+                // Item is being deselected
+                delete selectedItems[item.type];
+                console.log('Reverting item:', item.type);
+                window.avatarDisplay.revertItem(item.type);
+            } else {
+                // Item is being selected
+                selectedItems[item.type] = itemId;
+                console.log('Trying on item:', item.name);
+                window.avatarDisplay.tryOnItem(item);
+            }
         } else {
             console.error('avatarDisplay not found or tryOnItem is not a function');
         }
 
-        if (selectedItems[item.type] === itemId) {
-            delete selectedItems[item.type];
-        } else {
-            selectedItems[item.type] = itemId;
-        }
-
         updateSelectedItems();
         updateTotalValueDisplay();
-        updateBuySelectedItemsButton(); // Add this line
+        updateBuySelectedItemsButton();
         console.log('Updated selectedItems:', selectedItems);
     } else {
         console.error('Item not found for id:', itemId);
